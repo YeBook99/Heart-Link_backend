@@ -1,5 +1,6 @@
-package com.ss.heartlinkapi.couple.entity;
+package com.ss.heartlinkapi.mission.entity;
 
+import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,13 +11,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class CoupleLinkMissionEntity {
+@Table(name = "link_mission")
+public class LinkMissionEntity {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long linkMissionId;
-    @Column(name = "couple_id")
-    private Long coupleId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "couple_id")
+    private CoupleEntity coupleId;
+
+    // 나중에 연결하기
     @Column(name = "linktag_id")
     private Long linkTagId;
     private String missionMonth;

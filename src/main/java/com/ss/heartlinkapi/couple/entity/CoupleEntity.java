@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.couple.entity;
 
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -8,15 +9,19 @@ import java.util.Date;
 
 @Entity
 @Data
+@Table(name = "couple")
 public class CoupleEntity {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long coupleId;
 
-    // 외래키 설정 필요
-    private Long user1;
-    private Long user2;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "users1_id" , nullable = false)
+    private UserEntity user1;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "users2_id" , nullable = false)
+    private UserEntity user2;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;

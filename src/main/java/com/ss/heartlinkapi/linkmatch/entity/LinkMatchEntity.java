@@ -1,11 +1,18 @@
-package com.ss.heartlinkapi.couple.entity;
+package com.ss.heartlinkapi.linkmatch.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Table(name = "link_match")
 @Entity
-public class CoupleLinkMatchEntity {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LinkMatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
