@@ -8,17 +8,20 @@ import java.util.Date;
 public class CoupleLinkMatchAnswerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long LinkMatchAnswerId;
 
-    @Column(name = "user_id")
+    // user 외래키 달기
     private Long userId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "couple_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "coupleId", nullable = false)
     private CoupleEntity coupleId;
 
-    private Long matchId;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "linkMatchId")
+    private CoupleLinkMatchEntity matchId;
+
     private int choice;
     private Date createdAt;
 

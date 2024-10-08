@@ -10,14 +10,15 @@ import java.util.Date;
 @Data
 public class CoupleEntity {
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long coupleId;
+
     // 외래키 설정 필요
     private Long user1;
     private Long user2;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
     @Column(name = "anniversary_date")
     private Date anniversaryDate;
