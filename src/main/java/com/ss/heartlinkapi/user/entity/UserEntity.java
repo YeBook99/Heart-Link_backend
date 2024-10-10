@@ -39,7 +39,8 @@ public class UserEntity {
     @Column(length = 1)
     private char gender;	// 성별 남:M, 여:F
     
-    private LocalDate birthdate; // 생년월일(6자)  
+    @Column(name = "birth_date")
+    private LocalDate birthDate; // 생년월일(6자)  
     
     private String roles; // 역할 여러 개 일시 ','로 구분
     
