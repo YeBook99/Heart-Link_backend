@@ -1,10 +1,15 @@
 package com.ss.heartlinkapi.couple.controller;
 
+import com.ss.heartlinkapi.couple.dto.MatchAnswer;
 import com.ss.heartlinkapi.couple.service.CoupleMatchService;
+import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
+import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/couple")
@@ -13,16 +18,27 @@ public class CoupleMatchController {
     @Autowired
     private CoupleMatchService coupleMatchService;
 
-    // 커플 매치 질문 저장
-
+    // 커플 매치 질문 조회
+    @GetMapping("/missionmatch/questions")
+    public LinkMatchEntity getMatchQuestion() {
+        LinkMatchEntity result = coupleMatchService.getMatchQuestion();
+        if(result != null) {
+            return result;
+        } else {
+            return null;
+        }
+    }
 
     // 커플 매치 답변 저장
     @PostMapping("/missionmatch/questions/choose")
-    public ResponseEntity<?> matchChoose(@RequestParam Long userId, @RequestParam Long questionId, @RequestParam int selectedOption) {
-        System.out.println(userId);
+    public ResponseEntity<?> matchChoose(@RequestBody MatchAnswer matchAnswer) {
 
-        coupleMatchService.answerSave(userId, questionId, selectedOption);
-        return ResponseEntity.ok(HttpStatus.OK);
+        LinkMatchAnswerEntity result = coupleMatchService.answerSave(matchAnswer);
+        if(result != null) {
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

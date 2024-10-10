@@ -10,10 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchAnswer {
-    private Long answerId;
     private Long userId;
-    private Long coupleId;
-    private Long matchId;
-    private int choice;
-    private Date createdAt;
+    private Long questionId;
+    private int selectedOption;
 }

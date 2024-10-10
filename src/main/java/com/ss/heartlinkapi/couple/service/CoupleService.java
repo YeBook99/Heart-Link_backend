@@ -10,8 +10,7 @@ public class CoupleService {
     @Autowired
     private CoupleRepository coupleRepository;
 
-    public CoupleEntity findById(Long id) {
-        return coupleRepository.findById(id).orElse(null);
+    public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
+        return coupleRepository.findCoupleByUserId(id);
     }
-
 }
