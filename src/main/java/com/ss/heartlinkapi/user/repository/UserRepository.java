@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
-
+	boolean existsByPhone(String phone);
 }
