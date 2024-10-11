@@ -6,4 +6,5 @@ import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
 	boolean existsByPhone(String phone);
+	boolean existsByLoginId(String loginId);
 }

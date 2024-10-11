@@ -11,33 +11,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.heartlinkapi.login.dto.JoinDTO;
-import com.ss.heartlinkapi.login.service.JoinService;
+import com.ss.heartlinkapi.login.service.LoginService;
 
 @RestController
 @RequestMapping("/user")
 public class LoginController {
 	
-	private final JoinService joinService;
-	public LoginController(JoinService joinService) {
-		this.joinService = joinService;
+	private final LoginService loginService;
+	public LoginController(LoginService loginService) {
+		this.loginService = loginService;
 	}
 
 	@GetMapping("/idcheck")
 	public ResponseEntity<?> usercheck(@RequestBody Map<String, String> request) {
 		String loginId = request.get("loginId");
-		
-		
-		return ResponseEntity.ok().build();
+		boolean isExist =  loginService.checkId(loginId);
+		if(isExist) {
+			return ResponseEntity.badRequest().build();
+		}else {
+			return ResponseEntity.ok().build();
+		}
 	}
 
 	@PostMapping("/join")
 	public ResponseEntity<?> join(@RequestBody JoinDTO joinDTO) {
 		//이미 있는 회원 400(bad request)
-		boolean isUser = joinService.isUser(joinDTO.getPhone());
+		boolean isUser = loginService.isUser(joinDTO.getPhone());
 		if(isUser) {
 			return ResponseEntity.badRequest().build();
 		}			
-		boolean isJoin=joinService.saveUser(joinDTO);
+		boolean isJoin=loginService.saveUser(joinDTO);
 		if(isJoin) {
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		}else {
