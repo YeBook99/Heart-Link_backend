@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.linkmatch.controller;
 
+import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linkmatch.dto.MatchAnswer;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchService;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/couple")
@@ -33,6 +36,7 @@ public class CoupleMatchController {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -77,6 +81,24 @@ public class CoupleMatchController {
             return ResponseEntity.internalServerError().build();
         }
 
+    }
+
+    // 매치 답변 내역 조회
+    @GetMapping("/missionmatch/answerList/{coupleId}")
+    public ResponseEntity<?> getMatchAnswerList(@PathVariable Long coupleId) {
+        // 오류 500 검사
+        try{
+            // 오류 400 검사
+            if(coupleId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            CoupleEntity couple = coupleService.findById(coupleId);
+        List<LinkMatchAnswerEntity> answerList = coupleMatchService.findAnswerListByCoupleId(couple);
+        return ResponseEntity.ok(answerList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

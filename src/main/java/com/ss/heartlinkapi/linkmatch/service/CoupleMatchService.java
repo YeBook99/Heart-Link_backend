@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class CoupleMatchService {
@@ -66,7 +67,13 @@ public class CoupleMatchService {
         return matchRepository.findByDisplayDate(today);
     }
 
+    // 매칭 성공 체크
     public int checkTodayMatching(Long coupleId) {
         return answerRepository.checkTodayMatching(coupleId);
+    }
+
+    // 매치 답변 내역 조회
+    public List<LinkMatchAnswerEntity> findAnswerListByCoupleId(CoupleEntity couple) {
+        return answerRepository.findByCoupleId(couple);
     }
 }

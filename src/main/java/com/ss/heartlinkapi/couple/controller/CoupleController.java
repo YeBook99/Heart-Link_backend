@@ -35,6 +35,7 @@ public class CoupleController {
             return ResponseEntity.ok(setCouple);
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
@@ -57,6 +58,7 @@ public class CoupleController {
             CoupleEntity result = coupleService.setAnniversary(couple);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }

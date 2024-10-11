@@ -24,6 +24,7 @@ public class AdminCoupleController {
             Page<LinkMatchEntity> questions = adminCoupleService.findAllByOrderByIdDesc(page, size);
             return ResponseEntity.ok(questions);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -42,6 +43,7 @@ public class AdminCoupleController {
             }
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -65,6 +67,7 @@ public class AdminCoupleController {
             return ResponseEntity.ok(result);
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -89,6 +92,7 @@ public class AdminCoupleController {
                 return ResponseEntity.ok().build();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
