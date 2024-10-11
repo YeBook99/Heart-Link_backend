@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.login.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,19 +8,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.heartlinkapi.login.dto.JoinDTO;
+import com.ss.heartlinkapi.login.service.JoinService;
 
 @RestController
 public class LoginController {
+	
+	private final JoinService joinService;
+	public LoginController(JoinService joinService) {
+		this.joinService = joinService;
+	}
 
-		@GetMapping("/user")
-		public String user() {
-			return "확인용 user컨트롤러";
+	@GetMapping("/user")
+	public String user() {
+		return "확인용 user컨트롤러";
+	}
+
+	@PostMapping("/user/join")
+	public ResponseEntity<?> join(@RequestBody JoinDTO joinDTO) {
+		//이미 있는 회원 400(bad request)
+		boolean isUser = joinService.isUser(joinDTO.getPhone());
+		if(isUser) {
+			return ResponseEntity.badRequest().build();
+		}			
+		boolean isJoin=joinService.saveUser(joinDTO);
+		if(isJoin) {
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+		}else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
-		@PostMapping("/user/join")
-		public ResponseEntity<?> join(@RequestBody JoinDTO joinDTO) {
-			
-			//dto설정 넘어오는정보다받아오기
-			//6강 https://www.devyummi.com/page?id=668d525886d3d643f4c18ba0 문서참조회원가입마무리
-			return null;
-		}
+	}
 }
