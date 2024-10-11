@@ -12,13 +12,13 @@ import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 
 @Service
-public class JoinService {
+public class LoginService {
 	
 	private final UserRepository userRepository;
 	private final ProfileRepository profileRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
 
-	public JoinService(UserRepository userRepository, ProfileRepository profileRepository,
+	public LoginService(UserRepository userRepository, ProfileRepository profileRepository,
 			BCryptPasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.profileRepository = profileRepository;
@@ -52,6 +52,10 @@ public class JoinService {
 	        System.err.println("saveUser 실패: " + e.getMessage());
 	        return false;
 	    }
+	}
+
+	public boolean checkId(String loginId) {
+		return userRepository.existsByLoginId(loginId);
 	}
 	
 }
