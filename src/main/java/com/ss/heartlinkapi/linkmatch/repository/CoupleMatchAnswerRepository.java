@@ -1,9 +1,12 @@
 package com.ss.heartlinkapi.linkmatch.repository;
 
+import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnswerEntity, Long> {
 
@@ -17,5 +20,8 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "FROM LinkMatchAnswerEntity a " +
             "WHERE a.coupleId.coupleId = :coupleId " +
             "AND DATE(a.createdAt) = CURRENT_DATE")
-    int checkTodayMatch(@Param("coupleId") Long coupleId);
+    int checkTodayMatching(@Param("coupleId") Long coupleId);
+
+    // 매치 답변 내역 조회
+    List<LinkMatchAnswerEntity> findByCoupleId(CoupleEntity coupleId);
 }

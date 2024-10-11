@@ -17,13 +17,16 @@ public class CoupleController {
     // 디데이 설정
     @PostMapping("/dday")
     public ResponseEntity<?> setAnniversaryDay(@RequestBody Dday dDayData) {
+        // 오류 500 검사
         try{
+            // 오류 400 검사
             if(dDayData == null) {
                 return ResponseEntity.badRequest().build();
             }
 
             CoupleEntity couple = coupleService.findById(dDayData.getCoupleId());
 
+            // 오류 404 검사
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -32,6 +35,7 @@ public class CoupleController {
             return ResponseEntity.ok(setCouple);
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
@@ -39,11 +43,14 @@ public class CoupleController {
     // 디데이 수정
     @PutMapping("/dday/update")
     public ResponseEntity<?> updateAnniversaryDay(@RequestBody Dday dDayData) {
+        // 오류 500 검사
         try{
+            // 오류 400 검사
             if(dDayData == null) {
                 return ResponseEntity.badRequest().build();
             }
             CoupleEntity couple = coupleService.findById(dDayData.getCoupleId());
+            // 오류 404 검사
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -51,6 +58,7 @@ public class CoupleController {
             CoupleEntity result = coupleService.setAnniversary(couple);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
