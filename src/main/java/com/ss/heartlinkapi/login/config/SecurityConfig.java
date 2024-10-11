@@ -20,6 +20,7 @@ public class SecurityConfig {
 			.httpBasic().disable()
 			.sessionManagement(config->config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
+												.antMatchers("/user/idcheck").permitAll()
 												.anyRequest().authenticated());
 
 			return http.build();	
