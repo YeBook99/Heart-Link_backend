@@ -18,6 +18,7 @@ import com.ss.heartlinkapi.login.service.LoginService;
 public class LoginController {
 	
 	private final LoginService loginService;
+	
 	public LoginController(LoginService loginService) {
 		this.loginService = loginService;
 	}
