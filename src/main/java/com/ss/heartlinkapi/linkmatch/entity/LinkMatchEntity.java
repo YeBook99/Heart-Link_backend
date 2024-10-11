@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Table(name = "link_match")
@@ -20,6 +21,6 @@ public class LinkMatchEntity {
     private String match1;
     private String match2;
     @Column(name = "display_date")
-    private Date displayDate;
+    private LocalDate displayDate;
 
 }

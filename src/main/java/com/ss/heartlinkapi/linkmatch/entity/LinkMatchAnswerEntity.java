@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -33,6 +34,6 @@ public class LinkMatchAnswerEntity {
     private LinkMatchEntity matchId;
 
     private int choice;
-    private Date createdAt;
+    private LocalDate createdAt;
 
 }

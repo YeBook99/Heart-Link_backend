@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -26,7 +27,9 @@ public class CoupleEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
     @Column(name = "anniversary_date")
-    private Date anniversaryDate;
+    private LocalDate anniversaryDate;
     @Column(name = "breakup_date")
-    private Date breakupDate;
+    private LocalDate breakupDate;
+    @Column(name = "match_count")
+    private Integer matchCount = 0;
 }
