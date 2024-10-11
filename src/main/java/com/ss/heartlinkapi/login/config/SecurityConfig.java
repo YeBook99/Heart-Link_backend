@@ -19,7 +19,7 @@ public class SecurityConfig {
 			.formLogin().disable()
 			.httpBasic().disable()
 			.sessionManagement(config->config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth.antMatchers("/user").permitAll()
+			.authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
 												.anyRequest().authenticated());
 
 			return http.build();	
