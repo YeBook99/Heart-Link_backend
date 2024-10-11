@@ -37,12 +37,10 @@ public class UserEntity {
     private String name; // 이름 
     
     @Column(length = 1)
-    private char gender;	// 성별 남:M, 여:F
+    private char gender; // 성별 남:M, 여:F
     
-    @Column(name = "birth_date")
-    private LocalDate birthDate; // 생년월일(6자)  
-    
-    private String roles; // 역할 여러 개 일시 ','로 구분
+    @Enumerated(EnumType.STRING)
+    private Role role; // 역할
     
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
