@@ -1,7 +1,5 @@
-package com.ss.heartlinkapi.couple.repository;
+package com.ss.heartlinkapi.linkmatch.repository;
 
-import com.ss.heartlinkapi.couple.dto.MatchAnswer;
-import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

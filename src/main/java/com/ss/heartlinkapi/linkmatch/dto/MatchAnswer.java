@@ -1,10 +1,8 @@
-package com.ss.heartlinkapi.couple.dto;
+package com.ss.heartlinkapi.linkmatch.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 @Data
 @NoArgsConstructor

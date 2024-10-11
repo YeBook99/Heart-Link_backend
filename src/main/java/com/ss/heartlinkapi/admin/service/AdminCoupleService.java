@@ -21,23 +21,31 @@ public class AdminCoupleService {
     }
 
     // 매치 질문 등록
-    public void addMatchQuestion(LinkMatchEntity questionText) {
-        coupleMatchRepository.save(questionText);
+    public LinkMatchEntity addMatchQuestion(LinkMatchEntity questionText) {
+        LinkMatchEntity result = coupleMatchRepository.save(questionText);
+        return result;
     }
 
     // 매치 질문 수정
-    public void updateMatchQuestion(Long questionId, LinkMatchEntity questionText) {
+    public LinkMatchEntity updateMatchQuestion(Long questionId, LinkMatchEntity questionText) {
         LinkMatchEntity matchQuestion = coupleMatchRepository.findById(questionId).orElse(null);
         if (matchQuestion != null) {
             matchQuestion.setMatch1(questionText.getMatch1());
             matchQuestion.setMatch2(questionText.getMatch2());
             matchQuestion.setDisplayDate(questionText.getDisplayDate());
-            coupleMatchRepository.save(matchQuestion);
+            return coupleMatchRepository.save(matchQuestion);
+        } else {
+            return null;
         }
     }
 
     // 매치 질문 삭제
     public void deleteMatchQuestion(Long questionId) {
         coupleMatchRepository.deleteById(questionId);
+    }
+
+    // 질문 아이디로 검색
+    public LinkMatchEntity findById(Long questionId) {
+        return coupleMatchRepository.findById(questionId).orElse(null);
     }
 }
