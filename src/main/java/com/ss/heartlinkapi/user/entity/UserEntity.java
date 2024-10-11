@@ -22,24 +22,25 @@ public class UserEntity {
     @Column(name = "id", nullable = false)
     private Long userId; // 기본키 회원id
     
-    @Column(name = "login_id")
+    @Column(name = "login_id", length = 30)
 	private String loginId; // 일반 로그인 회원 아이디
     
-    @Column(unique = true)
+    @Column(unique = true, length = 100)
     private String email; // 이메일(중복체크)
     
     private String password; // 비밀번호(8~16자이내 특수문자/영어/숫자 모두 포함)
     
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false,length = 20)
     private String phone; // 전화번호(문자인증)  
     
+    @Column(length = 20)
     private String name; // 이름 
     
-    private boolean gender;	// 성별 남:0, 여:1
+    @Column(length = 1)
+    private char gender; // 성별 남:M, 여:F
     
-    private LocalDate birthdate; // 생년월일(6자)  
-    
-    private String roles; // 역할 여러 개 일시 ','로 구분
+    @Enumerated(EnumType.STRING)
+    private Role role; // 역할
     
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
