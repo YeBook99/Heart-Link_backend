@@ -55,13 +55,4 @@ public class CoupleMatchController {
 
     }
 
-//    // 커플 매치 성공여부 확인 임시
-//    @Autowired
-//    private CoupleMatchAnswerRepository rep;
-//    @GetMapping("/missionmatch/questionss")
-//    public int getMatchcheck() {
-//        int result = rep.checkTodayMatch(1L);
-//        System.out.println(result);
-//        return result;
-//    }
 }

@@ -31,5 +31,5 @@ public class CoupleEntity {
     @Column(name = "breakup_date")
     private LocalDate breakupDate;
     @Column(name = "match_count")
-    private int matchCount = 0;
+    private Integer matchCount = 0;
 }
