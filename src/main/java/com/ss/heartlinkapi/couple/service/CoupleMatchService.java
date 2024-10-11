@@ -48,8 +48,13 @@ public class CoupleMatchService {
 
         try{
             LinkMatchAnswerEntity entity = answerRepository.save(answerEntity);
+
+            System.out.println("커플아이디 : "+couple.getCoupleId());
+            int result = answerRepository.checkTodayMatch(couple.getCoupleId());
+            System.out.println("결과 : "+result);
             return entity;
         } catch (Exception e){
+            e.printStackTrace();
             return null;
         }
 
@@ -61,4 +66,5 @@ public class CoupleMatchService {
         LocalDate today = now.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return matchRepository.findByDisplayDate(today);
     }
+
 }

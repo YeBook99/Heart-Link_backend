@@ -21,6 +21,8 @@ public class SecurityConfig {
 			.sessionManagement(config->config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
 												.antMatchers("/user/idcheck").permitAll()
+												// 예능 전용
+												.antMatchers("/couple/**", "/admin/**").permitAll()
 												.anyRequest().authenticated());
 
 			return http.build();	

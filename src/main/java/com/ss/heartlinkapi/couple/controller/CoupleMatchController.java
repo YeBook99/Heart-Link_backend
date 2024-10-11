@@ -1,6 +1,8 @@
 package com.ss.heartlinkapi.couple.controller;
 
 import com.ss.heartlinkapi.couple.dto.MatchAnswer;
+import com.ss.heartlinkapi.couple.repository.CoupleMatchAnswerRepository;
+import com.ss.heartlinkapi.couple.repository.CoupleMatchRepository;
 import com.ss.heartlinkapi.couple.service.CoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
@@ -41,4 +43,13 @@ public class CoupleMatchController {
         }
     }
 
+//    // 커플 매치 성공여부 확인 임시
+//    @Autowired
+//    private CoupleMatchAnswerRepository rep;
+//    @GetMapping("/missionmatch/questionss")
+//    public int getMatchcheck() {
+//        int result = rep.checkTodayMatch(1L);
+//        System.out.println(result);
+//        return result;
+//    }
 }
