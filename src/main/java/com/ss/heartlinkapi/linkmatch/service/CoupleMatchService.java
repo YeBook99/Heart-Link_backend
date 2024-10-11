@@ -49,7 +49,7 @@ public class CoupleMatchService {
             LinkMatchAnswerEntity entity = answerRepository.save(answerEntity);
 
             System.out.println("커플아이디 : "+couple.getCoupleId());
-            int result = answerRepository.checkTodayMatch(couple.getCoupleId());
+            int result = answerRepository.checkTodayMatching(couple.getCoupleId());
             System.out.println("결과 : "+result);
             return entity;
         } catch (Exception e){
@@ -66,4 +66,7 @@ public class CoupleMatchService {
         return matchRepository.findByDisplayDate(today);
     }
 
+    public int checkTodayMatching(Long coupleId) {
+        return answerRepository.checkTodayMatching(coupleId);
+    }
 }

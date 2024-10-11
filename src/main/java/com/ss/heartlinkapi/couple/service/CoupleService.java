@@ -24,4 +24,9 @@ public class CoupleService {
     public CoupleEntity setAnniversary(CoupleEntity couple) {
         return coupleRepository.save(couple);
     }
+
+    // 커플 매칭 카운트 증가
+    public int matchCountUp(Long coupleId) {
+        return coupleRepository.matchCountUp(coupleId);
+    }
 }

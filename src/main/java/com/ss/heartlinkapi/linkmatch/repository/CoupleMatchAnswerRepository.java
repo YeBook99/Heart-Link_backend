@@ -17,5 +17,5 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "FROM LinkMatchAnswerEntity a " +
             "WHERE a.coupleId.coupleId = :coupleId " +
             "AND DATE(a.createdAt) = CURRENT_DATE")
-    int checkTodayMatch(@Param("coupleId") Long coupleId);
+    int checkTodayMatching(@Param("coupleId") Long coupleId);
 }
