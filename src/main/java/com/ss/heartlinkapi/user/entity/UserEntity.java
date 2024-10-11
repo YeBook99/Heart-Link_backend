@@ -1,8 +1,6 @@
 package com.ss.heartlinkapi.user.entity;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import javax.persistence.*;
 
 import org.springframework.data.annotation.CreatedDate;
