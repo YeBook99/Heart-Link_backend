@@ -1,7 +1,5 @@
 package com.ss.heartlinkapi.login.dto;
 
-import java.time.LocalDate;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
