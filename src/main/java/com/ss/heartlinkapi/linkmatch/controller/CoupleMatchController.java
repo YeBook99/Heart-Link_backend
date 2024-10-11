@@ -23,9 +23,10 @@ public class CoupleMatchController {
     // 커플 매치 질문 조회
     @GetMapping("/missionmatch/questions")
     public ResponseEntity<?> getMatchQuestion() {
+        // 오류 500 검사
         try {
             LinkMatchEntity result = coupleMatchService.getMatchQuestion();
-
+            // 오류 404 검사
             if (result != null) {
                 return ResponseEntity.ok(result);
             } else {
