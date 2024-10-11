@@ -25,10 +25,10 @@ public class CoupleMatchController {
             if (result != null) {
                 return ResponseEntity.ok(result);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -39,18 +39,18 @@ public class CoupleMatchController {
         try {
             if (matchAnswer == null || matchAnswer.getQuestionId() == null
                     || matchAnswer.getSelectedOption() > 1 || matchAnswer.getSelectedOption() < 0 || matchAnswer.getUserId() == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                return ResponseEntity.badRequest().build();
             }
 
             LinkMatchAnswerEntity result = coupleMatchService.answerSave(matchAnswer);
             if (result != null) {
-                return new ResponseEntity<>(result, HttpStatus.OK);
+                return ResponseEntity.ok(result);
             } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                return ResponseEntity.notFound().build();
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.internalServerError().build();
         }
 
     }

@@ -17,44 +17,71 @@ public class AdminCoupleController {
 
     // 매치 질문 조회
     @GetMapping("/questions")
-    public Page<LinkMatchEntity> getAllquestions
-            (@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-
-        System.out.println(adminCoupleService.findAllByOrderByIdDesc(page, size).toString());
-        return adminCoupleService.findAllByOrderByIdDesc(page, size);
+    public ResponseEntity<?> getAllquestions
+    (@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
+        try {
+            Page<LinkMatchEntity> questions = adminCoupleService.findAllByOrderByIdDesc(page, size);
+            return ResponseEntity.ok(questions);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     // 매치 질문 등록
     @PostMapping("/questions")
     public ResponseEntity<?> addMatchQuestion(@RequestBody LinkMatchEntity questionText) {
-        LinkMatchEntity result = adminCoupleService.addMatchQuestion(questionText);
-        if(result != null) {
+        try {
+            LinkMatchEntity result = adminCoupleService.addMatchQuestion(questionText);
+
+            if (questionText == null || questionText.getMatch1() == null || questionText.getMatch2() == null
+                    || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
+                return ResponseEntity.badRequest().build();
+            }
             return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     // 매치 질문 수정
     @PutMapping("/questions/{questionId}/update")
     public ResponseEntity<?> updateMatchQuestion(@PathVariable Long questionId, @RequestBody LinkMatchEntity questionText) {
-        LinkMatchEntity result = adminCoupleService.updateMatchQuestion(questionId, questionText);
-        if(result != null) {
+        try{
+            LinkMatchEntity result = adminCoupleService.updateMatchQuestion(questionId, questionText);
+
+            if(questionText == null || questionText.getMatch1() == null || questionText.getMatch2() == null
+            || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            if (result == null) {
+                return ResponseEntity.notFound().build();
+            }
+
             return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.notFound().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     // 매치 질문 삭제
     @DeleteMapping("/questions/{questionId}/delete")
     public ResponseEntity<?> deleteMatchQuestion(@PathVariable Long questionId) {
-        LinkMatchEntity question = adminCoupleService.findById(questionId);
-        if(question != null) {
-            adminCoupleService.deleteMatchQuestion(questionId);
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
+        try{
+            if(questionId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            LinkMatchEntity question = adminCoupleService.findById(questionId);
+
+            if (question == null) {
+                return ResponseEntity.notFound().build();
+            } else {
+                adminCoupleService.deleteMatchQuestion(questionId);
+                return ResponseEntity.ok().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 
