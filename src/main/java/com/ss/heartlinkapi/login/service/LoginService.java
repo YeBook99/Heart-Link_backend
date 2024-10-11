@@ -24,7 +24,11 @@ public class LoginService {
 		this.profileRepository = profileRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
-
+	
+	public boolean checkId(String loginId) {
+		return userRepository.existsByLoginId(loginId);
+	}
+	
 	public boolean isUser(String phone) {
 		return userRepository.existsByPhone(phone);	
 	}
@@ -52,10 +56,6 @@ public class LoginService {
 	        System.err.println("saveUser 실패: " + e.getMessage());
 	        return false;
 	    }
-	}
-
-	public boolean checkId(String loginId) {
-		return userRepository.existsByLoginId(loginId);
 	}
 	
 }
