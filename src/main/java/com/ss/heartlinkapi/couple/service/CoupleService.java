@@ -10,6 +10,7 @@ public class CoupleService {
     @Autowired
     private CoupleRepository coupleRepository;
 
+    // 유저아이디로 커플아이디 조회
     public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
         return coupleRepository.findCoupleByUserId(id);
     }

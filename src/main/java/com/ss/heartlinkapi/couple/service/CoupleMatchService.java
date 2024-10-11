@@ -60,7 +60,7 @@ public class CoupleMatchService {
 
     }
 
-    // 매일 새 매치질문 조회
+    // 오늘의 매치 질문 조회
     public LinkMatchEntity getMatchQuestion() {
         Date now = new Date();
         LocalDate today = now.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();

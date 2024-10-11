@@ -6,5 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdminCoupleMatchRepository extends JpaRepository<LinkMatchEntity, Long> {
+
+    // 매치 질문 조회
     Page<LinkMatchEntity> findAllByOrderByLinkMatchIdDesc(Pageable pageable);
 }
