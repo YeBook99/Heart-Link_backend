@@ -18,4 +18,8 @@ public class AdminCoupleService {
         Pageable pageable = PageRequest.of(page, size);
         return coupleMatchRepository.findAllByOrderByLinkMatchIdDesc(pageable);
     }
+
+    public void addMatchQuestion(LinkMatchEntity questionText) {
+        coupleMatchRepository.save(questionText);
+    }
 }
