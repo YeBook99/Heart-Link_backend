@@ -24,6 +24,7 @@ public class LinkMissionEntity {
     @JoinColumn(name = "link_tag_id")
     @OneToOne(fetch = FetchType.EAGER)
     private LinkTagEntity linkTagId;
+    
     private String missionMonth;
     private int completedCount;
 }
