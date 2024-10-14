@@ -1,4 +1,4 @@
-package com.ss.heartlinkapi.message.dto;
+package com.ss.heartlinkapi.message.entity;
 
 
 import lombok.Data;
