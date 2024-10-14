@@ -58,4 +58,8 @@ public class LoginService {
 	    }
 	}
 	
+	public UserEntity findByLoginId(String loginId) {
+		return userRepository.findByLoginId(loginId);
+	}
+	
 }
