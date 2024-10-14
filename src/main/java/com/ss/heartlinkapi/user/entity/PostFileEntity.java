@@ -33,7 +33,7 @@ public class PostFileEntity {
 	@Column(name = "file_type", length = 50)
 	private String file_type;
 	
-	@Column(name = "sort_order")
+	@Column(unique = true, name = "sort_order")
 	private int sortOrder;
 
 }
