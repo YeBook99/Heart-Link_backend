@@ -16,5 +16,5 @@ public class JoinDTO {
 	private char gender;
 	private String nickname;
 	private String phone;
-		
+	private String coupleCode;	
 }
