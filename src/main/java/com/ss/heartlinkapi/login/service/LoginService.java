@@ -24,7 +24,11 @@ public class LoginService {
 		this.profileRepository = profileRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
-
+	
+	public boolean checkId(String loginId) {
+		return userRepository.existsByLoginId(loginId);
+	}
+	
 	public boolean isUser(String phone) {
 		return userRepository.existsByPhone(phone);	
 	}
@@ -53,9 +57,9 @@ public class LoginService {
 	        return false;
 	    }
 	}
-
-	public boolean checkId(String loginId) {
-		return userRepository.existsByLoginId(loginId);
+	
+	public UserEntity findByLoginId(String loginId) {
+		return userRepository.findByLoginId(loginId);
 	}
 	
 }
