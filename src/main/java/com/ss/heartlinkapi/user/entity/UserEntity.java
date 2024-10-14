@@ -1,6 +1,8 @@
 package com.ss.heartlinkapi.user.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import javax.persistence.*;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -40,6 +42,9 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private Role role; // 역할
     
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RefreshTokenEntity> refreshTokens; // 리프레시 토큰 목록
+    
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt; // 생성일시
@@ -47,4 +52,5 @@ public class UserEntity {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt; // 수정일시
+    
 }
