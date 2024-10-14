@@ -10,6 +10,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,17 +27,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.login.dto.LoginDTO;
 import com.ss.heartlinkapi.login.service.CustomUserDetailsService;
+import com.ss.heartlinkapi.login.service.RefreshTokenService;
 
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	
 	private final CustomUserDetailsService customUserDetailsService;
 	private final PasswordEncoder passwordEncoder;
 	private final AuthenticationManager authenticationManager;
+	private final JWTUtil jwtUtil;
+	private final RefreshTokenService refreshTokenService;
 
-	public LoginFilter(CustomUserDetailsService customUserDetailsService,PasswordEncoder passwordEncoder,AuthenticationManager authenticationManager) {
+	public LoginFilter(CustomUserDetailsService customUserDetailsService, PasswordEncoder passwordEncoder,
+			AuthenticationManager authenticationManager, JWTUtil jwtUtil, RefreshTokenService refreshTokenService) {
 		this.customUserDetailsService = customUserDetailsService;
 		this.passwordEncoder = passwordEncoder;
 		this.authenticationManager = authenticationManager;
+		this.jwtUtil = jwtUtil;
+		this.refreshTokenService = refreshTokenService;
 	}
 
 	@Override
@@ -72,16 +79,32 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 	
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		super.successfulAuthentication(request, response, chain, authResult);
+			Authentication authentication) throws IOException, ServletException {
+		
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+		String loginId = customUserDetails.getUsername();
+		String role = null;
+		Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
+		if(!authorities.isEmpty()) {
+			GrantedAuthority authority = authorities.iterator().next();
+			role = authority.getAuthority();
+		}
+		
+		 String access = jwtUtil.createJwt("access", loginId, role, 600000L);
+		 String refresh = jwtUtil.createJwt("refresh", loginId, role, 86400000L);
+		 
+		 refreshTokenService.saveRefreshToken(loginId, refresh, 86400000L);
+		 
+		 response.setHeader("Authorization","Bearer "+ access);
+		 response.setHeader("Refresh-Token", refresh);	 
+		 
+		 response.setStatus(HttpStatus.OK.value());
 	}
 	
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		super.unsuccessfulAuthentication(request, response, failed);
+		response.setStatus(401);
 	}
 	
 
