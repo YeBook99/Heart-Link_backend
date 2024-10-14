@@ -1,6 +1,9 @@
 package com.ss.heartlinkapi.login.service;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.SecureRandom;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,9 @@ import com.ss.heartlinkapi.user.repository.UserRepository;
 
 @Service
 public class LoginService {
+	
+	private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	private static final int CODE_LENGTH = 6;
 	
 	private final UserRepository userRepository;
 	private final ProfileRepository profileRepository;
@@ -44,6 +50,7 @@ public class LoginService {
 		user.setGender(joinDTO.getGender());
 		user.setPhone(joinDTO.getPhone());
 		user.setRole(Role.ROLE_USER);
+		user.setCoupleCode(generateRandomCode());
 	    try {
 	        // save user
 	        userRepository.save(user);
@@ -56,6 +63,17 @@ public class LoginService {
 	        System.err.println("saveUser 실패: " + e.getMessage());
 	        return false;
 	    }
+	}
+	
+	public String generateRandomCode() {
+	    SecureRandom random = new SecureRandom();
+	    StringBuilder code = new StringBuilder(CODE_LENGTH);
+	    int charactersLength = CHARACTERS.length();
+	    for (int i = 0; i < CODE_LENGTH; i++) {
+	        int index = random.nextInt(charactersLength);
+	        code.append(CHARACTERS.charAt(index));
+	    }
+	    return code.toString();
 	}
 	
 	public UserEntity findByLoginId(String loginId) {
