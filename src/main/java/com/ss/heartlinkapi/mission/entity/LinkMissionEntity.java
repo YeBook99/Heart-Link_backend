@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.mission.entity;
 
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,10 +21,9 @@ public class LinkMissionEntity {
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "couple_id")
     private CoupleEntity coupleId;
-
-    // 나중에 연결하기
-    @Column(name = "linktag_id")
-    private Long linkTagId;
+    @JoinColumn(name = "link_tag_id")
+    @OneToOne(fetch = FetchType.EAGER)
+    private LinkTagEntity linkTagId;
     private String missionMonth;
     private int completedCount;
 }
