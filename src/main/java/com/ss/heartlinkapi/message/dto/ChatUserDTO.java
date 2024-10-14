@@ -15,6 +15,5 @@ public class ChatUserDTO {
     private String userName;
     private String userImg;
     private String lastMessage;
-    private LocalDateTime lastMessageTime;
     private boolean isLogin;
 }
