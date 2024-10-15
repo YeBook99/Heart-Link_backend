@@ -45,7 +45,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RefreshTokenEntity> refreshTokens; // 리프레시 토큰 목록
     
-    @Column(name = "couple_code", length = 6, nullable = false)
+    @Column(name = "couple_code", length = 6)
     private String coupleCode;	// 커플 코드
     
     @CreatedDate
