@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.post.service;
 
+import java.lang.System.Logger;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,6 +16,9 @@ import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class PostService {
 
@@ -29,6 +33,10 @@ public class PostService {
 	// 게시글 작성
 	@Transactional
 	public void savePost(PostDTO postDTO, UserEntity user) {
+		// UserEntity의 ID 출력
+		log.info("User ID: {}", user.getUserId());
+        
+		
 		PostEntity post = new PostEntity();
 
 		post.setUserId(user);
@@ -46,7 +54,7 @@ public class PostService {
 				PostFileEntity postFile = new PostFileEntity();
 				postFile.setPostId(post);
 				postFile.setFileUrl(postFileDTO.getFileUrl());
-				postFile.setFile_type(postFileDTO.getFile_type());
+				postFile.setFileType(postFileDTO.getFileType());
 				postFile.setSortOrder(postFileDTO.getSortOrder());
 
 				postFileRepository.save(postFile);
