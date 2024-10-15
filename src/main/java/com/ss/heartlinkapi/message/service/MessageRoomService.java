@@ -4,6 +4,7 @@ import com.ss.heartlinkapi.message.dto.ChatUserDTO;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.message.repository.MessageRoomRepository;
+import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +34,29 @@ public class MessageRoomService {
         List<MessageRoomEntity> messageRoomEntities = messageRoomRepository.findByUser1IdOrUser2Id(userId, userId);
         log.info("entities : {}", messageRoomEntities);
         for (MessageRoomEntity entity : messageRoomEntities) {
+            Long chatUserId = 0L;
+
+//            대화 상대 userId를 확인하는 조건문
+            if (Objects.equals(entity.getUser1Id(), userId)) {
+                chatUserId = entity.getUser2Id();
+            } else {
+                chatUserId = entity.getUser1Id();
+            }
+
+//            대화 상대 entity 가져오기
+            UserEntity ChatUserEntity = userRepository.findById(chatUserId).get();
+
 //            대화 상대 유저이름
-//        String userName = userRepository.findById(userId).get().getLoginId();
-            String userName = "히히";
-//            대화 상대 유저 이미지(나중에 jpa연결되면 구현할것.)
-            String userImg = "hello.jpg";
-            Long messageRoomId = entity.getId();
+            String userName = ChatUserEntity.getName();
+            
+//            대화 상대 유저 이미지
+            ProfileEntity profileEntity = profileRepository.findByUserEntity(ChatUserEntity);
+            String userImg = profileEntity.getProfile_img();
+
 //            마지막 메시지 구하기
+            Long messageRoomId = entity.getId();
             String lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
+
 //            로그인 상태 확인
             boolean isLogin = true;
 
@@ -51,8 +68,6 @@ public class MessageRoomService {
                     .lastMessage(lastMessage)
                     .build());
         }
-
-
 
         return list;
     }
