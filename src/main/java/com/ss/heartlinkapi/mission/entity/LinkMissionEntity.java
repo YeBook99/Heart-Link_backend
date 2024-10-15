@@ -1,11 +1,12 @@
 package com.ss.heartlinkapi.mission.entity;
 
-import com.ss.heartlinkapi.couple.entity.CoupleEntity;
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -17,13 +18,9 @@ public class LinkMissionEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long linkMissionId;
+    @JoinColumn(name = "link_tag_id")
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "couple_id")
-    private CoupleEntity coupleId;
-
-    // 나중에 연결하기
-    @Column(name = "linktag_id")
-    private Long linkTagId;
-    private String missionMonth;
-    private int completedCount;
+    private LinkTagEntity linkTagId;
+    private LocalDate start_date;
+    private LocalDate end_date;
 }
