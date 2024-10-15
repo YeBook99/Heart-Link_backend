@@ -23,17 +23,34 @@ public class PostController {
 	}
 	
 	// 게시글 작성
+//	@PostMapping("/write")
+//	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
+//		
+//		try {
+//			postService.savePost(postDTO, user);
+//			return ResponseEntity.status(HttpStatus.CREATED).build();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//		}
+//		
+//	}
+	
 	@PostMapping("/write")
-	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
-		
-		try {
-			postService.savePost(postDTO, user);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-		
+	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO) {
+	    // 임시 UserEntity 생성
+	    UserEntity testUser = new UserEntity();
+	    testUser.setUserId(1L);  // 임의의 사용자 ID
+//	    testUser.setUsername("testUser");  // 임의의 사용자 이름
+
+	    try {
+	        postService.savePost(postDTO, testUser);
+	        return ResponseEntity.status(HttpStatus.CREATED).build();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
 	}
+
 
 }
