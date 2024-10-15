@@ -44,17 +44,19 @@ public class MessageRoomService {
             }
 
 //            대화 상대 entity 가져오기
-            UserEntity ChatUserEntity = userRepository.findById(chatUserId).get();
+            UserEntity chatUserEntity = userRepository.findById(chatUserId).get();
 
 //            대화 상대 유저이름
-            String userName = ChatUserEntity.getName();
-            
+            String userName = chatUserEntity.getLoginId();
+
 //            대화 상대 유저 이미지
-            ProfileEntity profileEntity = profileRepository.findByUserEntity(ChatUserEntity);
+            ProfileEntity profileEntity = profileRepository.findByUserEntity(chatUserEntity);
             String userImg = profileEntity.getProfile_img();
 
-//            마지막 메시지 구하기
+//            msg_room_id 가져오기
             Long messageRoomId = entity.getId();
+
+//            마지막 메시지 구하기
             String lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
 
 //            로그인 상태 확인
@@ -63,6 +65,7 @@ public class MessageRoomService {
             new ChatUserDTO();
 
             list.add(ChatUserDTO.builder()
+                    .msgRoomId(messageRoomId)
                     .userName(userName)
                     .userImg(userImg)
                     .lastMessage(lastMessage)
