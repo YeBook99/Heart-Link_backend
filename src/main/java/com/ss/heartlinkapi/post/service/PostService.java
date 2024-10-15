@@ -33,9 +33,6 @@ public class PostService {
 	// 게시글 작성
 	@Transactional
 	public void savePost(PostDTO postDTO, UserEntity user) {
-		// UserEntity의 ID 출력
-		log.info("User ID: {}", user.getUserId());
-        
 		
 		PostEntity post = new PostEntity();
 
