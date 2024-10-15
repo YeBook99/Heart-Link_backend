@@ -20,6 +20,7 @@ public class AdminCoupleMissionController {
     @Autowired
     private AdminCoupleMissionService adminMissionService;
 
+    // 링크 미션 태그 추가
     @PostMapping("/missionLink")
     public ResponseEntity<?> addMissionTag(@RequestBody LinkMissionDTO missionTag) {
         try{
@@ -56,4 +57,22 @@ public class AdminCoupleMissionController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PutMapping("/missionslink/{missionId}/update")
+    public ResponseEntity<?> updateMissionTag(@PathVariable Long missionId, @RequestBody LinkMissionDTO missionTag) {
+        try{
+        LinkMissionEntity mission = adminMissionService.findByMissionId(missionId);
+
+        if(mission == null){
+            return ResponseEntity.badRequest().build();
+        }
+
+        LinkMissionEntity result = adminMissionService.updateMission(mission, missionTag);
+        return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }
