@@ -9,12 +9,17 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "post_file")
+@Table(name = "post_file",
+	   uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"post_id", "sort_order"})
+    }
+)
 public class PostFileEntity {
 	@Id
     @Column(name = "id", nullable = false)
@@ -31,7 +36,7 @@ public class PostFileEntity {
 	@Column(name = "file_type", length = 50)
 	private String file_type;
 	
-	@Column(unique = true, name = "sort_order")
+	@Column(name = "sort_order")
 	private int sortOrder;
 
 }
