@@ -27,30 +27,7 @@ public class MessageController {
     public ResponseEntity<List<ChatUserDTO>> getAllChatList(@PathVariable("userId") Long userId) {
         List<ChatUserDTO> list = new ArrayList<>();
         list = messageRoomService.getAllChatList(userId);
-
-
-//        new ChatUserDTO();
-//        list.add(ChatUserDTO.builder()
-//                .userName("shin_hyuna")
-//                .userImg("shin.png")
-//                .lastMessage("아니~~")
-//                .lastMessageTime(LocalDateTime.now().minusMinutes(10))
-//                .isLogin(true)
-//                .build());
-//        list.add(ChatUserDTO.builder()
-//                .userName("tktkaj")
-//                .userImg("heeman.png")
-//                .lastMessage("밥묵자..")
-//                .lastMessageTime(LocalDateTime.now().minusMinutes(5))
-//                .isLogin(false)
-//                .build());
-//        list.add(ChatUserDTO.builder()
-//                .userName("moong_52")
-//                .userImg("moong.jpeg")
-//                .lastMessage("그래서요?")
-//                .lastMessageTime(LocalDateTime.now().minusMinutes(15))
-//                .isLogin(true)
-//                .build());
+        
 
         return ResponseEntity.ok(list);
     }
