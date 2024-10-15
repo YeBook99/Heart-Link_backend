@@ -33,29 +33,29 @@ public class PostEntity {
 	@Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long postId;
+	private Long postId; // 게시글 id
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
-	private UserEntity userId;
+	private UserEntity userId; // 게시글 작성자 id
 	
 	@Column(name = "content")
-	private String content;
+	private String content; // 내용
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable= false, updatable = false)
-	private LocalDateTime createdAt;
+	private LocalDateTime createdAt; // 작성 시간
 	
 	@LastModifiedDate
 	@Column(name = "update_at")
-	private LocalDateTime updatedAt;
+	private LocalDateTime updatedAt; // 수정 시간
 	
 	@Column(name = "like_count", nullable= false)
-	private int likeCount;
+	private int likeCount; // 좋아요 수
 	
 	@Column(name = "comment_count", nullable= false)
-	private int commentCount;
+	private int commentCount; // 댓글 수
 	
 	@Enumerated(EnumType.STRING)
-	private Visibility visibility;
+	private Visibility visibility; // 공개 범위
 }
