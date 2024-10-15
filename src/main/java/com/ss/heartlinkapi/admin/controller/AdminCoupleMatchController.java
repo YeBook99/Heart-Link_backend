@@ -41,7 +41,7 @@ public class AdminCoupleMatchController {
                     || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
                 return ResponseEntity.badRequest().build();
             }
-            return ResponseEntity.ok(result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
@@ -64,7 +64,8 @@ public class AdminCoupleMatchController {
                 return ResponseEntity.notFound().build();
             }
 
-            return ResponseEntity.ok(result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,7 +90,7 @@ public class AdminCoupleMatchController {
                 return ResponseEntity.notFound().build();
             } else {
                 adminCoupleMatchService.deleteMatchQuestion(questionId);
-                return ResponseEntity.ok().build();
+                return ResponseEntity.noContent().build();
             }
         } catch (Exception e) {
             e.printStackTrace();

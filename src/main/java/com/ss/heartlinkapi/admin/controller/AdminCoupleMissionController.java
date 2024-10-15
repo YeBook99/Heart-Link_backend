@@ -6,6 +6,7 @@ import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,7 +49,7 @@ public class AdminCoupleMissionController {
                 if(addResult == null){
                     return ResponseEntity.badRequest().build();
                 } else {
-                    return ResponseEntity.ok(addResult);
+                    return ResponseEntity.status(HttpStatus.CREATED).body(addResult);
                 }
             }
 
@@ -58,17 +59,36 @@ public class AdminCoupleMissionController {
         }
     }
 
+    // 링크 미션 태그 수정
     @PutMapping("/missionslink/{missionId}/update")
     public ResponseEntity<?> updateMissionTag(@PathVariable Long missionId, @RequestBody LinkMissionDTO missionTag) {
         try{
-        LinkMissionEntity mission = adminMissionService.findByMissionId(missionId);
-
-        if(mission == null){
-            return ResponseEntity.badRequest().build();
+            if(missionId == null || missionTag == null || missionTag.getMissionEndDate()==null || missionTag.getMissionStartDate()==null || missionTag.getMissionTagName().isEmpty()){
+                return ResponseEntity.badRequest().build();
+            }
+            LinkMissionEntity mission = adminMissionService.findByMissionId(missionId);
+            LinkMissionEntity result = adminMissionService.updateMission(mission, missionTag);
+        if (result == null){
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
 
-        LinkMissionEntity result = adminMissionService.updateMission(mission, missionTag);
-        return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 링크 미션 태그 삭제
+    @DeleteMapping("/missionslink/{missionId}/delete")
+    public ResponseEntity<?> deleteMissionTag(@PathVariable Long missionId) {
+        try{
+            LinkMissionEntity findMission = adminMissionService.findByMissionId(missionId);
+            if(findMission == null){
+                return ResponseEntity.badRequest().build();
+            }
+            adminMissionService.deleteMissionTagById(findMission);
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

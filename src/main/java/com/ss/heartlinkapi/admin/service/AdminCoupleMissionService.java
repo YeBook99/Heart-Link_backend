@@ -30,7 +30,8 @@ public class AdminCoupleMissionService {
 
     // 미션 아이디로 미션 찾기
     public LinkMissionEntity findByMissionId(Long missionId) {
-        return missionRepository.findById(missionId).orElse(null);
+        LinkMissionEntity why = missionRepository.findById(missionId).orElse(null);
+        return why;
     }
 
     // 미션 태그 수정
@@ -41,10 +42,24 @@ public class AdminCoupleMissionService {
         LinkTagEntity findTag = linkTagRepository.findByKeywordContains(afterMission.getMissionTagName());
 
         if(findTag != null) {
-
-
+            System.out.println("여긴가1");
+            // 기존 태그가 존재할 때 기존 태그 사용
+            beforeMission.setLinkTagId(findTag);
+            return missionRepository.save(beforeMission);
+        } else {
+            System.out.println("여긴가2");
+            // 기존에 태그가 존재하지 않을 때 새 태그 추가
+            LinkTagEntity newTag = new LinkTagEntity();
+            newTag.setKeyword(afterMission.getMissionTagName());
+            linkTagRepository.save(newTag);
+            System.out.println("여긴가3");
+            beforeMission.setLinkTagId(newTag);
+            return missionRepository.save(beforeMission);
         }
+    }
 
-        return null;
+    // 미션 태그 삭제
+    public void deleteMissionTagById(LinkMissionEntity missionId) {
+        missionRepository.delete(missionId);
     }
 }
