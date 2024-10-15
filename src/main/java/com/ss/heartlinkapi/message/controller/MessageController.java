@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.message.controller;
 
+import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.dto.ChatUserDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
@@ -22,14 +23,20 @@ import java.util.List;
 public class MessageController {
 
     private final MessageRoomService messageRoomService;
+    private final MessageService messageService;
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<ChatUserDTO>> getAllChatList(@PathVariable("userId") Long userId) {
         List<ChatUserDTO> list = new ArrayList<>();
         list = messageRoomService.getAllChatList(userId);
-        
 
         return ResponseEntity.ok(list);
     }
+    @GetMapping("/{msgRoomId}/detail")
+    public ResponseEntity<List<ChatMsgListDTO>> getAllChatMessage(@PathVariable("msgRoomId") Long msgRoomId){
+        List<ChatMsgListDTO> list = new ArrayList<>();
+        list = messageService.getAllChatMessage(msgRoomId);
 
+        return ResponseEntity.ok(list);
+    }
 }
