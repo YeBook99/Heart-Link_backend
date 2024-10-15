@@ -64,6 +64,7 @@ public class SecurityConfig {
                         // 예능 전용
                         .antMatchers("/couple/**", "/admin/**").permitAll()
                         .antMatchers("/dm/**","/message").permitAll()
+						.antMatchers("/img/**").permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(new JWTFilter(jwtService), LoginFilter.class);
         http.addFilterAt(new LoginFilter(customUserDetailsService, bCryptPasswordEncoder(), authenticationManager(),jwtUtil,refreshTokenService), UsernamePasswordAuthenticationFilter.class);
