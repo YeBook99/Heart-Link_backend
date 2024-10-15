@@ -4,6 +4,7 @@ import com.ss.heartlinkapi.couple.dto.Dday;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class CoupleController {
             }
             couple.setAnniversaryDate(dDayData.getFirstMetDate());
             CoupleEntity setCouple = coupleService.setAnniversary(couple);
-            return ResponseEntity.ok(setCouple);
+            return ResponseEntity.status(HttpStatus.CREATED).body(setCouple);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,7 +57,7 @@ public class CoupleController {
             }
             couple.setAnniversaryDate(dDayData.getFirstMetDate());
             CoupleEntity result = coupleService.setAnniversary(couple);
-            return ResponseEntity.ok(result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();

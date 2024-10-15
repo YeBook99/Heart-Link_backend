@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AdminCoupleService {
+public class AdminCoupleMatchService {
 
     @Autowired
     private AdminCoupleMatchRepository coupleMatchRepository;
