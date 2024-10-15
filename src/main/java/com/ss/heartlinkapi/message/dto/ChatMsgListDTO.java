@@ -15,7 +15,7 @@ public class ChatMsgListDTO {
 
     private Long senderId;
     private String content;
-    private String imoge;
+    private String emoji;
     private String imageUrl;
     private LocalDateTime lastMessageTime;
     private boolean isRead;
