@@ -43,7 +43,7 @@ public class CoupleController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -66,7 +66,7 @@ public class CoupleController {
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -99,6 +99,12 @@ public class CoupleController {
                 return ResponseEntity.badRequest().build();
             }
             UserEntity user = userRepository.findById(userId).orElse(null);
+
+            if(user.getCoupleCode().equals(code.getCode())) {
+                // 자신의 코드를 입력했을 때
+                return ResponseEntity.badRequest().body("자신의 커플 코드를 입력할 수 없습니다.");
+            }
+
             if(user == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -117,7 +123,108 @@ public class CoupleController {
         }
     }
 
+    //  커플 해지 (break_date 유예 3개월 설정)
+    @PutMapping("/{coupleId}/unlink")
+    public ResponseEntity<?> unlinkCouple(@PathVariable Long coupleId) {
+        try{
+            if(coupleId == null) {
+                return ResponseEntity.badRequest().build();
+            }
 
+            CoupleEntity couple = coupleService.findById(coupleId);
 
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            CoupleEntity result = coupleService.setBreakDate(couple);
+
+            if(result == null) {
+                return ResponseEntity.badRequest().body("연결 해지 실패");
+            }
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 연결 해지 취소 (break_date 삭제)
+    @PutMapping("/{coupleId}/unlink/cancel")
+    public ResponseEntity<?> cancelUnlinkCouple(@PathVariable Long coupleId) {
+        try{
+            if(coupleId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            CoupleEntity couple = coupleService.findById(coupleId);
+
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            CoupleEntity result = coupleService.deleteBreakDate(couple);
+            if (result == null) {
+                return ResponseEntity.badRequest().body("연결 해지 취소 실패");
+            }
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 유예기간 종료 후 최종 연결 해지
+    @DeleteMapping("/{coupleId}/finalUnlink")
+    public ResponseEntity<?> finalUnlinkCouple(@PathVariable Long coupleId) {
+        System.out.println("finalUnlinkCouple");
+
+        try{
+            if(coupleId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            CoupleEntity couple = coupleService.findById(coupleId);
+
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+            boolean result = coupleService.finalUnlinkCouple(couple);
+
+            if(result) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.badRequest().body("아직 커플 유예기간입니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 유예기간 없이 즉시 연결 해지
+    @DeleteMapping("/{coupleId}/finalNowUnlink")
+    public ResponseEntity<?> finalNowUnlinkCouple(@PathVariable Long coupleId) {
+        try{
+            if(coupleId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            CoupleEntity couple = coupleService.findById(coupleId);
+
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            coupleService.finalNowUnlinkCouple(couple);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
 
 }

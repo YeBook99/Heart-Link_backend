@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Service
@@ -55,4 +57,67 @@ public class CoupleService {
         return coupleRepository.save(newCouple);
     }
 
+    // 커플 해지일 설정
+    public CoupleEntity setBreakDate(CoupleEntity couple) {
+        LocalDate breakDate = LocalDate.now().plusMonths(3);
+        couple.setBreakupDate(breakDate);
+        return coupleRepository.save(couple);
+    }
+
+    // 커플 해지일 삭제
+    public CoupleEntity deleteBreakDate(CoupleEntity couple) {
+        couple.setBreakupDate(null);
+        return coupleRepository.save(couple);
+    }
+
+    // 커플 해지 유예기간 지나고 최종 해지
+    public boolean finalUnlinkCouple(CoupleEntity couple) {
+        if(couple.getBreakupDate().isBefore(LocalDate.now())) {
+            UserEntity user1 = couple.getUser1();
+            UserEntity user2 = couple.getUser2();
+            System.out.println("111111 : "+user1);
+            System.out.println("222222 : "+user2);
+
+            coupleRepository.delete(couple);
+
+            user1.setCoupleCode(generateRandomCode());
+            user2.setCoupleCode(generateRandomCode());
+
+            userRepository.save(user1);
+            userRepository.save(user2);
+
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    // 커플 코드 랜덤값 적용
+    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private final int CODE_LENGTH = 6;
+
+    public String generateRandomCode() {
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder(CODE_LENGTH);
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            code.append(CHARACTERS.charAt(index));
+        }
+        return code.toString();
+    }
+
+    // 커플 해지 유예기간 없이 즉시 해지
+    public void finalNowUnlinkCouple(CoupleEntity couple) {
+        UserEntity user1 = couple.getUser1();
+        UserEntity user2 = couple.getUser2();
+
+        coupleRepository.delete(couple);
+
+        user1.setCoupleCode(generateRandomCode());
+        user2.setCoupleCode(generateRandomCode());
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+    }
 }
