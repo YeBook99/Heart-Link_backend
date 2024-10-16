@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.heartlinkapi.follow.dto.FollowDTO;
 import com.ss.heartlinkapi.follow.service.FollowService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
@@ -22,7 +23,7 @@ public class FollowingController {
 
 	// 로그인한 회원의 팔로잉 찾기
 	@GetMapping("/{userId}")
-	public List<UserEntity> getFollowing(@PathVariable String userId) {
+	public List<FollowDTO> getFollowing(@PathVariable String userId) {
 		return followService.getFollowingIdsByLoginId(userId);
 	}
 
