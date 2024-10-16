@@ -1,7 +1,6 @@
 package com.ss.heartlinkapi.login.jwt;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -15,8 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.login.service.JWTService;
-import com.ss.heartlinkapi.user.entity.Role;
-import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public class JWTFilter extends OncePerRequestFilter{
 	

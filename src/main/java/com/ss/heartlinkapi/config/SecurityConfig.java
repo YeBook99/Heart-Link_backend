@@ -12,13 +12,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.ss.heartlinkapi.login.jwt.CustomLogoutFilter;
 import com.ss.heartlinkapi.login.jwt.JWTFilter;
 import com.ss.heartlinkapi.login.jwt.JWTUtil;
 import com.ss.heartlinkapi.login.jwt.LoginFilter;
+import com.ss.heartlinkapi.login.service.CustomLogoutService;
 import com.ss.heartlinkapi.login.service.CustomUserDetailsService;
 import com.ss.heartlinkapi.login.service.JWTService;
 import com.ss.heartlinkapi.login.service.RefreshTokenService;
@@ -32,15 +35,17 @@ public class SecurityConfig {
 	private final JWTUtil jwtUtil;
 	private final JWTService jwtService;
 	private final RefreshTokenService refreshTokenService;
+	private final CustomLogoutService customLogoutService;
 
 	public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,
 			CustomUserDetailsService customUserDetailsService, JWTUtil jwtUtil, JWTService jwtService,
-			RefreshTokenService refreshTokenService) {
+			RefreshTokenService refreshTokenService, CustomLogoutService customLogoutService) {
 		this.authenticationConfiguration = authenticationConfiguration;
 		this.customUserDetailsService = customUserDetailsService;
 		this.jwtUtil = jwtUtil;
 		this.jwtService = jwtService;
 		this.refreshTokenService = refreshTokenService;
+		this.customLogoutService = customLogoutService;
 	}
 
 	@Bean
@@ -70,7 +75,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
         http.addFilterBefore(new JWTFilter(jwtService), LoginFilter.class);
         http.addFilterAt(new LoginFilter(customUserDetailsService, bCryptPasswordEncoder(), authenticationManager(),jwtUtil,refreshTokenService), UsernamePasswordAuthenticationFilter.class);
-        
+        http.addFilterBefore(new CustomLogoutFilter(customLogoutService), LogoutFilter.class);
 			return http.build();	
 	}
 	
