@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.post.service;
 import java.lang.System.Logger;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.transaction.Transactional;
 
@@ -18,7 +19,6 @@ import com.ss.heartlinkapi.user.entity.UserEntity;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class PostService {
 
@@ -34,6 +34,9 @@ public class PostService {
 	@Transactional
 	public void savePost(PostDTO postDTO, UserEntity user) {
 		
+		List<PostFileDTO> fileList = postDTO.getFiles();
+		
+		
 		PostEntity post = new PostEntity();
 
 		post.setUserId(user);
@@ -42,21 +45,22 @@ public class PostService {
 		post.setCreatedAt(LocalDateTime.now());
 		post.setLikeCount(0);
 		post.setCommentCount(0);
+		
 
 		postRepository.save(post);
 
-		List<PostFileDTO> fileList = postDTO.getFiles();
-		if (fileList != null) {
+		
+			int sortOrder = 1;
 			for (PostFileDTO postFileDTO : fileList) {
 				PostFileEntity postFile = new PostFileEntity();
 				postFile.setPostId(post);
 				postFile.setFileUrl(postFileDTO.getFileUrl());
 				postFile.setFileType(postFileDTO.getFileType());
-				postFile.setSortOrder(postFileDTO.getSortOrder());
+				postFile.setSortOrder(sortOrder);
 
 				postFileRepository.save(postFile);
+				sortOrder++;
 			}
-		}
 
 	}
 
