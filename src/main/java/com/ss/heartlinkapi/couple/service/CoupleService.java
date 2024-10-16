@@ -10,6 +10,9 @@ public class CoupleService {
     @Autowired
     private CoupleRepository coupleRepository;
 
+//    @Autowired
+//    private
+
     // 유저아이디로 커플아이디 조회
     public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
         return coupleRepository.findCoupleByUserId(id);
@@ -28,5 +31,10 @@ public class CoupleService {
     // 커플 매칭 카운트 증가
     public int matchCountUp(Long coupleId) {
         return coupleRepository.matchCountUp(coupleId);
+    }
+
+    // 커플 연결
+    public CoupleEntity coupleCodeMatch(Long userId, String code) {
+        return null;
     }
 }

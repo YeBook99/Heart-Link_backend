@@ -3,6 +3,8 @@ package com.ss.heartlinkapi.couple.controller;
 import com.ss.heartlinkapi.couple.dto.Dday;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
+import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,9 @@ public class CoupleController {
 
     @Autowired
     private CoupleService coupleService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // 디데이 설정
     @PostMapping("/dday")
@@ -61,6 +66,49 @@ public class CoupleController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    // 자신의 커플 코드 확인
+    @GetMapping("/match/{userid}/code")
+    public ResponseEntity<?> selectMyCode(@PathVariable Long userid) {
+        try{
+            if(userid == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            UserEntity user = userRepository.findById(userid).orElse(null);
+
+            if(user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(user.getCoupleCode());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 커플 연결
+    @PostMapping("/match/{userid}/code/link")
+    public ResponseEntity<?> coupleCodeMatch(@PathVariable Long userId, @RequestBody String code){
+        try{
+
+            if(userId == null || code == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            UserEntity user = userRepository.findById(userId).orElse(null);
+            if(user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            CoupleEntity result = coupleService.coupleCodeMatch(user.getUserId(), code);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
