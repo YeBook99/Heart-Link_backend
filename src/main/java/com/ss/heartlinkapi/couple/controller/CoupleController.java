@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.couple.controller;
 
+import com.ss.heartlinkapi.couple.dto.CoupleCode;
 import com.ss.heartlinkapi.couple.dto.Dday;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
@@ -91,26 +92,32 @@ public class CoupleController {
     }
 
     // 커플 연결
-    @PostMapping("/match/{userid}/code/link")
-    public ResponseEntity<?> coupleCodeMatch(@PathVariable Long userId, @RequestBody String code){
+    @PostMapping("/match/{userId}/code/link")
+    public ResponseEntity<?> coupleCodeMatch(@PathVariable("userId") Long userId, @RequestBody CoupleCode code){
         try{
-
             if(userId == null || code == null) {
                 return ResponseEntity.badRequest().build();
             }
-
             UserEntity user = userRepository.findById(userId).orElse(null);
             if(user == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            CoupleEntity result = coupleService.coupleCodeMatch(user.getUserId(), code);
+            CoupleEntity result = coupleService.coupleCodeMatch(user, code);
+
+            if(result == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
+
+
 
 
 }
