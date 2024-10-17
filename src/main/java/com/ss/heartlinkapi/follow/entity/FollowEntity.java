@@ -32,11 +32,11 @@ public class FollowEntity {
 	@Column(name = "id", nullable = false)
     private Long followId;				// 팔로우 아이디
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "follower_id")
 	private UserEntity follower;		// 팔로우하는 회원 아이디
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "following_id")
 	private UserEntity following;		// 팔로우되는 회원 아이디
 	
