@@ -11,7 +11,7 @@ import com.ss.heartlinkapi.follow.entity.FollowEntity;
 public interface FollowRepository extends JpaRepository<FollowEntity, Long>{
 	
 	// 로그인한 회원의 팔로잉 회원 정보
-	@Query("SELECT f FROM FollowEntity f JOIN f.follower u WHERE u.loginId = :loginId")
-	List<FollowEntity> findFollowingIdsByFollowerLoginId(@Param("loginId") String loginId);
+	@Query("SELECT f FROM FollowEntity f WHERE f.follower.id =:followerId")
+	List<FollowEntity> findFollowingIdsByFollowerId(@Param("followerId") Long followerId);
 
 }

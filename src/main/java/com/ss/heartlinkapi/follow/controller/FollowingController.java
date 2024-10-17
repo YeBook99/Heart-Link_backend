@@ -23,8 +23,8 @@ public class FollowingController {
 
 	// 로그인한 회원의 팔로잉 찾기
 	@GetMapping("/{userId}")
-	public List<FollowDTO> getFollowing(@PathVariable String userId) {
-		return followService.getFollowingIdsByLoginId(userId);
+	public List<FollowDTO> getFollowing(@PathVariable Long userId) {
+		return followService.getFollowingIdsByUserId(userId);
 	}
 
 }

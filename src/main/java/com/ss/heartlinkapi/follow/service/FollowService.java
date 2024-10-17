@@ -20,8 +20,8 @@ public class FollowService {
 	}
 
 	// 로그인한 회원의 팔로잉 회원 정보
-	public List<FollowDTO> getFollowingIdsByLoginId(String loginId) {
-		List<FollowEntity> follows = followRepository.findFollowingIdsByFollowerLoginId(loginId);
+	public List<FollowDTO> getFollowingIdsByUserId(Long userId) {
+		List<FollowEntity> follows = followRepository.findFollowingIdsByFollowerId(userId);
 
 		return follows.stream().map(follow -> new FollowDTO(follow.getFollowing().getLoginId()))
 				.collect(Collectors.toList());
