@@ -7,6 +7,7 @@ import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/dm")
 @RequiredArgsConstructor
+@Slf4j
 public class MessageController {
 
     private final MessageRoomService messageRoomService;
@@ -29,7 +31,7 @@ public class MessageController {
     public ResponseEntity<List<ChatUserDTO>> getAllChatList(@PathVariable("userId") Long userId) {
         List<ChatUserDTO> list = new ArrayList<>();
         list = messageRoomService.getAllChatList(userId);
-
+        log.info("접근함");
         return ResponseEntity.ok(list);
     }
     @GetMapping("/{msgRoomId}/detail")

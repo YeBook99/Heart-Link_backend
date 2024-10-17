@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ChatUserDTO {
+    private Long msgRoomId;
     private String userName;
     private String userImg;
     private String lastMessage;
