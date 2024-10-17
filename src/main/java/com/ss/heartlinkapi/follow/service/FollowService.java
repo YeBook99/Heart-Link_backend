@@ -23,7 +23,7 @@ public class FollowService {
 	public List<FollowDTO> getFollowingIdsByUserId(Long userId) {
 		List<FollowEntity> follows = followRepository.findFollowingIdsByFollowerId(userId);
 
-		return follows.stream().map(follow -> new FollowDTO(follow.getFollowing().getLoginId()))
+		return follows.stream().map(follow -> new FollowDTO(follow.getFollowId(), follow.getFollowing().getLoginId()))
 				.collect(Collectors.toList());
 	}
 

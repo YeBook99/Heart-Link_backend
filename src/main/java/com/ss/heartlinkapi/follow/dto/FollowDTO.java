@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FollowDTO {
-	private String myFollowingId;	// 내 팔로잉 아이디
+	private Long followId;				// 팔로우 관계의 ID
+	private String follwoingLoginId;	// 팔로잉 LoginId
 
 }
