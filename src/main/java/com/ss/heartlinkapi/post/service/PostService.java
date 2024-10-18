@@ -69,14 +69,25 @@ public class PostService {
 	public List<PostDTO> getPublicPostByFollowerId(Long followerId) {
 	    List<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId);
 	    return posts.stream()
-	                .map(post -> new PostDTO(
-	                        post.getPostId(),
-	                        post.getUserId().getLoginId(),  // UserEntity에서 필요한 필드만 추출
-	                        post.getContent(),
-	                        post.getCreatedAt(),
-	                        post.getVisibility(), null))
+	                .map(post -> {
+	                    List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+	                    return new PostDTO(
+	                            post.getPostId(),
+	                            post.getUserId().getLoginId(),
+	                            post.getContent(),
+	                            post.getCreatedAt(),
+	                            post.getVisibility(),
+	                            postFiles.stream()
+	                                .map(file -> new PostFileDTO(
+	                                    post.getPostId(),
+	                                    file.getFileUrl(),
+	                                    file.getFileType(),
+	                                    file.getSortOrder()))
+	                                .collect(Collectors.toList()));
+	                })
 	                .collect(Collectors.toList());
 	}
+
 
 
 }
