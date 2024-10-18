@@ -18,4 +18,6 @@ public class PostDTO {
     private LocalDateTime createdAt;    // 작성 시간
     private Visibility visibility;      // 게시글 공개 타입
     private List<PostFileDTO> files;    // 게시글에 첨부된 파일 리스트
+    
+    private String partnerId; // 내 커플의 아이디
 }
