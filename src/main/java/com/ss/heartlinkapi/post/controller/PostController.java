@@ -1,14 +1,19 @@
 package com.ss.heartlinkapi.post.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.heartlinkapi.post.dto.PostDTO;
+import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
@@ -58,6 +63,12 @@ public class PostController {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
+	}
+	
+	// 내 팔로잉 게시물 조회
+	@GetMapping("/{followerId}")
+	public List<PostDTO> getFollowingPublicPosts(@PathVariable Long followerId){
+		return postService.getPublicPostByFollowerId(followerId);
 	}
 
 

@@ -120,4 +120,17 @@ public class CoupleService {
         userRepository.save(user1);
         userRepository.save(user2);
     }
+    
+    // 내 커플의 아이디 가져오기
+    public UserEntity getCouplePartner(Long userId) {
+    	CoupleEntity couple = coupleRepository.findCoupleByUserId(userId);
+    	if(couple != null) {
+    		if(couple.getUser1().getUserId().equals(userId)) {
+    			return couple.getUser2();
+    		} else {
+    			return couple.getUser1();
+    		}
+    	}
+    	return null;
+    }
 }

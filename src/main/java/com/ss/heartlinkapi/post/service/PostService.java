@@ -4,11 +4,13 @@ import java.lang.System.Logger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
@@ -17,17 +19,18 @@ import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 public class PostService {
 
 	private final PostRepository postRepository;
 	private final PostFileRepository postFileRepository;
+	private final CoupleService coupleService;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
+		this.coupleService = coupleService;
 	}
 
 	// 게시글 작성
@@ -63,5 +66,36 @@ public class PostService {
 			}
 
 	}
+	
+	// 내 팔로잉 게시물 조회
+	public List<PostDTO> getPublicPostByFollowerId(Long followerId) {
+	    List<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId);
+	    return posts.stream()
+	                .map(post -> {
+	                    List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+	                    
+	                    
+	                    // 내 커플 조회
+	                    UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+	                    return new PostDTO(
+	                            post.getPostId(),
+	                            post.getUserId().getLoginId(),
+	                            post.getContent(),
+	                            post.getCreatedAt(),
+	                            post.getVisibility(),
+	                            postFiles.stream()
+	                                .map(file -> new PostFileDTO(
+	                                    post.getPostId(),
+	                                    file.getFileUrl(),
+	                                    file.getFileType(),
+	                                    file.getSortOrder()))
+	                                .collect(Collectors.toList()),
+		                    partner != null ? partner.getLoginId() : "No Partner"
+		                );
+	                })
+	                .collect(Collectors.toList());
+	}
+
+
 
 }
