@@ -63,5 +63,10 @@ public class PostService {
 			}
 
 	}
+	
+	public List<PostEntity> getPublicPostByFollowerId(Long followerId){
+		
+		return postRepository.findPublicPostsByFollowerId(followerId);
+	}
 
 }
