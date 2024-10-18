@@ -65,6 +65,7 @@ public class PostService {
 
 	}
 	
+	// 내 팔로잉 게시물 조회
 	public List<PostDTO> getPublicPostByFollowerId(Long followerId) {
 	    List<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId);
 	    return posts.stream()

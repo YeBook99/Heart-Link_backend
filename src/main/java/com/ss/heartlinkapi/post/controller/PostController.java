@@ -65,6 +65,7 @@ public class PostController {
 	    }
 	}
 	
+	// 내 팔로잉 게시물 조회
 	@GetMapping("/{followerId}")
 	public List<PostDTO> getFollowingPublicPosts(@PathVariable Long followerId){
 		return postService.getPublicPostByFollowerId(followerId);
