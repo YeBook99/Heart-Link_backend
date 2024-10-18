@@ -66,7 +66,7 @@ public class PostController {
 	}
 	
 	@GetMapping("/{followerId}")
-	public List<PostEntity> getFollowingPublicPosts(@PathVariable Long followerId){
+	public List<PostDTO> getFollowingPublicPosts(@PathVariable Long followerId){
 		return postService.getPublicPostByFollowerId(followerId);
 	}
 

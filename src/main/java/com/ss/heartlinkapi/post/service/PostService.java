@@ -4,6 +4,7 @@ import java.lang.System.Logger;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -64,9 +65,17 @@ public class PostService {
 
 	}
 	
-	public List<PostEntity> getPublicPostByFollowerId(Long followerId){
-		
-		return postRepository.findPublicPostsByFollowerId(followerId);
+	public List<PostDTO> getPublicPostByFollowerId(Long followerId) {
+	    List<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId);
+	    return posts.stream()
+	                .map(post -> new PostDTO(
+	                        post.getPostId(),
+	                        post.getUserId().getLoginId(),  // UserEntity에서 필요한 필드만 추출
+	                        post.getContent(),
+	                        post.getCreatedAt(),
+	                        post.getVisibility(), null))
+	                .collect(Collectors.toList());
 	}
+
 
 }
