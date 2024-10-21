@@ -64,17 +64,17 @@ public class CoupleMatchController {
                     int countUpresult = coupleService.matchCountUp(result.getCoupleId().getCoupleId());
                     if(countUpresult == 1) {
                         // 카운트 증가 성공하여 1 반환
-                        return ResponseEntity.ok(countUpresult);
+                        return ResponseEntity.status(HttpStatus.OK).body(countUpresult);
                     } else {
                         // 카운트 증가 실패
                         return ResponseEntity.ok("매칭 성공했으나 카운트 증가 실패");
                     }
                 } else if(matchResult == 0) { // 매칭 실패
                     // 매칭 실패하여 0 반환
-                    return ResponseEntity.ok(matchResult);
+                    return ResponseEntity.status(HttpStatus.OK).body(matchResult);
                 } else {
                     // 상대방이 선택지를 고르지 않아 2 반환
-                    return ResponseEntity.ok(matchResult);
+                    return ResponseEntity.status(HttpStatus.OK).body(matchResult);
                 }
             } else {
                 return ResponseEntity.notFound().build();

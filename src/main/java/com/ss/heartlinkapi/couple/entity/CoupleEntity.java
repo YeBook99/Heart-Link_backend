@@ -27,9 +27,12 @@ public class CoupleEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
     @Column(name = "anniversary_date")
-    private LocalDate anniversaryDate;
+    private LocalDate anniversaryDate = null;
     @Column(name = "breakup_date")
-    private LocalDate breakupDate;
+    private LocalDate breakupDate = null;
     @Column(name = "match_count")
     private Integer matchCount = 0;
+    // 피드 공개 여부 체크(false = 전체공개, true = 팔로워한테만 공개)
+    @Column(name = "is_private")
+    private Boolean isPrivate = false;
 }
