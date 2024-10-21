@@ -24,6 +24,8 @@ public class MessageEntity {
     private Long senderId;
     @Column(name = "content")
     private String content;
+    @Column(name = "img_url")
+    private String imgUrl;
     @Column(name = "is_read")
     private boolean isRead;
     @CreatedDate
