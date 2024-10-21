@@ -65,10 +65,34 @@ public class PostController {
 	    }
 	}
 	
-	// 내 팔로잉 게시물 조회
+	// 내 게시물 조회
 	@GetMapping("/{followerId}")
-	public List<PostDTO> getFollowingPublicPosts(@PathVariable Long followerId){
-		return postService.getPublicPostByFollowerId(followerId);
+	public ResponseEntity<?> getFollowingPublicPosts(@PathVariable Long followerId){
+		
+		List<PostDTO> followingPosts = postService.getPublicPostByFollowerId(followerId);
+		List<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(followerId);
+		
+		return ResponseEntity.ok().body(new PostsResponse(followingPosts, nonFollowedPosts));
+		
+	}
+	
+	private static class PostsResponse {
+		private List<PostDTO> followingPosts;
+		private List<PostDTO> nonFollowedPosts;
+		
+		public PostsResponse(List<PostDTO> followingPosts, List<PostDTO> nonFollowedPosts) {
+			this.followingPosts = followingPosts;
+			this.nonFollowedPosts = nonFollowedPosts;
+		}
+		
+		public List<PostDTO> getFollowingPosts(){
+			return followingPosts;
+		}
+		
+		public List<PostDTO> getNonFollowedPosys(){
+			return nonFollowedPosts;
+		}
+		
 	}
 
 

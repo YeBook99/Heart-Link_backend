@@ -19,5 +19,13 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	           "ORDER BY p.createdAt DESC")
 	List<PostEntity> findPublicPostsByFollowerId(@Param("followerId") Long followerId);
 
+	// 내 팔로잉이 아닌 사람의 게시글 조회
+	@Query("SELECT p FROM PostEntity p " +
+	           "WHERE p.userId.userId NOT IN (SELECT f.following.id FROM FollowEntity f WHERE f.follower.id = :userId) " +
+	           "AND NOT EXISTS (SELECT r FROM ReportEntity r WHERE r.postId = p.postId) " +
+	           "AND p.visibility = com.ss.heartlinkapi.post.entity.Visibility.PUBLIC " +
+	           "ORDER BY p.createdAt DESC")
+	    List<PostEntity> findNonFollowedAndNonReportedPosts(@Param("userId") Long userId);
+	
 
 }
