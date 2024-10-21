@@ -74,14 +74,15 @@ public class PostService {
 	                .map(post -> {
 	                    List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
 	                    
-	                    
-	                    // 내 커플 조회
 	                    UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	                    return new PostDTO(
 	                            post.getPostId(),
 	                            post.getUserId().getLoginId(),
 	                            post.getContent(),
 	                            post.getCreatedAt(),
+	                            post.getUpdatedAt(),
+	                            post.getLikeCount(),
+	                            post.getCommentCount(),
 	                            post.getVisibility(),
 	                            postFiles.stream()
 	                                .map(file -> new PostFileDTO(
