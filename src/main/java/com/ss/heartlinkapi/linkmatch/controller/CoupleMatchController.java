@@ -3,6 +3,9 @@ package com.ss.heartlinkapi.linkmatch.controller;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linkmatch.dto.MatchAnswer;
+import com.ss.heartlinkapi.linkmatch.dto.MatchCountGenderDTO;
+import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
+import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchRepository;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
@@ -99,6 +102,15 @@ public class CoupleMatchController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+        @Autowired
+        private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
+    // 통계 - 성별 별 매치 답변 조회 (한건)
+    @GetMapping("/missionmatch/{id}")
+    public ResponseEntity<?> getCountMatchGenderById(@PathVariable Long id) {
+        MatchCountGenderDTO result = coupleMatchAnswerRepository.matchCountGenderById(id);
+        return ResponseEntity.ok(result);
     }
 
 }
