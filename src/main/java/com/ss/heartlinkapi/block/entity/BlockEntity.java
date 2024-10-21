@@ -1,4 +1,4 @@
-package com.ss.heartlinkapi.like.entity;
+package com.ss.heartlinkapi.block.entity;
 
 import java.sql.Timestamp;
 
@@ -16,36 +16,35 @@ import javax.persistence.Table;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.ss.heartlinkapi.comment.entity.CommentEntity;
-import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "like")
+@Table(name = "block")
 @EntityListeners(AuditingEntityListener.class)
-public class LikeEntitiy {
+public class BlockEntity {
 	@Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long likeId;					// 좋아요 아이디
+	private Long blockId;				// 차단 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id", nullable = false)
-	private UserEntity userId;				// 회원 아이디
+	@JoinColumn(name = "blocker_id", nullable = false)
+	private UserEntity blockerId;		// 차단한 회원 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", nullable = false)
-	private PostEntity postId;				// 게시글 아이디
+	@JoinColumn(name = "blocked_id", nullable = false)
+	private UserEntity blockedId;		// 차단된 회원 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id", nullable = false)
-	private CommentEntity commentId;		// 댓글 아이디
+	@JoinColumn(name = "couple_id", nullable = false)
+	private CoupleEntity coupleId;		// 차단된 커플 아이디
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable= false, updatable = false)
-	private Timestamp createdAt;			// 생성일시
+	private Timestamp createdAt;		// 생성일시
 
 }
