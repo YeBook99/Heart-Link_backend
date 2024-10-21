@@ -97,6 +97,37 @@ public class PostService {
 	                .collect(Collectors.toList());
 	}
 
+	
+	// 팔로우하지 않은 사용자 게시글 조회
+	public List<PostDTO> getNonFollowedAndNonReportedPosts(Long userId) {
+	    List<PostEntity> posts = postRepository.findNonFollowedAndNonReportedPosts(userId);
+	 
+	    return posts.stream()
+	    		.map(post -> {
+	    			List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+	    			
+	    			UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+	    			return new PostDTO(
+	    					post.getPostId(),
+                            post.getUserId().getLoginId(),
+                            post.getContent(),
+                            post.getCreatedAt(),
+                            post.getUpdatedAt(),
+                            post.getLikeCount(),
+                            post.getCommentCount(),
+                            post.getVisibility(),
+                            postFiles.stream()
+                                .map(file -> new PostFileDTO(
+                                    post.getPostId(),
+                                    file.getFileUrl(),
+                                    file.getFileType(),
+                                    file.getSortOrder()))
+                                .collect(Collectors.toList()),
+	                    partner != null ? partner.getLoginId() : "No Partner"
+	    					);
+	    		})
+	    		.collect(Collectors.toList());
+	}
 
 
 }
