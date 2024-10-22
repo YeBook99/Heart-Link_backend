@@ -21,6 +21,8 @@ public class MessageRoomEntity {
     private Long user1Id;
     @Column(name = "user2_id")
     private Long user2Id;
+    @Column(name = "type")
+    private String type;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

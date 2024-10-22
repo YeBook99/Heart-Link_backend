@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.message.service;
 
+import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatUserDTO;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
@@ -73,5 +74,16 @@ public class MessageRoomService {
         }
 
         return list;
+    }
+
+    public void applyMessage(ApplyMessageDTO applyMessageDTO) {
+
+        MessageRoomEntity messageRoomEntity = new MessageRoomEntity();
+        messageRoomEntity.setUser1Id(applyMessageDTO.getUserId());
+        messageRoomEntity.setUser2Id(applyMessageDTO.getApplyId());
+        messageRoomEntity.setCreatedAt(LocalDateTime.now());
+//        수락전은 N으로해서 팔로우 된 사람들과의 대화랑 구분
+        messageRoomEntity.setType("N");
+        messageRoomRepository.save(messageRoomEntity);
     }
 }
