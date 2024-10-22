@@ -66,11 +66,11 @@ public class PostController {
 	}
 	
 	// 내 게시물 조회
-	@GetMapping("/{followerId}")
-	public ResponseEntity<?> getFollowingPublicPosts(@PathVariable Long followerId){
+	@GetMapping("/{userId}")
+	public ResponseEntity<?> getFollowingPublicPosts(@PathVariable Long userId){
 		
-		List<PostDTO> followingPosts = postService.getPublicPostByFollowerId(followerId);
-		List<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(followerId);
+		List<PostDTO> followingPosts = postService.getPublicPostByFollowerId(userId);
+		List<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(userId);
 		
 		return ResponseEntity.ok().body(new PostsResponse(followingPosts, nonFollowedPosts));
 		
@@ -89,7 +89,7 @@ public class PostController {
 			return followingPosts;
 		}
 		
-		public List<PostDTO> getNonFollowedPosys(){
+		public List<PostDTO> getNonFollowedPosts(){
 			return nonFollowedPosts;
 		}
 		

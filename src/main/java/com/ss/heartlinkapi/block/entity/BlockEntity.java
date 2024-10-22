@@ -40,7 +40,7 @@ public class BlockEntity {
 	private UserEntity blockedId;		// 차단된 회원 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "couple_id", nullable = false)
+	@JoinColumn(name = "couple_id")
 	private CoupleEntity coupleId;		// 차단된 커플 아이디
 	
 	@CreatedDate
