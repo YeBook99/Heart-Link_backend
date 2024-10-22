@@ -3,17 +3,19 @@ package com.ss.heartlinkapi.linkmatch.controller;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linkmatch.dto.MatchAnswer;
-import com.ss.heartlinkapi.linkmatch.dto.MatchCountGenderDTO;
-import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
-import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchRepository;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
+import com.ss.heartlinkapi.linkmatch.service.CoupleMatchStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -25,6 +27,9 @@ public class CoupleMatchController {
 
     @Autowired
     private CoupleService coupleService;
+
+    @Autowired
+    private CoupleMatchStatisticsService statisticsService;
 
     // 커플 매치 질문 조회
     @GetMapping("/missionmatch/questions")
@@ -104,13 +109,30 @@ public class CoupleMatchController {
         }
     }
 
-        @Autowired
-        private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
-    // 통계 - 성별 별 매치 답변 조회 (한건)
-    @GetMapping("/missionmatch/{id}")
-    public ResponseEntity<?> getCountMatchGenderById(@PathVariable Long id) {
-        MatchCountGenderDTO result = coupleMatchAnswerRepository.matchCountGenderById(id);
-        return ResponseEntity.ok(result);
+    // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트)
+    @GetMapping("/statistics/dailyMatch")
+    public ResponseEntity<?> getStatisticsDailyMatchById() {
+        try{
+            Date todayDate = new Date();
+            LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            LinkMatchEntity todayMatch = statisticsService.findMatchByDate(today);
+
+            if(todayMatch == null) {
+                return ResponseEntity.notFound().build();
+            }
+            // 성별 별 비율 통계
+            statisticsService.matchCountGenderById(todayMatch);
+
+            // 매칭된 커플 퍼센트
+
+
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
     }
 
 }

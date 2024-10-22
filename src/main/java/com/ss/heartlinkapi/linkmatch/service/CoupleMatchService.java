@@ -49,9 +49,7 @@ public class CoupleMatchService {
         try{
             LinkMatchAnswerEntity entity = answerRepository.save(answerEntity);
 
-            System.out.println("커플아이디 : "+couple.getCoupleId());
             int result = answerRepository.checkTodayMatching(couple.getCoupleId());
-            System.out.println("결과 : "+result);
             return entity;
         } catch (Exception e){
             e.printStackTrace();

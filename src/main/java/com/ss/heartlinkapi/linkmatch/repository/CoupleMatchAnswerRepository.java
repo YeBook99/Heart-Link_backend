@@ -34,7 +34,7 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "GROUP BY m.link_match_id, g.gender, c.choice " +
             "having m.link_match_id = :matchId " +
             "ORDER BY m.link_match_id, g.gender, c.choice", nativeQuery = true)
-    MatchCountGenderDTO matchCountGenderById(Long matchId);
+    List<Object[]> matchCountGenderById(Long matchId);
 
     // 통계 - 성별 별 선택답변 조회 (전체 질문)
 
