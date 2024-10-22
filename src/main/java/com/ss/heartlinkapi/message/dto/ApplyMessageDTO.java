@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class ApplyMessageDTO {
     private Long userId;
     private Long applyId;
+    private String type;
 }
