@@ -1,12 +1,12 @@
 package com.ss.heartlinkapi.linkmatch.repository;
 
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
-import com.ss.heartlinkapi.linkmatch.dto.MatchCountGenderDTO;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnswerEntity, Long> {
@@ -36,6 +36,42 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "ORDER BY m.link_match_id, g.gender, c.choice", nativeQuery = true)
     List<Object[]> matchCountGenderById(Long matchId);
 
-    // 통계 - 성별 별 선택답변 조회 (전체 질문)
+    // 통계 - 오늘 매치 답변에 응답한 인원 수 커플 아이디로 그룹지어 조회하기
+    @Query(value = "select count(*) from match_answer where created_at = :today group by couple_id", nativeQuery = true)
+    List<Integer> todayTotalAnswerCountGroupByCoupleId(LocalDate today);
+
+    // 통계 - 오늘 매치 답변에 매치성공한 커플 쌍의 수
+    @Query(value = "SELECT COUNT(*) AS matching_couples\n" +
+            "FROM (\n" +
+            "    SELECT couple_id\n" +
+            "    FROM match_answer\n" +
+            "    WHERE created_at = CURDATE()\n" +
+            "    GROUP BY couple_id, choice\n" +
+            "    HAVING COUNT(*) = 2\n" +
+            ") AS matched", nativeQuery = true)
+    int todaySuccessMatchCount();
+
+    // 통계 - 월별 모든 커플의 매치 성공 횟수
+    @Query(value = "SELECT COUNT(*) FROM (" +
+            "SELECT COUNT(*) AS count " +
+            "FROM match_answer " +
+            "WHERE created_at >= :startDate " +
+            "AND created_at < :endDate " +
+            "GROUP BY couple_id, link_match_id, choice " +
+            "HAVING COUNT(*) > 1) AS monthMatchCount",
+            nativeQuery = true)
+    int monthSuccessMatchCount(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    // 통계 - 월별 한 커플의 매치 성공 횟수
+    @Query(value = "SELECT COUNT(*) AS matching_choice_count "+
+            "FROM match_answer AS ma1 "+
+            "JOIN match_answer AS ma2 ON ma1.couple_id = ma2.couple_id " +
+            "WHERE ma1.link_match_id = ma2.link_match_id " +
+            "  AND YEAR(ma1.created_at) = :year " +
+            "  AND MONTH(ma1.created_at) = :month " +
+            "  AND ma1.couple_id = :coupleId " +
+            "  AND ma1.choice = ma2.choice " +
+            "  AND ma1.id < ma2.id", nativeQuery = true)
+    int monthSuccessMatchCountByCoupleId(@Param("coupleId") Long coupleId, @Param("year")String year, @Param("month")String month);
 
 }

@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/couple")
@@ -110,8 +111,8 @@ public class CoupleMatchController {
     }
 
     // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트)
-    @GetMapping("/statistics/dailyMatch")
-    public ResponseEntity<?> getStatisticsDailyMatchById() {
+    @GetMapping("/statistics/dailyMatch/{coupleId}")
+    public ResponseEntity<?> getStatisticsDailyMatchById(@PathVariable Long coupleId) {
         try{
             Date todayDate = new Date();
             LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -121,11 +122,12 @@ public class CoupleMatchController {
             if(todayMatch == null) {
                 return ResponseEntity.notFound().build();
             }
-            // 성별 별 비율 통계
-            statisticsService.matchCountGenderById(todayMatch);
 
-            // 매칭된 커플 퍼센트
+            Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, coupleId);
 
+            if(rateResult == null) {
+                return ResponseEntity.notFound().build();
+            }
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
