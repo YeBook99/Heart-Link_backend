@@ -103,4 +103,13 @@ public class MessageController {
 
         return ResponseEntity.ok("rejection success");
     }
+
+//    비공개 사용자 메시지 요청 수락
+    @PutMapping("/message/accept/{msgRoomId}")
+    public ResponseEntity<String> applyAccept(@PathVariable("msgRoomId") Long msgRoomId){
+
+        messageRoomService.applyAccept(msgRoomId);
+
+        return ResponseEntity.ok("accept success");
+    }
 }
