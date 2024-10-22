@@ -96,7 +96,12 @@ public class PostController {
 	}
 	
 	// 특정 게시글 댓글 출력
-//	@GetMapping("/{postId}")
+	@GetMapping("/single/{feedId}")
+	public ResponseEntity<PostDTO> getPostWithComments(@PathVariable Long postId){
+		PostDTO postDTO = postService.getPostWithComments(postId);
+		
+		return ResponseEntity.ok(postDTO);
+	}
 
 
 }
