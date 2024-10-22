@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.message.controller;
 
+import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.dto.ChatUserDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
@@ -46,5 +47,14 @@ public class MessageController {
     @PostMapping("/messages")
     public void saveChatMessage(@RequestBody ChatMsgListDTO chatMsgListDTO){
         messageService.saveChatMessage(chatMsgListDTO);
+    }
+
+//    비공개 사용자에게 메시지 요청보내기
+    @PostMapping("/messages/apply")
+    public ResponseEntity<String> applyMessage(@RequestBody ApplyMessageDTO applyMessageDTO) {
+
+        messageRoomService.applyMessage(applyMessageDTO);
+
+        return ResponseEntity.ok("apply success");
     }
 }
