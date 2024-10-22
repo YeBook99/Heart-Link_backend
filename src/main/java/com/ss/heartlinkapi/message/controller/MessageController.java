@@ -3,10 +3,8 @@ package com.ss.heartlinkapi.message.controller;
 import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.dto.ChatUserDTO;
-import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
-import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -90,7 +87,7 @@ public class MessageController {
     }
     
 //    비공개 사용자에게 메시지 요청보내기
-    @PostMapping("/messages/apply")
+    @PostMapping("/message/apply")
     public ResponseEntity<String> applyMessage(@RequestBody ApplyMessageDTO applyMessageDTO) {
 
         messageRoomService.applyMessage(applyMessageDTO);
@@ -98,4 +95,12 @@ public class MessageController {
         return ResponseEntity.ok("apply success");
     }
 
+//    비공개 사용자 메세지 요청 거절
+    @GetMapping("/message/rejection/{msgRoomId}")
+    public ResponseEntity<String> applyRejection(@PathVariable("msgRoomId") Long msgRoomId) {
+
+        messageRoomService.applyRejection(msgRoomId);
+
+        return ResponseEntity.ok("rejection success");
+    }
 }
