@@ -94,6 +94,9 @@ public class PostController {
 		}
 		
 	}
+	
+	// 특정 게시글 댓글 출력
+//	@GetMapping("/{postId}")
 
 
 }

@@ -28,6 +28,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	           "OR (b.blockedId.id = :userId AND b.coupleId.id = p.userId.userId)) " +  // 차단된 유저나 차단한 유저의 게시물 필터링
 	           "ORDER BY p.createdAt DESC")
 	List<PostEntity> findNonFollowedAndNonReportedPosts(@Param("userId") Long userId);
+	
 
 	
 

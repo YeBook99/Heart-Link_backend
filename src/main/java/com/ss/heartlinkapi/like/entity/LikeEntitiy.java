@@ -24,7 +24,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "like")
+@Table(name = "likes")
 @EntityListeners(AuditingEntityListener.class)
 public class LikeEntitiy {
 	@Id
@@ -37,11 +37,11 @@ public class LikeEntitiy {
 	private UserEntity userId;				// 회원 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", nullable = false)
+	@JoinColumn(name = "post_id")
 	private PostEntity postId;				// 게시글 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id", nullable = false)
+	@JoinColumn(name = "comment_id")
 	private CommentEntity commentId;		// 댓글 아이디
 	
 	@CreatedDate
