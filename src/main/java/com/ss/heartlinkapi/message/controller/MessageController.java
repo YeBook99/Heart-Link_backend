@@ -1,9 +1,6 @@
 package com.ss.heartlinkapi.message.controller;
 
-import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
-import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
-import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
-import com.ss.heartlinkapi.message.dto.ChatUserDTO;
+import com.ss.heartlinkapi.message.dto.*;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,26 +43,41 @@ public class MessageController {
         return ResponseEntity.ok(list);
     }
 
-    //    보낸 메세지를 저장
-    @PostMapping("/messages")
-    public void saveChatMessage(@RequestParam("file") MultipartFile multipartFile,
-                                @RequestParam("msgRoomId") Long msgRoomId,
-                                @RequestParam("content") String content,
-                                @RequestParam("emoji") String emoji,
-                                @RequestParam("senderId") Long senderId,
-//                                @RequestParam("lastMessageTime") LocalDateTime lastMessageTime,
-                                @RequestParam("isRead") boolean isRead) {
+//    텍스트 메세지를 저장
+    @PostMapping("/messages/text")
+    public ResponseEntity<String> createTextMessage(@RequestBody TextMessageDTO textMessageDTO) {
 
+        ChatMsgListDTO chatMsgListDTO = new ChatMsgListDTO().builder()
+                .msgRoomId(textMessageDTO.getMsgRoomId())
+                .senderId(textMessageDTO.getSenderId())
+                .content(textMessageDTO.getContent())
+                .lastMessageTime(LocalDateTime.now())
+                .isRead(false)
+                .build();
+
+        messageService.saveChatMessage(chatMsgListDTO);
+
+        return ResponseEntity.ok("save message");
+    }
+
+    //    이미지 파일 또는 gif를 메시지 저장
+    @PostMapping("/messages/img")
+    public void saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
+                                @RequestParam("msgRoomId") Long msgRoomId,
+                                @RequestParam("senderId") Long senderId) {
+
+//        이미지가 비었는지 확인
         if (multipartFile.isEmpty()) {
-            log.info("파일이 비었습니다.");
-        } else {
-            log.info("파일은: {}", multipartFile.getOriginalFilename());
-            log.info("파일 사이즈는: {}", multipartFile.getSize());
+            log.error("이미지가 없습니다.");
+
         }
 
         try {
-//            이미지를 저장하는 과정
-            String filePath = "src/main/resources/static/img/" + multipartFile.getOriginalFilename();
+//            현재 heartlink-api폴더 경로를 가져옴.
+            String currentPath = Paths.get("").toAbsolutePath().toString();
+
+//            img파일 위치 경로에 파일 이름을 더해 filePath에 저장
+            String filePath = currentPath + "/src/main/resources/static/img/" + multipartFile.getOriginalFilename();
             multipartFile.transferTo(new File(filePath));
 
 //            이미지를 가져올 경로를 저장하는 과정
@@ -72,11 +86,10 @@ public class MessageController {
             ChatMsgListDTO chatMsgListDTO = new ChatMsgListDTO().builder()
                     .msgRoomId(msgRoomId)
                     .senderId(senderId)
-                    .content(content)
-                    .emoji(emoji)
+                    .emoji(null)
                     .imageUrl(ImportPath)
-//                    .lastMessageTime(lastMessageTime)
-                    .isRead(isRead)
+                    .lastMessageTime(LocalDateTime.now())
+                    .isRead(false)
                     .build();
 
             messageService.saveChatMessage(chatMsgListDTO);
