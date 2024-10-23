@@ -35,6 +35,9 @@ public class CoupleMatchStatisticsService {
     @Autowired
     private CoupleRepository coupleRepository;
 
+    Date todayDate = new Date();
+    LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
     // 통계 - 커플 매치 통계
     public Map<String, Object> matchRate(LinkMatchEntity matchQuestion, Long coupleId) {
         List<Object[]> result = matchAnswerRepository.matchCountGenderById(matchQuestion.getLinkMatchId());
@@ -43,34 +46,25 @@ public class CoupleMatchStatisticsService {
         MatchGenderRateDTO genderRateResult = matchGenderRate(result);
         // 오늘 매치 질문에 대한 매칭 성공 확률
         int todayMatchRate = matchCoupleRate(matchQuestion);
-        // 이번 달 모든 커플의 매칭 성공 횟수
+        // 이번달, 저번달, 저저번달 모든 커플의 매칭 성공 횟수
         // 0 : 이번달, 1 : 저번달, 2 : 저저번달
         int[] monthAllMatchCount = monthSuccessMatchCount();
-        // 해당 커플의 매치카운트 횟수 조회
-        CoupleEntity couple = coupleRepository.findById(coupleId).orElse(null);
-        monthSuccessMatchCountByCoupleId(coupleId);
-
-        // 커플 조회 실패 시
-        if(couple == null) {
-            return null;
-        }
+        // 이번달, 저번달, 저저번달 해당 커플의 매치카운트 횟수 조회
+        // 0 : 이번달, 1 : 저번달, 2 : 저저번달
+        int[] monthOneMatchCount = monthSuccessMatchCountByCoupleId(coupleId);
 
         Map<String, Object> mathRate = new HashMap<>();
-//        mathRate.put("gender_m_0_count", genderRateResult.getChoice0ByM());
-//        mathRate.put("gender_m_1_count", genderRateResult.getChoice1ByM());
-//        mathRate.put("gender_f_0_count", genderRateResult.getChoice0ByF());
-//        mathRate.put("gender_f_1_count", genderRateResult.getChoice1ByF());
-//        mathRate.put("gender_m_totalCount", genderRateResult.getTotalMCount());
-//        mathRate.put("gender_f_totalCount", genderRateResult.getTotalFCount());
         mathRate.put("gender_m_0_rate", genderRateResult.getSelect0RateM());
         mathRate.put("gender_m_1_rate", genderRateResult.getSelect1RateM());
         mathRate.put("gender_f_0_rate", genderRateResult.getSelect0RateF());
         mathRate.put("gender_f_1_rate", genderRateResult.getSelect1RateF());
         mathRate.put("todayMatchRate", todayMatchRate);
-        mathRate.put("thisMonthAllMatchCount", monthAllMatchCount[0]);
-        mathRate.put("before1MonthAllMatchCount", monthAllMatchCount[1]);
-        mathRate.put("before2MonthAllMatchCount", monthAllMatchCount[2]);
-        mathRate.put("ourCoupleMatchCount", couple.getMatchCount());
+        mathRate.put("thisMonthAllMatchAvgCount", monthAllMatchCount[0]);
+        mathRate.put("before1MonthAllMatchAvgCount", monthAllMatchCount[1]);
+        mathRate.put("before2MonthAllMatchAvgCount", monthAllMatchCount[2]);
+        mathRate.put("ourThisCoupleMatchCount", monthOneMatchCount[0]);
+        mathRate.put("ourBefore1CoupleMatchCount", monthOneMatchCount[1]);
+        mathRate.put("ourBefore2CoupleMatchCount", monthOneMatchCount[2]);
 
         return mathRate;
     }
@@ -82,8 +76,14 @@ public class CoupleMatchStatisticsService {
 
     // 통계 - 이번달, 저번달, 저저번달 해당 커플의 매치 성공 횟수
     private int[] monthSuccessMatchCountByCoupleId(Long coupleId){
-        
-        return matchAnswerRepository.monthSuccessMatchCountByCoupleId(coupleId);
+        int thisMonthSuccessMatchCount = matchAnswerRepository.monthSuccessMatchCountByCoupleId(coupleId, today.getYear(), today.getMonthValue());
+        System.out.println("해당 커플의 이번달 매치 성공 : "+thisMonthSuccessMatchCount);
+        int before1MonthSuccessMatchCount = matchAnswerRepository.monthSuccessMatchCountByCoupleId(coupleId, today.getYear(), today.getMonthValue()-1);
+        System.out.println("해당 커플의 저번달 매치 성공 : "+before1MonthSuccessMatchCount);
+        int before2MonthSuccessMatchCount = matchAnswerRepository.monthSuccessMatchCountByCoupleId(coupleId, today.getYear(), today.getMonthValue()-2);
+        System.out.println("해당 커플의 저저번달 매치 성공 : "+before2MonthSuccessMatchCount);
+        int[] result = {thisMonthSuccessMatchCount, before1MonthSuccessMatchCount, before2MonthSuccessMatchCount};
+        return result;
     }
 
     // 통계 - 성별 별 매치 선택 횟수로 통계 구하기
@@ -113,31 +113,49 @@ public class CoupleMatchStatisticsService {
 
     // 통계 - 매칭된 커플 비율(매치 확률)
     private int matchCoupleRate(LinkMatchEntity matchQuestion) {
-        Date todayDate = new Date();
-        LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         List<Integer> countList = matchAnswerRepository.todayTotalAnswerCountGroupByCoupleId(today);
         int todayAllAnswerCount = countList.size(); // 오늘 매치 답변한 커플 쌍의 수
         int todayMatchCountResult = matchAnswerRepository.todaySuccessMatchCount(); // 오늘 매치에 성공한 커플 쌍의 수
 
         int todayMatchRate = (int) Math.round(((double) todayMatchCountResult / todayAllAnswerCount) * 100);
-
+        System.out.println("오늘 매칭된 커플 비율 : "+todayMatchRate);
         return todayMatchRate;
     }
 
-    // 통계 - 이번달, 저번달, 저저번달 모든 커플의 매치 성공 횟수
+    // 통계 - 이번달, 저번달, 저저번달 모든 커플의 매치 성공 평균 횟수
     private int[] monthSuccessMatchCount() {
         LocalDate today = LocalDate.now();
-        LocalDate startDate = LocalDate.of(today.getYear(), today.getMonth(), 1);          // 시작일
-        LocalDate endDate = startDate.plusMonths(1);
-        int thisMonthSuccessMatchCount = matchAnswerRepository.monthSuccessMatchCount(startDate.toString(), endDate.toString());
-        startDate = startDate.minusMonths(1);
-        endDate = startDate.plusMonths(1);
-        int before1MonthSuccessMatchCount = matchAnswerRepository.monthSuccessMatchCount(startDate.toString(), endDate.toString());
-        startDate = startDate.minusMonths(1);
-        endDate = startDate.plusMonths(1);
-        int before2MonthSuccessMatchCount = matchAnswerRepository.monthSuccessMatchCount(startDate.toString(), endDate.toString());
 
-        int[] result = {thisMonthSuccessMatchCount, before1MonthSuccessMatchCount, before2MonthSuccessMatchCount};
+        LocalDate startDate = today.withDayOfMonth(1);
+        LocalDate endDate = startDate.plusMonths(1);
+        int matchCount = matchAnswerRepository.monthSuccessMatchCount(startDate.toString(), endDate.toString());
+        System.out.println("이번달 매칭된 커플전체 답변 전체 수 : "+matchCount);
+        int coupleCount = matchAnswerRepository.attendMatchCoupleCount(today.getYear(), today.getMonthValue());
+        System.out.println("이번달 매칭에 참여한 커플 수 : "+coupleCount);
+
+        int thisMonthAvgCount = coupleCount == 0 ? 0 : (int) (matchCount / coupleCount);
+
+        LocalDate before1Month = today.minusMonths(1);
+        startDate = before1Month.withDayOfMonth(1);
+        endDate = startDate.plusMonths(1);
+        matchCount = matchAnswerRepository.monthSuccessMatchCount(startDate.toString(), endDate.toString());
+        System.out.println("저번달 매칭된 커플전체 답변 전체 수 : "+matchCount);
+        coupleCount = matchAnswerRepository.attendMatchCoupleCount(before1Month.getYear(), before1Month.getMonthValue());
+        System.out.println("저번달 매칭에 참여한 커플 수 : "+coupleCount);
+
+        int before1MonthAvgCount = coupleCount == 0 ? 0 : (int) (matchCount / coupleCount);
+
+        LocalDate before2Month = today.minusMonths(2);
+        startDate = before2Month.withDayOfMonth(1);
+        endDate = startDate.plusMonths(1);
+        matchCount = matchAnswerRepository.monthSuccessMatchCount(startDate.toString(), endDate.toString());
+        System.out.println("저저번달 매칭된 커플전체 답변 전체 수 : "+matchCount);
+        coupleCount = matchAnswerRepository.attendMatchCoupleCount(before2Month.getYear(), before2Month.getMonthValue());
+        System.out.println("저저번달 매칭에 참여한 커플 수 : "+coupleCount);
+
+        int before2MonthAvgCount = coupleCount == 0 ? 0 : (int) (matchCount / coupleCount);
+
+        int[] result = {thisMonthAvgCount, before1MonthAvgCount, before2MonthAvgCount};
         return result;
     }
 }

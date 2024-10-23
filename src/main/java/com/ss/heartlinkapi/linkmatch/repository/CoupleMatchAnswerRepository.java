@@ -41,13 +41,13 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
     List<Integer> todayTotalAnswerCountGroupByCoupleId(LocalDate today);
 
     // 통계 - 오늘 매치 답변에 매치성공한 커플 쌍의 수
-    @Query(value = "SELECT COUNT(*) AS matching_couples\n" +
-            "FROM (\n" +
-            "    SELECT couple_id\n" +
-            "    FROM match_answer\n" +
-            "    WHERE created_at = CURDATE()\n" +
-            "    GROUP BY couple_id, choice\n" +
-            "    HAVING COUNT(*) = 2\n" +
+    @Query(value = "SELECT COUNT(*) AS matching_couples " +
+            "FROM ( " +
+            "    SELECT couple_id " +
+            "    FROM match_answer " +
+            "    WHERE created_at = CURDATE() " +
+            "    GROUP BY couple_id, choice " +
+            "    HAVING COUNT(*) = 2 " +
             ") AS matched", nativeQuery = true)
     int todaySuccessMatchCount();
 
@@ -72,6 +72,12 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "  AND ma1.couple_id = :coupleId " +
             "  AND ma1.choice = ma2.choice " +
             "  AND ma1.id < ma2.id", nativeQuery = true)
-    int monthSuccessMatchCountByCoupleId(@Param("coupleId") Long coupleId, @Param("year")String year, @Param("month")String month);
+    int monthSuccessMatchCountByCoupleId(@Param("coupleId") Long coupleId, @Param("year")int year, @Param("month")int month);
 
+    // 통계 - 한 달동안 매치에 답변한 커플 쌍의 수(중복없이)
+    @Query(value = "SELECT COUNT(DISTINCT couple_id) AS unique_couple_count " +
+            "FROM match_answer " +
+            "WHERE YEAR(created_at) = :year " +
+            "  AND MONTH(created_at) = :month", nativeQuery = true)
+    int attendMatchCoupleCount(@Param("year") int year, @Param("month") int month);
 }

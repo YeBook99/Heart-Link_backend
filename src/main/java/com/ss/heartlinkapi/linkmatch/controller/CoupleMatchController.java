@@ -110,7 +110,7 @@ public class CoupleMatchController {
         }
     }
 
-    // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트)
+    // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트, 월별 매칭 횟수 조회)
     @GetMapping("/statistics/dailyMatch/{coupleId}")
     public ResponseEntity<?> getStatisticsDailyMatchById(@PathVariable Long coupleId) {
         try{
@@ -129,7 +129,7 @@ public class CoupleMatchController {
                 return ResponseEntity.notFound().build();
             }
 
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(rateResult);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
