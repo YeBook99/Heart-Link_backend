@@ -86,4 +86,15 @@ public class MessageRoomService {
         messageRoomEntity.setType("N");
         messageRoomRepository.save(messageRoomEntity);
     }
+//    msgRoomId를 기준으로 방을 삭제
+    public void applyRejection(Long msgRoomId) {
+        messageRoomRepository.deleteById(msgRoomId);
+    }
+
+//    msgRoomId를 기준으로 type을 y로 업데이트
+    public void applyAccept(Long msgRoomId) {
+        MessageRoomEntity messageRoomEntity = messageRoomRepository.findById(msgRoomId).orElseThrow(() -> new RuntimeException("MsgRoomId not found"));
+        messageRoomEntity.setType("Y");
+        messageRoomRepository.save(messageRoomEntity);
+    }
 }
