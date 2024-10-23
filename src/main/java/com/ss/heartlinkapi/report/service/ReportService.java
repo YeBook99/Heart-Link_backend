@@ -1,22 +1,46 @@
 package com.ss.heartlinkapi.report.service;
 
-import java.util.List;
 
-import javax.transaction.Transactional;
-
+import com.ss.heartlinkapi.comment.entity.CommentEntity;
+import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.report.dto.AddReportDTO;
+import com.ss.heartlinkapi.report.entity.Status;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
-import com.ss.heartlinkapi.report.dto.ReportDTO;
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.report.repository.ReportRepository;
 
 @Service
 public class ReportService {
-	
-	private final ReportRepository reportRepository;
-	
-	public ReportService(ReportRepository reportRepository) {
-		this.reportRepository = reportRepository;
-	}
 
+    private final ReportRepository reportRepository;
+
+    public ReportService(ReportRepository reportRepository) {
+        this.reportRepository = reportRepository;
+    }
+
+    public void addReport(AddReportDTO addReportDTO) {
+
+//		entity생성
+		CommentEntity comment = new CommentEntity();
+		PostEntity post = new PostEntity();
+		UserEntity user = new UserEntity();
+
+//		각 엔티티에 id값 설정
+		comment.setCommentId(addReportDTO.getCommentId());
+		post.setPostId(addReportDTO.getPostId());
+		user.setUserId(addReportDTO.getUserId());
+
+//		각 엔티티 reportEntity에 합치기
+		ReportEntity reportEntity = new ReportEntity();
+		reportEntity.setUserId(user);
+		reportEntity.setPostId(post);
+		reportEntity.setCommentId(comment);
+		reportEntity.setReason(addReportDTO.getReason());
+		reportEntity.setStatus(Status.valueOf("AWAIT"));
+
+//		저장
+		reportRepository.save(reportEntity);
+    }
 }
