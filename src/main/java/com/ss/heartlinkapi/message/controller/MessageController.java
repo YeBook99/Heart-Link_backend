@@ -1,9 +1,6 @@
 package com.ss.heartlinkapi.message.controller;
 
-import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
-import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
-import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
-import com.ss.heartlinkapi.message.dto.ChatUserDTO;
+import com.ss.heartlinkapi.message.dto.*;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -46,8 +43,25 @@ public class MessageController {
         return ResponseEntity.ok(list);
     }
 
-    //    이미지 파일 또는 gif를 메시지로 보낸 경우
-    @PostMapping("/messages")
+//    텍스트 메세지를 저장
+    @PostMapping("/messages/text")
+    public ResponseEntity<String> createTextMessage(@RequestBody TextMessageDTO textMessageDTO) {
+
+        ChatMsgListDTO chatMsgListDTO = new ChatMsgListDTO().builder()
+                .msgRoomId(textMessageDTO.getMsgRoomId())
+                .senderId(textMessageDTO.getSenderId())
+                .content(textMessageDTO.getContent())
+                .lastMessageTime(LocalDateTime.now())
+                .isRead(false)
+                .build();
+
+        messageService.saveChatMessage(chatMsgListDTO);
+
+        return ResponseEntity.ok("save message");
+    }
+
+    //    이미지 파일 또는 gif를 메시지 저장
+    @PostMapping("/messages/img")
     public void saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
                                 @RequestParam("msgRoomId") Long msgRoomId,
                                 @RequestParam("senderId") Long senderId) {
