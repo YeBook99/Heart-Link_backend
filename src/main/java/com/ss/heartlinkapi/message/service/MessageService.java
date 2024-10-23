@@ -1,10 +1,16 @@
 package com.ss.heartlinkapi.message.service;
 
+import com.ss.heartlinkapi.block.entity.BlockEntity;
+import com.ss.heartlinkapi.block.repository.BlockRepository;
+import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
+import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,7 +23,8 @@ import java.util.List;
 public class MessageService {
 
     private final MessageRepository messageRepository;
-
+    private final BlockRepository blockRepository;
+    private final UserRepository userRepository;
     /*
     * 사용자들의 대화내역은 채팅방 번호 즉 msgRoomId를 기본키로 해서 저장되므로
     * 이를 기준으로 메세지를 list형태에 저장하여 가져온다.
@@ -69,6 +76,18 @@ public class MessageService {
     }
 
 
+    public boolean blockMessage(BlockUserCheckDTO blockUserCheckDTO) {
 
+//        받아온 userid, blockUserId를 엔티티로 변환
+        UserEntity user = userRepository.findById(blockUserCheckDTO.getUserId()).get();
+        UserEntity blockUser = userRepository.findById(blockUserCheckDTO.getBlockUserId()).get();
+
+//        blockUserId와 UserId에 맞는 튜플이 있다면 반환하기
+        if(blockRepository.findByBlockedIdAndBlockerId(blockUser, user)!=null)
+            return true;
+
+        return false;
+
+    }
 }
 
