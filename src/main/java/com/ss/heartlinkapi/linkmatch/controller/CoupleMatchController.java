@@ -6,12 +6,18 @@ import com.ss.heartlinkapi.linkmatch.dto.MatchAnswer;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
+import com.ss.heartlinkapi.linkmatch.service.CoupleMatchStatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/couple")
@@ -22,6 +28,9 @@ public class CoupleMatchController {
 
     @Autowired
     private CoupleService coupleService;
+
+    @Autowired
+    private CoupleMatchStatisticsService statisticsService;
 
     // 커플 매치 질문 조회
     @GetMapping("/missionmatch/questions")
@@ -99,6 +108,33 @@ public class CoupleMatchController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트, 월별 매칭 횟수 조회)
+    @GetMapping("/statistics/dailyMatch/{coupleId}")
+    public ResponseEntity<?> getStatisticsDailyMatchById(@PathVariable Long coupleId) {
+        try{
+            Date todayDate = new Date();
+            LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            LinkMatchEntity todayMatch = statisticsService.findMatchByDate(today);
+
+            if(todayMatch == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, coupleId);
+
+            if(rateResult == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(rateResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
     }
 
 }
