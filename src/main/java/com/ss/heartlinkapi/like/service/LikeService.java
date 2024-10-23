@@ -29,6 +29,8 @@ public class LikeService {
 					.map(like -> new LikeDTO(
 						like.getLikeId(),
 						like.getUserId().getUserId(),
+						like.getUserId().getLoginId(),
+						like.getUserId().getProfileEntity(),
 						postId,
 						null,
 						like.getCreatedAt()

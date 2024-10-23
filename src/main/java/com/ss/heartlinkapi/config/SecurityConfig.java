@@ -73,6 +73,7 @@ public class SecurityConfig {
 						// 정훈 전용
 						.antMatchers("/feed/**").permitAll()
 						.antMatchers("/following/**").permitAll()
+						.antMatchers("/like/**").permitAll()
                         .anyRequest().authenticated());
         http.addFilterBefore(new JWTFilter(jwtService), LoginFilter.class);
         http.addFilterAt(new LoginFilter(customUserDetailsService, bCryptPasswordEncoder(), authenticationManager(),jwtUtil,refreshTokenService), UsernamePasswordAuthenticationFilter.class);

@@ -22,7 +22,7 @@ public class LikeController {
 	}
 	
 	// 게시글의 좋아요 조회
-    @GetMapping("/post/{postId}/users")
+    @GetMapping("/{postId}/users")
     public ResponseEntity<List<LikeDTO>> getLikesByPostId(@PathVariable Long postId) {
         List<LikeDTO> likes = likeService.getLikesByPostId(postId);
         return ResponseEntity.ok(likes);
