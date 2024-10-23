@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.like.entity;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,7 +27,7 @@ import lombok.Data;
 @Data
 @Table(name = "likes")
 @EntityListeners(AuditingEntityListener.class)
-public class LikeEntitiy {
+public class LikeEntity {
 	@Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +47,6 @@ public class LikeEntitiy {
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable= false, updatable = false)
-	private Timestamp createdAt;			// 생성일시
+	private LocalDateTime createdAt;			// 생성일시
 
 }
