@@ -1,6 +1,6 @@
 package com.ss.heartlinkapi.comment.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -49,11 +49,11 @@ public class CommentEntity {
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable= false, updatable = false)
-	private Timestamp createdAt;			// 작성 시간
+	private LocalDateTime createdAt;			// 작성 시간
 	
 	@LastModifiedDate
 	@Column(name = "update_at")
-	private Timestamp updatedAt;			// 수정 시간
+	private LocalDateTime updatedAt;			// 수정 시간
 	
 	
 

@@ -2,8 +2,10 @@ package com.ss.heartlinkapi.post.service;
 
 import java.lang.System.Logger;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
+import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
@@ -96,6 +99,7 @@ public class PostService {
 	                                    file.getFileType(),
 	                                    file.getSortOrder()))
 	                                .collect(Collectors.toList()),
+	                                null,
 		                    partner != null ? partner.getLoginId() : "No Partner"
 		                );
 	                })
@@ -128,58 +132,108 @@ public class PostService {
                                     file.getFileType(),
                                     file.getSortOrder()))
                                 .collect(Collectors.toList()),
+                                null,
 	                    partner != null ? partner.getLoginId() : "No Partner"
 	    					);
 	    		})
 	    		.collect(Collectors.toList());
 	}
 	
-	// 특정 게시글 댓글 조회
-	public PostDTO getPostWithComments(Long postId) {
-		
-		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
-		UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
-		List<CommentEntity> comments = commentRepository.findByPostId(postId);
-		List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-		
-		// 게시글 + 게시글 첨부파일 데이터
-		PostDTO postDTO = new PostDTO(
-				post.getPostId(),
-				post.getUserId().getLoginId(),
-				post.getContent(),
-				post.getCreatedAt(),
-				post.getUpdatedAt(),
-				post.getLikeCount(),
-				post.getCommentCount(),
-				post.getVisibility(),
-				postFiles.stream()
+	// 게시글 상세보기
+	public PostDTO getPostById(Long postId) {
+	    Optional<PostEntity> optionalPost = postRepository.findById(postId);
+	    
+	    // 값이 존재하는 경우
+	    if (optionalPost.isPresent()) {
+	        PostEntity post = optionalPost.get();
+	        List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+	        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+	        
+	        // 댓글 목록 가져오기
+	        List<CommentEntity> comments = commentRepository.findByPostId(post); // post.getPostId()로 수정
+	        List<CommentDTO> commentDTO = comments.stream()
+	            .map(comment -> new CommentDTO(
+	                comment.getCommentId(),
+	                comment.getPostId().getPostId(),
+	                comment.getParentId() != null ? comment.getParentId().getCommentId() : null,
+	                comment.getUserId().getUserId(),
+	                comment.getContent(),
+	                comment.getCreatedAt(),
+	                comment.getUpdatedAt()
+	            ))
+	            .collect(Collectors.toList());
+	        
+	        return new PostDTO(
+	            post.getPostId(),
+	            post.getUserId().getLoginId(),
+	            post.getContent(),
+	            post.getCreatedAt(),
+	            post.getUpdatedAt(),
+	            post.getLikeCount(),
+	            post.getCommentCount(),
+	            post.getVisibility(),
+	            postFiles.stream()
 	                .map(file -> new PostFileDTO(
 	                    post.getPostId(),
 	                    file.getFileUrl(),
 	                    file.getFileType(),
 	                    file.getSortOrder()))
 	                .collect(Collectors.toList()),
-	           partner != null ? partner.getLoginId() : "No Partner"
-			);
-		
-		// 댓글 데이터
-		List<CommentDTO> commentDTO = comments.stream()
-				.map(comment -> new CommentDTO(
-					comment.getCommentId(),
-					comment.getPostId().getPostId(),
-					comment.getParentId()  != null ? comment.getParentId().getCommentId() : null,
-					comment.getUserId().getLoginId(),
-					comment.getContent(),
-					comment.getCreatedAt(),
-					comment.getUpdatedAt()
-				))
-				.collect(Collectors.toList());
-		
-		postDTO.setComments(commentDTO);
-		
-				
-		return postDTO;		
+	            commentDTO.isEmpty() ? Collections.emptyList() : commentDTO, // 댓글이 없으면 빈 리스트
+	            partner != null ? partner.getLoginId() : "No Partner"
+	        );
+	    } else {
+	        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
+	    }
 	}
+
+	
+//	// 특정 게시글 댓글 조회
+//	public PostDTO getPostWithComments(Long postId) {
+//		
+//		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
+//		UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+//		List<CommentEntity> comments = commentRepository.findByPostId(post.getPostId());
+//		List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+//		
+//		// 게시글 + 게시글 첨부파일 데이터
+//		PostDTO postDTO = new PostDTO(
+//				post.getPostId(),
+//				post.getUserId().getLoginId(),
+//				post.getContent(),
+//				post.getCreatedAt(),
+//				post.getUpdatedAt(),
+//				post.getLikeCount(),
+//				post.getCommentCount(),
+//				post.getVisibility(),
+//				postFiles.stream()
+//	                .map(file -> new PostFileDTO(
+//	                    post.getPostId(),
+//	                    file.getFileUrl(),
+//	                    file.getFileType(),
+//	                    file.getSortOrder()))
+//	                .collect(Collectors.toList()),
+//	           partner != null ? partner.getLoginId() : "No Partner"
+//			);
+//		
+//		// 댓글 데이터
+//		List<CommentDTO> commentDTO = comments.stream()
+//				.map(comment -> new CommentDTO(
+//					comment.getCommentId(),
+//					comment.getPostId().getPostId(),
+//					comment.getParentId()  != null ? comment.getParentId().getCommentId() : null,
+//					comment.getUserId().getLoginId(),
+//					comment.getContent(),
+//					comment.getCreatedAt(),
+//					comment.getUpdatedAt()
+//				))
+//				.collect(Collectors.toList());
+//		
+//		postDTO.setComments(commentDTO);
+//		
+//				
+//		return postDTO;		
+//	}
 
 
 }
