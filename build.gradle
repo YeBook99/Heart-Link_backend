@@ -42,6 +42,7 @@ dependencies {
     implementation 'co.elastic.clients:elasticsearch-java:7.17.12'
     implementation 'org.glassfish:jakarta.json:2.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 }
 
