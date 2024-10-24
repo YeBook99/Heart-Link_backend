@@ -9,23 +9,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ss.heartlinkapi.oauth2.service.CustomOAuth2UserService;
+import com.ss.heartlinkapi.oauth2.service.PhoneService;
 
 
 @RestController
 @RequestMapping("/user/auth")
 public class OAuth2Controller {
 	
-	private final CustomOAuth2UserService service;
-
-	public OAuth2Controller(CustomOAuth2UserService service) {
-		this.service = service;
+	private final PhoneService phoneService;
+	
+	public OAuth2Controller(PhoneService phoneService) {
+		this.phoneService = phoneService;
 	}
+
 
 	@PostMapping("/phone")
 	public ResponseEntity<Void> setPhoneNumber(@RequestBody Map<String, String> request,@RequestParam String providerId){
 		String phone = request.get("phone");
-		service.setPhone(phone);
+		phoneService.storeTempPhone(providerId, phone);
 		return ResponseEntity.ok().build();
 	}
 	
