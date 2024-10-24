@@ -27,5 +27,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	           "ORDER BY p.createdAt DESC")
 	    List<PostEntity> findNonFollowedAndNonReportedPosts(@Param("userId") Long userId);
 	
+	// 키워드가 포함된 게시글 내용 검색
+	List<PostEntity> findAllByContentIgnoreCaseContaining(String keyword);
 
 }
