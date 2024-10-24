@@ -47,14 +47,26 @@ public class CoupleService {
     public CoupleEntity coupleCodeMatch(UserEntity user1, CoupleCode code) {
         String coupleCode = code.getCode().toUpperCase().trim();
         UserEntity user2 = userRepository.findByCoupleCode(coupleCode);
-        if(user2 == null) {
-            return null;
-        }
+
         CoupleEntity newCouple = new CoupleEntity();
         newCouple.setUser1(user1);
         newCouple.setUser2(user2);
         newCouple.setCreatedAt(new Timestamp(new Date().getTime()));
         return coupleRepository.save(newCouple);
+    }
+
+    // 커플코드 연결 전 확인
+    public int codeCheck(CoupleCode code){
+        String coupleCode = code.getCode().toUpperCase().trim();
+        UserEntity user = userRepository.findByCoupleCode(coupleCode);
+        if(user == null) {
+            return 1; // 존재하지 않는 커플코드
+        }
+        CoupleEntity couple = coupleRepository.findCoupleByUserId(user.getUserId());
+        if(couple != null) {
+            return 2; // 이미 상대가 커플임
+        }
+        return 3; // 정상
     }
 
     // 커플 해지일 설정
