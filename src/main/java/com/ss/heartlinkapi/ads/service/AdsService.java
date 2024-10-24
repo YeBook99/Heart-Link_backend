@@ -10,18 +10,18 @@ import org.springframework.http.HttpMethod;
 @Service
 public class AdsService {
 
-    private final RestTemplate restTemplate;
-
-    public AdsService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-    public String getGoogleAds(){
-        String url = "https://example.com/google-ads-endpoint";
-
-        HttpHeaders headers = new HttpHeaders();
-
-
-
-    }
+//    private final RestTemplate restTemplate;
+//
+//    public AdsService(RestTemplate restTemplate) {
+//        this.restTemplate = restTemplate;
+//    }
+//
+//    public String getGoogleAds(){
+//        String url = "https://example.com/google-ads-endpoint";
+//
+//        HttpHeaders headers = new HttpHeaders();
+//
+//
+//
+//    }
 }

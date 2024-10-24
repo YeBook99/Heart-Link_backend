@@ -20,16 +20,16 @@ public class AdsController {
     @Autowired
     private AdsService adsService;
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserAds(@PathVariable Long userId){
-        List<SearchHistoryEntity> history = searchService.findHistoryByUserId();
-
-        if(history.isEmpty()){
-            return null;
-//            검색기록이 없을 때
-        }
-
-    }
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<?> getUserAds(@PathVariable Long userId){
+//        List<SearchHistoryEntity> history = searchService.findHistoryByUserId();
+//
+//        if(history.isEmpty()){
+//            return null;
+////            검색기록이 없을 때
+//        }
+//
+//    }
 
 
 }
