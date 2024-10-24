@@ -47,6 +47,30 @@ public class LikeService {
                 })
                 .collect(Collectors.toList());
     }
+
+	// 댓글 좋아요 목록 조회
+	public List<LikeDTO> getLikesByCommentId(Long commentId) {
+
+		List<LikeEntity> likes = likeRepository.findByPostId_PostId(commentId);
+			
+			
+		return likes.stream()
+		            .map(like -> {
+		                
+		                List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(like.getUserId());
+		
+		                return new LikeDTO(
+		                    like.getLikeId(),
+		                    like.getUserId().getUserId(),
+		                    like.getUserId().getLoginId(),
+		                    (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
+		                    null,
+		                    commentId,
+		                    like.getCreatedAt()
+		                );
+		            })
+		            .collect(Collectors.toList());
+	}
 	
 
 }

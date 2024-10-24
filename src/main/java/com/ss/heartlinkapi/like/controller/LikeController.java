@@ -21,18 +21,18 @@ public class LikeController {
 		this.likeService = likeService;
 	}
 	
-	// 게시글의 좋아요 조회
+	// 게시글의 좋아요 목록 조회
     @GetMapping("/{postId}/users")
     public ResponseEntity<List<LikeDTO>> getLikesByPostId(@PathVariable Long postId) {
         List<LikeDTO> likes = likeService.getLikesByPostId(postId);
         return ResponseEntity.ok(likes);
     }
 
-    // 댓글의 좋아요 조회
-//    @GetMapping("/comment/{commentId}/users")
-//    public ResponseEntity<List<LikeDTO>> getLikesByCommentId(@PathVariable Long commentId) {
-//        List<LikeDTO> likes = likeService.getLikesByCommentId(commentId);
-//        return ResponseEntity.ok(likes);
-//    }
+    // 댓글의 좋아요 목록 조회
+    @GetMapping("/comment/{commentId}/users")
+    public ResponseEntity<List<LikeDTO>> getLikesByCommentId(@PathVariable Long commentId) {
+        List<LikeDTO> likes = likeService.getLikesByCommentId(commentId);
+        return ResponseEntity.ok(likes);
+    }
 
 }
