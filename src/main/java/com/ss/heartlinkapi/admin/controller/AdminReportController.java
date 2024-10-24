@@ -5,9 +5,7 @@ import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,5 +39,13 @@ public class AdminReportController {
         }
 
         return ResponseEntity.ok(reportList);
+    }
+
+    @PutMapping("/report/{reportId}/rejection")
+    public ResponseEntity<String> rejectReport(@PathVariable("reportId") Long reportId){
+
+        reportService.updateStatus(reportId);
+
+        return ResponseEntity.ok("reject report");
     }
 }

@@ -1,13 +1,18 @@
 package com.ss.heartlinkapi.report.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.report.entity.ReportEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ReportRepository extends JpaRepository<ReportEntity, Long>{
 
+//    신고 반려처분하는 쿼리문
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE report SET status = 'INVALID' WHERE id = :reportId", nativeQuery = true )
+    void updateStatus(Long reportId);
 }
