@@ -10,14 +10,18 @@ import org.springframework.stereotype.Service;
 import com.ss.heartlinkapi.like.dto.LikeDTO;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
 import com.ss.heartlinkapi.like.repository.LikeRepository;
+import com.ss.heartlinkapi.user.entity.ProfileEntity;
+import com.ss.heartlinkapi.user.repository.ProfileRepository;
 
 @Service
 public class LikeService {
 	
 	private final LikeRepository likeRepository;
+	private final ProfileRepository profileRepository;
 	
-	public LikeService(LikeRepository likeRepository) {
+	public LikeService(LikeRepository likeRepository, ProfileRepository profileRepository) {
 		this.likeRepository = likeRepository;
+		this.profileRepository = profileRepository;
 	}
 	
 	// 게시글 좋아요 목록 조회
@@ -25,18 +29,27 @@ public class LikeService {
 	public List<LikeDTO> getLikesByPostId(Long postId) {
 		List<LikeEntity> likes = likeRepository.findByPostId_PostId(postId);
 		
+		
 		return likes.stream()
-					.map(like -> new LikeDTO(
-						like.getLikeId(),
-						like.getUserId().getUserId(),
-						like.getUserId().getLoginId(),
-						like.getUserId().getProfileEntity(),
-						postId,
-						null,
-						like.getCreatedAt()
-					))
-					.collect(Collectors.toList());
-	}
+                .map(like -> {
+                    Long userId = like.getUserId().getUserId();
+                    String loginId = like.getUserId().getLoginId();
+                    
+                    ProfileEntity profile = profileRepository.findByUserEntity(like.getUserId());
+                    String profileImg = (profile != null) ? profile.getProfile_img() : null;
+
+                    return new LikeDTO(
+                        like.getLikeId(),
+                        userId,
+                        loginId,
+                        profileImg, // 프로필 이미지 추가
+                        postId,
+                        null,
+                        like.getCreatedAt()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 	
 
 }
