@@ -1,10 +1,12 @@
 package com.ss.heartlinkapi.admin.controller;
 
+import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.report.dto.ReportDTO;
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.List;
 public class AdminReportController {
 
     private final ReportService reportService;
+    private final PostService postService;
 
 //    reportlist 불러오는 메서드
     @GetMapping("/report")
@@ -40,13 +43,21 @@ public class AdminReportController {
 
         return ResponseEntity.ok(reportList);
     }
-    
+
 //    신고 반려 기능
-    @PutMapping("/report/{reportId}/rejection")
+    @PutMapping("/report/rejection/{reportId}")
     public ResponseEntity<String> rejectReport(@PathVariable("reportId") Long reportId){
 
         reportService.updateStatus(reportId);
 
         return ResponseEntity.ok("reject report");
+    }
+
+    //    신고받은 내용확인하고 글 삭제하는 기능
+    @DeleteMapping("/report/delete/{postId}")
+    public ResponseEntity<String> deleteFeed(@PathVariable("postId") Long postId) {
+
+        postService.deletePost(postId);
+        return ResponseEntity.ok("delete post");
     }
 }
