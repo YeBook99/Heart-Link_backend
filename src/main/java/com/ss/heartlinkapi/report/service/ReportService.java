@@ -50,4 +50,9 @@ public class ReportService {
     public List<ReportEntity> getAllList() {
 		return reportRepository.findAll();
     }
+
+//		신고 반려 처분하는 메서드
+	public void updateStatus(Long reportId) {
+		reportRepository.updateStatus(reportId);
+	}
 }
