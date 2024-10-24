@@ -40,7 +40,8 @@ public class AdminReportController {
 
         return ResponseEntity.ok(reportList);
     }
-
+    
+//    신고 반려 기능
     @PutMapping("/report/{reportId}/rejection")
     public ResponseEntity<String> rejectReport(@PathVariable("reportId") Long reportId){
 
