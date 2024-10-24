@@ -32,14 +32,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	private final UserRepository userRepository;
 	private final SocialRepository socialRepository;
 	private final ProfileRepository profileRepository;
-	
-	private String phone;
+	private final PhoneService phoneService;
 	
 	public CustomOAuth2UserService(UserRepository userRepository, SocialRepository socialRepository,
-			ProfileRepository profileRepository) {
+			ProfileRepository profileRepository, PhoneService phoneService) {
 		this.userRepository = userRepository;
 		this.socialRepository = socialRepository;
 		this.profileRepository = profileRepository;
+		this.phoneService = phoneService;
 	}
 
 	@Override
@@ -62,15 +62,26 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		String providerId = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
 
 		String phone = null;
+
+		// OAuth2Response에서 전화번호 가져오기
 		if (oAuth2Response.getPhone() != null) {
 			phone = oAuth2Response.getProvider().equals("kakao") ? kakaoFormatPhone(oAuth2Response.getPhone())
 					: oAuth2Response.getPhone();
-		} else {
+		}
+		
+		// Redis에서 전화번호 가져오기
+		String tempPhone = phoneService.retrieveTempPhone(providerId);
+		if(tempPhone!=null) {
+			phone = tempPhone;
+		}
+
+		// 전화번호가 여전히 null인 경우 처리
+		if(phone==null) {
 			if(socialRepository.existsByProviderId(providerId)) {
 				return login(oAuth2Response, providerId);
 			}
-			// 모두 해당하지 않으면 프론트로 전화번호를 요청해야함
-			throw new OAuth2AuthenticationException(new OAuth2Error("전화번호를 입력받아야 합니다.",providerId,null));
+		    // 전화번호 입력 요청
+			throw new OAuth2AuthenticationException(new OAuth2Error("전화번호를 입력받아야 합니다.",providerId, null));		
 		}
 
 		UserEntity existData = userRepository.findByPhone(phone);
@@ -176,10 +187,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		String suffix = suffixes[random.nextInt(suffixes.length)];
 
 		return prefix + " " + suffix;
-	}
-	
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 
 }
