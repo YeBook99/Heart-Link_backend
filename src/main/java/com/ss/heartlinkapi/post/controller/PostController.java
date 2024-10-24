@@ -29,7 +29,7 @@ public class PostController {
 		this.postService = postService;
 	}
 	
-	// 게시글 작성
+	// 게시글 작성 a
 //	@PostMapping("/write")
 //	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
 //		
