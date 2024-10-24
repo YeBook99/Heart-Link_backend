@@ -22,8 +22,10 @@ public class PostDTO {
     private int likeCount;				// 좋아요 수
     private int commentCount;			// 댓글 수
     private Visibility visibility;      // 게시글 공개 타입
+    private String profileImg;			// 프로필 이미지
     private List<PostFileDTO> files;    // 게시글에 첨부된 파일 리스트
     private List<CommentDTO> comments;	// 댓글 리스트
+    
     
     private String partnerId; // 내 커플의 아이디
 //    private List<CommentDTO> comments;	// 댓글 리스트

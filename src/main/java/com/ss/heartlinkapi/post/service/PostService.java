@@ -23,7 +23,9 @@ import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
+import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.ProfileRepository;
 
 
 @Service
@@ -33,12 +35,14 @@ public class PostService {
 	private final PostFileRepository postFileRepository;
 	private final CoupleService coupleService;
 	private final CommentRepository commentRepository;
+	private final ProfileRepository profileRepository;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
 		this.commentRepository = commentRepository;
+		this.profileRepository = profileRepository;
 	}
 
 	// 게시글 작성
@@ -81,7 +85,7 @@ public class PostService {
 	    return posts.stream()
 	                .map(post -> {
 	                    List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-	                    
+	                    List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 	                    UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	                    return new PostDTO(
 	                            post.getPostId(),
@@ -92,6 +96,7 @@ public class PostService {
 	                            post.getLikeCount(),
 	                            post.getCommentCount(),
 	                            post.getVisibility(),
+	                            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
 	                            postFiles.stream()
 	                                .map(file -> new PostFileDTO(
 	                                    post.getPostId(),
@@ -114,7 +119,7 @@ public class PostService {
 	    return posts.stream()
 	    		.map(post -> {
 	    			List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-	    			
+	    			List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 	    			UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	    			return new PostDTO(
 	    					post.getPostId(),
@@ -125,6 +130,7 @@ public class PostService {
                             post.getLikeCount(),
                             post.getCommentCount(),
                             post.getVisibility(),
+                            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
                             postFiles.stream()
                                 .map(file -> new PostFileDTO(
                                     post.getPostId(),
@@ -147,21 +153,29 @@ public class PostService {
 	    if (optionalPost.isPresent()) {
 	        PostEntity post = optionalPost.get();
 	        List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+	        List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 	        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	        
 	        // 댓글 목록 가져오기
 	        List<CommentEntity> comments = commentRepository.findByPostId(post); // post.getPostId()로 수정
 	        List<CommentDTO> commentDTO = comments.stream()
-	            .map(comment -> new CommentDTO(
+	            .map(comment -> {
+	            	List<ProfileEntity> commentProfiles = profileRepository.findAllByUserEntity(comment.getUserId());
+	                String profileImage = (commentProfiles != null && !commentProfiles.isEmpty()) ? commentProfiles.get(0).getProfile_img() : null;
+	            	
+	            return new CommentDTO(
 	                comment.getCommentId(),
 	                comment.getPostId().getPostId(),
 	                comment.getParentId() != null ? comment.getParentId().getCommentId() : null,
 	                comment.getUserId().getUserId(),
 	                comment.getContent(),
 	                comment.getCreatedAt(),
-	                comment.getUpdatedAt()
-	            ))
-	            .collect(Collectors.toList());
+	                comment.getUpdatedAt(),
+	                comment.getUserId().getLoginId(),
+	                profileImage
+	            );
+	        })
+	        .collect(Collectors.toList());
 	        
 	        return new PostDTO(
 	            post.getPostId(),
@@ -172,6 +186,7 @@ public class PostService {
 	            post.getLikeCount(),
 	            post.getCommentCount(),
 	            post.getVisibility(),
+	            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
 	            postFiles.stream()
 	                .map(file -> new PostFileDTO(
 	                    post.getPostId(),
