@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.search.controller;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/search")
 public class SearchController {
 
     @Autowired
     private SearchService searchService;
+
+    @GetMapping("/history")
+    public ResponseEntity<?> searchHistory(@RequestParam Long userId){
+        List<SearchHistoryEntity> historyList = searchService.findHistoryByUserId(userId);
+        return null;
+    }
 
     @GetMapping("/keyword")
     public ResponseEntity<?> search(@RequestParam String keyword, @RequestParam Long userId) {
@@ -41,11 +53,21 @@ public class SearchController {
                 return ResponseEntity.ok(tag.getId());
             } else {
                 System.out.println("키워드 : "+keyword);
-                PostEntity post = searchService.searchByPost(keyword, userId);
+                List<PostEntity> post = searchService.searchByPost(keyword, userId);
                 if(post == null) {
                     return ResponseEntity.notFound().build();
                 }
-                return null;
+                List<Map<String, Object>> postList = new ArrayList<>();
+                for(int i=0; i<post.size(); i++) {
+                    Map<String, Object> postMap = new HashMap<>();
+                    for(int j=0; j<post.size(); j++) {
+                        postMap.put("id", post.get(i).getPostId());
+                        postMap.put("content", post.get(i).getContent());
+                    }
+                    postList.add(i, postMap);
+                }
+
+                return ResponseEntity.ok(postList);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class SearchService {
@@ -89,30 +90,34 @@ public class SearchService {
     }
 
     // 키워드로 게시글 검색
-    public PostEntity searchByPost(String keyword, Long userId) {
-//        LinkTagEntity findTag = postRepository.findByContent(keyword);
-//        UserEntity user = userRepository.findById(userId).orElse(null);
-//
-//        if(user == null || findTag == null) {
-//            return null;
-//        }
-//
-//        SearchHistoryEntity searchHistory = searchRepository.findByKeywordAndTypeAndUserId(keyword, "tag", user);
-//
-//        if(searchHistory != null) {
-//            searchHistory.setUpdatedAt(LocalDateTime.now());
-//            searchRepository.save(searchHistory);
-//        } else {
-//            SearchHistoryEntity searchHistoryEntity = new SearchHistoryEntity();
-//            searchHistoryEntity.setUserId(user);
-//            searchHistoryEntity.setKeyword(findTag.getKeyword());
-//            searchHistoryEntity.setType("tag");
-//            searchHistoryEntity.setCreatedAt(LocalDateTime.now());
-//            SearchHistoryEntity result = searchRepository.save(searchHistoryEntity);
-//            System.out.println("Result : " + result);
-//        }
-        return null;
+    public List<PostEntity> searchByPost(String keyword, Long userId) {
+        keyword = keyword.trim();
+        List<PostEntity> findPost = postRepository.findAllByContentIgnoreCaseContaining(keyword);
+        UserEntity user = userRepository.findById(userId).orElse(null);
+
+        if(user == null || findPost == null) {
+            return null;
+        }
+
+        SearchHistoryEntity searchHistory = searchRepository.findByKeywordAndTypeAndUserId(keyword, "content", user);
+
+        if(searchHistory != null) {
+            searchHistory.setUpdatedAt(LocalDateTime.now());
+            searchRepository.save(searchHistory);
+        } else {
+            SearchHistoryEntity searchHistoryEntity = new SearchHistoryEntity();
+            searchHistoryEntity.setUserId(user);
+            searchHistoryEntity.setKeyword(keyword);
+            searchHistoryEntity.setType("content");
+            searchHistoryEntity.setCreatedAt(LocalDateTime.now());
+            SearchHistoryEntity result = searchRepository.save(searchHistoryEntity);
+            System.out.println("Result : " + result);
+        }
+        return findPost;
     }
 
-
+    // 유저 아이디로 검색기록 가져오기
+    public List<SearchHistoryEntity> findHistoryByUserId(Long userId) {
+       return searchRepository.findByUserId(userId);
+    }
 }
