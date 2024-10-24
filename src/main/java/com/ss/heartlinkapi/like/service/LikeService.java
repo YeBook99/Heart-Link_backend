@@ -35,8 +35,8 @@ public class LikeService {
                     Long userId = like.getUserId().getUserId();
                     String loginId = like.getUserId().getLoginId();
                     
-                    ProfileEntity profile = profileRepository.findByUserEntity(like.getUserId());
-                    String profileImg = (profile != null) ? profile.getProfile_img() : null;
+                    List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(like.getUserId());
+                    String profileImg = (profiles != null) ? profiles.get(0).getProfile_img() : null;
 
                     return new LikeDTO(
                         like.getLikeId(),
