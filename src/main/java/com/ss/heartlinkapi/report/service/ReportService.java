@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.report.repository.ReportRepository;
 
+import java.util.List;
+
 @Service
 public class ReportService {
 
@@ -42,5 +44,10 @@ public class ReportService {
 
 //		저장
 		reportRepository.save(reportEntity);
+    }
+
+//		신고 리스트 전체 불러오는 메서드
+    public List<ReportEntity> getAllList() {
+		return reportRepository.findAll();
     }
 }
