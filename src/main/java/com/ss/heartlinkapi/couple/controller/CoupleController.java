@@ -100,19 +100,28 @@ public class CoupleController {
             }
             UserEntity user = userRepository.findById(userId).orElse(null);
 
+            // 유저 검색 실패
+            if(user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
             if(user.getCoupleCode().equals(code.getCode())) {
                 // 자신의 코드를 입력했을 때
                 return ResponseEntity.badRequest().body("자신의 커플 코드를 입력할 수 없습니다.");
             }
 
-            if(user == null) {
-                return ResponseEntity.notFound().build();
+            // 존재하지 않는 커플코드인지 확인
+            int checkResult = coupleService.codeCheck(code);
+            if(checkResult==1) {
+                return ResponseEntity.badRequest().body("존재하지 않는 커플코드입니다.");
+            } else if(checkResult==2) {
+                return ResponseEntity.badRequest().body("이미 커플 연결되어 있는 상대방입니다.");
             }
 
             CoupleEntity result = coupleService.coupleCodeMatch(user, code);
 
             if(result == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.badRequest().body("커플 연결에 실패하였습니다.");
             }
 
             return ResponseEntity.status(HttpStatus.CREATED).body(result);

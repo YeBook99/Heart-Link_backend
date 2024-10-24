@@ -36,5 +36,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	
 
 	
+	// 키워드가 포함된 게시글 내용 검색
+	List<PostEntity> findAllByContentIgnoreCaseContaining(String keyword);
 
 }
