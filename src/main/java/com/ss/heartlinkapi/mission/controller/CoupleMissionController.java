@@ -1,5 +1,7 @@
 package com.ss.heartlinkapi.mission.controller;
 
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
@@ -11,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/couple")
@@ -33,13 +37,16 @@ public class CoupleMissionController {
                 month = LocalDate.now().getMonthValue();
             }
 
+            // 매월 미션 리스트 조회
             List<LinkMissionEntity> missionList = MissionService.findMissionByYearMonth(year, month);
 
             if(missionList == null || missionList.isEmpty()){
                 return ResponseEntity.notFound().build();
             }
+            // 미션 리스트의 태그 조회
+            List<Map<String, Object>> tagList =  MissionService.findMissionTag(missionList);
 
-            return ResponseEntity.ok(missionList);
+            return ResponseEntity.ok(tagList);
 
         } catch (Exception e) {
             e.printStackTrace();
