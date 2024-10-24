@@ -5,6 +5,7 @@ import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
+import com.ss.heartlinkapi.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,9 @@ public class CoupleMissionService {
     @Autowired
     private LinkTagRepository linkTagRepository;
 
+    @Autowired
+    private PostRepository postRepository;
+
     // 매월 미션 태그 리스트 조회
     public List<LinkMissionEntity> findMissionByYearMonth(Integer year, Integer month) {
         return missionRepository.findMissionByYearMonth(year, month);
@@ -37,8 +41,12 @@ public class CoupleMissionService {
             tagMap.put("linkTag", tag.getKeyword());
             tagList.add(tagMap);
         }
-
         return tagList;
+    }
+
+    // 이번 미션 태그에 달성되는지 확인하는 메서드
+    public void checkMissionTag(){
 
     }
+
 }
