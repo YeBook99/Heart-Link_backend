@@ -235,5 +235,8 @@ public class PostService {
 //		return postDTO;		
 //	}
 
-
+//	관리자 신고한 게시물 삭제
+    public void deletePost(Long postId) {
+		postRepository.deleteById(postId);
+    }
 }
