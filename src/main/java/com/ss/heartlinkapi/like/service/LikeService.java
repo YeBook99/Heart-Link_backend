@@ -32,17 +32,14 @@ public class LikeService {
 		
 		return likes.stream()
                 .map(like -> {
-                    Long userId = like.getUserId().getUserId();
-                    String loginId = like.getUserId().getLoginId();
                     
                     List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(like.getUserId());
-                    String profileImg = (profiles != null) ? profiles.get(0).getProfile_img() : null;
 
                     return new LikeDTO(
                         like.getLikeId(),
-                        userId,
-                        loginId,
-                        profileImg, // 프로필 이미지 추가
+                        like.getUserId().getUserId(),
+                        like.getUserId().getLoginId(),
+                        (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
                         postId,
                         null,
                         like.getCreatedAt()
