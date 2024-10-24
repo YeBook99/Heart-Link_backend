@@ -42,20 +42,20 @@ public class SearchController {
                 System.out.println(keyword);
                 UserEntity user = searchService.searchByUserId(keyword, userId);
                 if(user == null) {
-                    return ResponseEntity.notFound().build();
+                    return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
                 return ResponseEntity.ok(user.getUserId());
             } else if (keyword.startsWith("&")) {
                 LinkTagEntity tag = searchService.searchByTag(keyword, userId);
                 if(tag == null) {
-                    return ResponseEntity.notFound().build();
+                    return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
                 return ResponseEntity.ok(tag.getId());
             } else {
                 System.out.println("키워드 : "+keyword);
                 List<PostEntity> post = searchService.searchByPost(keyword, userId);
                 if(post == null) {
-                    return ResponseEntity.notFound().build();
+                    return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
                 List<Map<String, Object>> postList = new ArrayList<>();
                 for(int i=0; i<post.size(); i++) {
