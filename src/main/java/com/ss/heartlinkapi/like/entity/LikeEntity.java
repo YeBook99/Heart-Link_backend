@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.like.entity;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,9 +25,9 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "like")
+@Table(name = "likes")
 @EntityListeners(AuditingEntityListener.class)
-public class LikeEntitiy {
+public class LikeEntity {
 	@Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,15 +38,15 @@ public class LikeEntitiy {
 	private UserEntity userId;				// 회원 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", nullable = false)
+	@JoinColumn(name = "post_id")
 	private PostEntity postId;				// 게시글 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id", nullable = false)
+	@JoinColumn(name = "comment_id")
 	private CommentEntity commentId;		// 댓글 아이디
 	
 	@CreatedDate
 	@Column(name = "created_at", nullable= false, updatable = false)
-	private Timestamp createdAt;			// 생성일시
+	private LocalDateTime createdAt;			// 생성일시
 
 }

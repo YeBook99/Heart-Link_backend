@@ -79,6 +79,7 @@ public class SecurityConfig {
 						// 정훈 전용
 						.antMatchers("/feed/**").permitAll()
 						.antMatchers("/following/**").permitAll()
+						.antMatchers("/like/**").permitAll()
                         .anyRequest().authenticated());
         
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)));

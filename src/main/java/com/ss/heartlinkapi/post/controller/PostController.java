@@ -29,7 +29,7 @@ public class PostController {
 		this.postService = postService;
 	}
 	
-	// 게시글 작성
+	// 게시글 작성 a
 //	@PostMapping("/write")
 //	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
 //		
@@ -66,11 +66,11 @@ public class PostController {
 	}
 	
 	// 내 게시물 조회
-	@GetMapping("/{followerId}")
-	public ResponseEntity<?> getFollowingPublicPosts(@PathVariable Long followerId){
+	@GetMapping("/{userId}")
+	public ResponseEntity<?> getFollowingPublicPosts(@PathVariable Long userId){
 		
-		List<PostDTO> followingPosts = postService.getPublicPostByFollowerId(followerId);
-		List<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(followerId);
+		List<PostDTO> followingPosts = postService.getPublicPostByFollowerId(userId);
+		List<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(userId);
 		
 		return ResponseEntity.ok().body(new PostsResponse(followingPosts, nonFollowedPosts));
 		
@@ -89,10 +89,18 @@ public class PostController {
 			return followingPosts;
 		}
 		
-		public List<PostDTO> getNonFollowedPosys(){
+		public List<PostDTO> getNonFollowedPosts(){
 			return nonFollowedPosts;
 		}
 		
+	}
+	
+	// 게시글 상세보기
+	@GetMapping("/details/{postId}")
+	public ResponseEntity<PostDTO> getPostWithComments(@PathVariable Long postId){
+		PostDTO postDTO = postService.getPostById(postId);
+		
+		return ResponseEntity.ok(postDTO);
 	}
 
 

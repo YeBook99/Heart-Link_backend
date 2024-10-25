@@ -8,6 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/admin")
 public class AdminCoupleMatchController {
@@ -22,7 +27,16 @@ public class AdminCoupleMatchController {
         // 오류 500 검사
         try {
             Page<LinkMatchEntity> questions = adminCoupleMatchService.findAllByOrderByIdDesc(page, size);
-            return ResponseEntity.ok(questions);
+            List<Map<String, Object>> questionsData = new ArrayList<>();
+            for(LinkMatchEntity entity : questions) {
+                Map<String, Object> questionData = new HashMap<>();
+                questionData.put("questionId", entity.getLinkMatchId());
+                questionData.put("match1", entity.getMatch1());
+                questionData.put("match2", entity.getMatch2());
+                questionData.put("displayDate", entity.getDisplayDate());
+            }
+
+            return ResponseEntity.ok(questionsData);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
@@ -41,7 +55,8 @@ public class AdminCoupleMatchController {
                     || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
                 return ResponseEntity.badRequest().build();
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("매치 질문을 등록하였습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
@@ -64,7 +79,7 @@ public class AdminCoupleMatchController {
                 return ResponseEntity.notFound().build();
             }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            return ResponseEntity.status(HttpStatus.CREATED).body("매치 질문이 수정되었습니다.");
 
 
         } catch (Exception e) {
@@ -90,7 +105,7 @@ public class AdminCoupleMatchController {
                 return ResponseEntity.notFound().build();
             } else {
                 adminCoupleMatchService.deleteMatchQuestion(questionId);
-                return ResponseEntity.noContent().build();
+                return ResponseEntity.ok().body("매치 질문이 삭제되었습니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();

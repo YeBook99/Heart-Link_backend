@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/couple")
 public class CoupleController {
@@ -39,7 +41,12 @@ public class CoupleController {
             }
             couple.setAnniversaryDate(dDayData.getFirstMetDate());
             CoupleEntity setCouple = coupleService.setAnniversary(couple);
-            return ResponseEntity.status(HttpStatus.CREATED).body(setCouple);
+
+            if(setCouple == null) {
+                return ResponseEntity.badRequest().body("기념일이 설정 실패하였습니다.");
+            }
+
+            return ResponseEntity.ok().body("기념일이 설정되었습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +70,11 @@ public class CoupleController {
             }
             couple.setAnniversaryDate(dDayData.getFirstMetDate());
             CoupleEntity result = coupleService.setAnniversary(couple);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+            if(result == null) {
+                return ResponseEntity.badRequest().body("기념일 수정 실패하였습니다.");
+            }
+            return ResponseEntity.ok().body("기념일이 수정되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
