@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.couple.service;
 import com.ss.heartlinkapi.couple.dto.CoupleCode;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
+import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 public class CoupleService {
@@ -145,4 +147,5 @@ public class CoupleService {
     	}
     	return null;
     }
+
 }

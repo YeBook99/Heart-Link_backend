@@ -23,7 +23,7 @@ public class UserLinkMissionEntity {
     @JoinColumn(name = "link_mission_id")
     @OneToOne(fetch = FetchType.EAGER)
     private LinkMissionEntity linkMissionId;
-    private boolean status;
+    private boolean status = false;
 
 
 }
