@@ -76,7 +76,7 @@ public class LikeService {
 	
 	// 내가 누른 좋아요 목록 조회
 	public List<PostFileDTO> getPostFilesByUserId(Long userId){
-		List<PostFileEntity> postFiles = likeRepository.findPostFilesByUserId(userId);
+		List<PostFileEntity> postFiles = likeRepository.findLikePostFilesByUserId(userId);
 		
 		return postFiles.stream()
 				.map(file -> new PostFileDTO(

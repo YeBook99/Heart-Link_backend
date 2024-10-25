@@ -23,6 +23,6 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
            "JOIN l.postId p " +
            "JOIN PostFileEntity pf ON pf.postId = p AND pf.sortOrder = 1 " +
            "WHERE l.userId.id = :userId")
-    List<PostFileEntity> findPostFilesByUserId(@Param("userId") Long userId);
+    List<PostFileEntity> findLikePostFilesByUserId(@Param("userId") Long userId);
 
 }
