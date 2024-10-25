@@ -105,8 +105,8 @@ public class PostController {
 	
 	// 게시글 상세보기
 	@GetMapping("/details/{postId}")
-	public ResponseEntity<PostDTO> getPostWithComments(@PathVariable Long postId){
-		PostDTO postDTO = postService.getPostById(postId);
+	public ResponseEntity<PostDTO> getPostWithComments(@PathVariable Long postId, @AuthenticationPrincipal UserEntity user){
+		PostDTO postDTO = postService.getPostById(postId, 1L); // 실제 코드에서는 1L 대신 user.getUserId() 
 		
 		return ResponseEntity.ok(postDTO);
 	}
