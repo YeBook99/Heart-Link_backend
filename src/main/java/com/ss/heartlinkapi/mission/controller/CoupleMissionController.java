@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.mission.controller;
 
+import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,20 @@ public class CoupleMissionController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    // 임시 테스트용
+    @GetMapping("/test")
+    public ResponseEntity<?> test(){
+        LocalDateTime today = LocalDateTime.now();
+
+        List<ContentLinktagEntity> tagList = new ArrayList<>();
+
+        ContentLinktagEntity contentLinktagEntity = new ContentLinktagEntity();
+
+
+        MissionService.checkMissionTag(today, );
+        return ResponseEntity.ok().build();
     }
 
 }
