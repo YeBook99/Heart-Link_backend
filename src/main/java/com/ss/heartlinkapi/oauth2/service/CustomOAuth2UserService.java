@@ -33,13 +33,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	private final SocialRepository socialRepository;
 	private final ProfileRepository profileRepository;
 	private final PhoneService phoneService;
-	
+	private final LoginIdService loginIdService;
+
 	public CustomOAuth2UserService(UserRepository userRepository, SocialRepository socialRepository,
-			ProfileRepository profileRepository, PhoneService phoneService) {
+			ProfileRepository profileRepository, PhoneService phoneService, LoginIdService loginIdService) {
 		this.userRepository = userRepository;
 		this.socialRepository = socialRepository;
 		this.profileRepository = profileRepository;
 		this.phoneService = phoneService;
+		this.loginIdService = loginIdService;
 	}
 
 	@Override
@@ -78,30 +80,36 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		// 전화번호가 여전히 null인 경우 처리
 		if(phone==null) {
 			if(socialRepository.existsByProviderId(providerId)) {
-				return login(oAuth2Response, providerId);
+				UserEntity existingUser = socialRepository.findUserByProviderId(providerId);
+				if(existingUser != null) {
+					String loginId = existingUser.getLoginId();
+					return login(oAuth2Response, loginId);
+				}
 			}
 		    // 전화번호 입력 요청
-			throw new OAuth2AuthenticationException(new OAuth2Error("전화번호를 입력받아야 합니다.",providerId, null));		
+			throw new OAuth2AuthenticationException(new OAuth2Error("전화번호를 입력받아야 합니다. [error: phone]",providerId, null));		
 		}
 
 		UserEntity existData = userRepository.findByPhone(phone);
-
+		
 		if (existData == null) {
 			// 회원가입
+			UserEntity newUserEntity = null;
 			try {
-				registerUser(oAuth2Response, phone, providerId);
+				newUserEntity = registerUser(oAuth2Response, phone, providerId);
 			} catch (Exception e) {
 				throw new OAuth2AuthenticationException(new OAuth2Error("회원가입 오류", e.getMessage(), null));
 			}
-			return login(oAuth2Response, providerId);
+			String loginId = newUserEntity.getLoginId();
+			return login(oAuth2Response, loginId);
 		} else {
-
 			// 이미 있는 회원일때
+			String loginId = existData.getLoginId();
+			// 해당 소셜 계정의 존재 여부 확인
 			String currentProvider = oAuth2Response.getProvider();
 			List<SocialEntity> socialAccounts = existData.getSocialAccounts();
 			boolean isLinked = socialAccounts.stream()
 					.anyMatch(account -> account.getProvider().equals(currentProvider));
-
 			if (!isLinked) {
 				// 소셜 계정 추가
 				SocialEntity socialEntity = new SocialEntity();
@@ -110,23 +118,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 				socialEntity.setUserEntity(existData);
 				socialRepository.save(socialEntity);
 			}
-			return login(oAuth2Response, providerId);
+			return login(oAuth2Response, loginId);
 		}
 
 	}
 
-	public CustomOAuth2User login(OAuth2Response oAuth2Response, String providerId) {
+	public CustomOAuth2User login(OAuth2Response oAuth2Response, String loginId) {
+		
 		OAuth2LoginDTO userDTO = new OAuth2LoginDTO();
-		userDTO.setLoginId(providerId); // 로그인 아이디로 교체해야함
+		userDTO.setLoginId(loginId); // 로그인 아이디로 교체해야함
 		userDTO.setName(oAuth2Response.getName());
 		userDTO.setRole(Role.ROLE_USER);
+		
 		return new CustomOAuth2User(userDTO);
-
 	}
 
 	@Transactional
-	public void registerUser(OAuth2Response oAuth2Response, String phone, String providerId) {
-
+	public UserEntity registerUser(OAuth2Response oAuth2Response, String phone, String providerId) {
+		
 		// 유저 엔티티
 		UserEntity userEntity = new UserEntity();
 		userEntity.setName(oAuth2Response.getName());
@@ -147,7 +156,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		userEntity.setCoupleCode(CoupleCode.generateRandomCode());
 		userEntity.setRole(Role.ROLE_USER);
 
-		/******************* 프론트에 요청해서 loginId 값 받아 와서 저장해주기 ********************/
+		String loginId = null;
+		
+		//Redis에서 아이디 가져오기
+		loginId = loginIdService.retrieveTempPhone(providerId);
+		
+		// 아이디 입력 요청
+		if(loginId==null) {
+			throw new OAuth2AuthenticationException(new OAuth2Error("아이디를 입력받아야 합니다. [error: loginId]",providerId, null));
+		}
+		userEntity.setLoginId(loginId);
 
 		// 소셜 엔티티
 		SocialEntity socialEntity = new SocialEntity();
@@ -164,7 +182,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		userRepository.save(userEntity);
 		socialRepository.save(socialEntity);
 		profileRepository.save(profileEntity);
-
+		
+		return userEntity;
 	}
 
 	public String kakaoFormatPhone(String phone) {
