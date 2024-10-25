@@ -54,6 +54,7 @@ public class CoupleMissionService {
     }
 
     // 이번 미션 태그에 달성되는지 확인하는 메서드
+    // 게시글 작성 기능 완성 후 반환값 확인 필요
     public void checkMissionTag(LocalDateTime postDate, List<ContentLinktagEntity> postTag){
         // 지금 올린 피드의 날짜와 연결_링크태그 엔티티를 조회해온다.
         if(postTag != null) {

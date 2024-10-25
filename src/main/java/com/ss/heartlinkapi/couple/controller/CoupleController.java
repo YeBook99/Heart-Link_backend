@@ -247,4 +247,17 @@ public class CoupleController {
 
     }
 
+    @GetMapping("/feed/{userId}/couple")
+    public ResponseEntity<?> feed(@PathVariable Long userId) {
+        try{
+            
+
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
+
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +25,14 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
+    // 유저 별 검색기록 확인
     @GetMapping("/history")
     public ResponseEntity<?> searchHistory(@RequestParam Long userId){
         List<SearchHistoryEntity> historyList = searchService.findHistoryByUserId(userId);
         return null;
     }
 
+    // 유저, 태그, 피드 내용 별 검색 후 결과 반환
     @GetMapping("/keyword")
     public ResponseEntity<?> search(@RequestParam String keyword, @RequestParam Long userId) {
         try {
@@ -74,4 +77,5 @@ public class SearchController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 }
