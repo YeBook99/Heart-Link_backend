@@ -57,18 +57,4 @@ public class CoupleMissionController {
         }
     }
 
-    // 임시 테스트용
-    @GetMapping("/test")
-    public ResponseEntity<?> test(){
-        LocalDateTime today = LocalDateTime.now();
-
-        List<ContentLinktagEntity> tagList = new ArrayList<>();
-
-        ContentLinktagEntity contentLinktagEntity = new ContentLinktagEntity();
-
-
-        MissionService.checkMissionTag(today, );
-        return ResponseEntity.ok().build();
-    }
-
 }
