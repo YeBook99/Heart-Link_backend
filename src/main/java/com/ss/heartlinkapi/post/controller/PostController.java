@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.heartlinkapi.like.service.LikeService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
+import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
@@ -24,9 +27,11 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 	
 	private final PostService postService;
+	private final LikeService likeService;
 	
-	public PostController(PostService postService) {
+	public PostController(PostService postService, LikeService likeService) {
 		this.postService = postService;
+		this.likeService = likeService;
 	}
 	
 	// 게시글 작성 a
@@ -102,6 +107,15 @@ public class PostController {
 		
 		return ResponseEntity.ok(postDTO);
 	}
+	
+	// 내가 누른 좋아요 목록 조회
+	@GetMapping("/{userId}/like")
+	public ResponseEntity<List<PostFileDTO>> getPostFilesByUserId(@PathVariable Long userId) {
+	    List<PostFileDTO> postFiles = likeService.getPostFilesByUserId(userId);
+	    
+	    return ResponseEntity.ok(postFiles);
+	}
+
 
 
 }
