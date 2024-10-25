@@ -16,12 +16,12 @@ public class PhoneService {
 
 	// 전화번호 임시 저장
 	public void storeTempPhone(String providerId,String phone) {
-		redisTemplate.opsForValue().set(providerId, phone,10,TimeUnit.MINUTES);
+		redisTemplate.opsForValue().set("auth:phone:" + providerId, phone,10,TimeUnit.MINUTES);
 	}
 	
 	// 전화번호 꺼내오기
 	public String retrieveTempPhone(String providerId) {
-		return redisTemplate.opsForValue().get(providerId);
+		return redisTemplate.opsForValue().get("auth:phone:" + providerId);
 	}
 	
 }
