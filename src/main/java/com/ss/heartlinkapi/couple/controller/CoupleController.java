@@ -3,7 +3,9 @@ package com.ss.heartlinkapi.couple.controller;
 import com.ss.heartlinkapi.couple.dto.CoupleCode;
 import com.ss.heartlinkapi.couple.dto.Dday;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
+import com.ss.heartlinkapi.couple.repository.CoupleRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
+import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -241,19 +243,6 @@ public class CoupleController {
             coupleService.finalNowUnlinkCouple(couple);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-
-    }
-
-    @GetMapping("/feed/{userId}/couple")
-    public ResponseEntity<?> feed(@PathVariable Long userId) {
-        try{
-            
-
-
-        } catch (Exception e){
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }

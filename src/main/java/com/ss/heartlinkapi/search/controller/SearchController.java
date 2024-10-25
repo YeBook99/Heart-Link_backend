@@ -28,8 +28,23 @@ public class SearchController {
     // 유저 별 검색기록 확인
     @GetMapping("/history")
     public ResponseEntity<?> searchHistory(@RequestParam Long userId){
-        List<SearchHistoryEntity> historyList = searchService.findHistoryByUserId(userId);
-        return null;
+        try{
+            if(userId == null){
+                return ResponseEntity.badRequest().body("유저 아이디가 존재하지 않습니다.");
+            }
+
+            List<Map<String, Object>> historyList = searchService.findHistoryByUserId(userId);
+            if(historyList == null){
+                return ResponseEntity.ok().body("검색 기록이 없습니다.");
+            }
+
+            return ResponseEntity.ok().body(historyList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
     }
 
     // 유저, 태그, 피드 내용 별 검색 후 결과 반환
