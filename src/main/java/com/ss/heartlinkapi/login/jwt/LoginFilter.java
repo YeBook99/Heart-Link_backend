@@ -97,7 +97,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		 
 		 response.setHeader("Authorization","Bearer "+ access);
 		 response.setHeader("Refresh-Token", refresh);	 
-		 response.setHeader("Access-Control-Expose-Headers", "Refresh-Token");
+		 response.setHeader("Access-Control-Expose-Headers", "Authorization, Refresh-Token");
 		 
 		 response.setStatus(HttpStatus.OK.value());
 	}
