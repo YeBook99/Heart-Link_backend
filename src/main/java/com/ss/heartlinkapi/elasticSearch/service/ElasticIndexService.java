@@ -2,12 +2,11 @@ package com.ss.heartlinkapi.elasticSearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.mapping.Property;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 
 import javax.annotation.PostConstruct;
 import java.nio.file.Files;
@@ -53,16 +52,22 @@ public class ElasticIndexService {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> mapping = objectMapper.readValue(mappingJson, Map.class);
 
+
         // mappings의 properties 부분을 가져오기
         Map<String, Object> properties = (Map<String, Object>) ((Map<String, Object>) mapping.get("mappings")).get("properties");
-        Map<String, Object> settings = (Map<String, Object>)mapping.get("setting");
+        Map<String, Object> settings = (Map<String, Object>) mapping.get("settings");
 
         // Map<String, Object> -> Map<String, Property> 변환
         Map<String, Property> propertyMap = convertToProperties(properties);
 
         // Elasticsearch 클라이언트에 인덱스 생성 요청
         elasticsearchClient.indices().create(CreateIndexRequest.of(c ->
-                c.index(indexName).mappings(m -> m.properties(propertyMap))
+                c.index(indexName)
+                        .settings(s -> s // settings를 Map으로 변환
+                                .numberOfShards(settings.get("number_of_shards").toString())
+                                .numberOfReplicas(settings.get("number_of_replicas").toString())
+                        )
+                        .mappings(m -> m.properties(propertyMap))
         ));
     }
 
