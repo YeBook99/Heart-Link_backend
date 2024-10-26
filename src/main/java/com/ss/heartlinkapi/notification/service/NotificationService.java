@@ -1,5 +1,8 @@
 package com.ss.heartlinkapi.notification.service;
 
+import com.ss.heartlinkapi.notification.dto.NotificationCommentDTO;
+import com.ss.heartlinkapi.notification.dto.NotificationFollowDTO;
+import com.ss.heartlinkapi.notification.dto.NotificationLikeDTO;
 import com.ss.heartlinkapi.notification.entity.NotificationEntity;
 import com.ss.heartlinkapi.notification.entity.Type;
 import com.ss.heartlinkapi.notification.repository.EmitterRepository;
@@ -34,8 +37,21 @@ public class NotificationService {
     }
 
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
-    public void notify(Long userId, Object data) {
-        sendToClient(userId, data);
+    public void notifyLike(String userName, Long postId) {
+        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/like" + postId, "http://localhost:9090/img/고먀미1.jpeg", userName + "님이 회원님의 글을 좋아합니다.");
+//        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
+        sendToClient(4L, notificationLikeDTO);
+    }
+
+    public void notifyComment(String userName, Long postId, Long commentId) {
+        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:9090/comments/" + postId, "http://localhost:9090/img/고먀미1.jpeg", commentId, userName + "님이 댓글을 남겼습니다.");
+//        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
+        sendToClient(4L, notificationCommentDTO);
+    }
+
+    public void notifyFollow(String userName, Long userId) {
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/follow", userName + "님이 팔로우하였습니다.");
+        sendToClient(userId, notificationFollowDTO);
     }
 
     //  실질적으로 client에게 메세지를 전달해주는 메서드
