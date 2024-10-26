@@ -20,11 +20,10 @@ public class ProfileEntity {
     @Column(name = "id", nullable = false)
 	private Long profileId;
 	
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name = "user_id")
 	private UserEntity userEntity;
 	
-	@Column(length = 10)
 	private String nickname;
 	
 	private String profile_img;

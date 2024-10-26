@@ -1,17 +1,12 @@
 package com.ss.heartlinkapi.user.repository;
 
 
-import javax.transaction.Transactional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
 
-import com.ss.heartlinkapi.user.entity.RefreshTokenEntity;
+import com.ss.heartlinkapi.user.entity.RefreshToken;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshTokenEntity, Long>{
+public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String>{
 	
-	Boolean existsByRefreshToken(String refreshToken);
-	
-    @Transactional
-    void deleteByRefreshToken(String refreshToken);
-
+    boolean existsByRefreshToken(String refreshToken);
 }

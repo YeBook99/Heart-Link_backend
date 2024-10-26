@@ -56,11 +56,9 @@ public class ReissueService {
 
 		String newAccess = jwtUtil.createJwt("access", loginId, role, 600000L);
 		String newRefresh = jwtUtil.createJwt("refresh", loginId, role, 86400000L);
-		
-        // 이전 리프레시 토큰 삭제
-        refreshTokenService.deleteByRefreshToken(refreshToken);
+
         // 새로운 리프레시 토큰 저장
-        refreshTokenService.saveRefreshToken(loginId, newRefresh, 86400000L);
+        refreshTokenService.saveRefreshToken(loginId, newRefresh);
 
 		Map<String, String> tokens = new HashMap<>();
 		tokens.put("accessToken", "Bearer " + newAccess);
