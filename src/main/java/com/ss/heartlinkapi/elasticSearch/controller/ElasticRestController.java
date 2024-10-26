@@ -1,4 +1,4 @@
-package com.ss.heartlinkapi.search.controller;
+package com.ss.heartlinkapi.elasticSearch.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

@@ -75,7 +75,7 @@ public class SecurityConfig {
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용
                         .antMatchers("/couple/**", "/admin/**", "/search/**").permitAll()
-                        .antMatchers("/dm/**","/message","/report").permitAll()
+                        .antMatchers("/dm/**","/message","/report","/notifications/**").permitAll()
 						.antMatchers("/img/**").permitAll()
 						// 정훈 전용
 						.antMatchers("/feed/**").permitAll()
