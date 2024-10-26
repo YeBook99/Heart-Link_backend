@@ -16,12 +16,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SearchHistoryDocument {
     @Id
-    @Field(type = FieldType.Long)
+    @Field(type = FieldType.Keyword)
     private Long searchHistoryId;
     @Field(type = FieldType.Keyword)
     private Long userId;
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, name = "keyword")
     private String keyword;
+    @Field(type = FieldType.Text, name = "keyword_korean")
+    private String keywordKorean;  // 한글 키워드
+    @Field(type = FieldType.Text, name = "keyword_english")
+    private String keywordEnglish;  // 영어 키워드
     @Field(type = FieldType.Keyword)
     private String type;
     @Field(type = FieldType.Date)
