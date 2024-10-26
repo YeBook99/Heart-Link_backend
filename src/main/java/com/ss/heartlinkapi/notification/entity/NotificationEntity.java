@@ -20,9 +20,9 @@ public class NotificationEntity {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private UserEntity userEntity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @Enumerated(EnumType.STRING)
     private Type type;
