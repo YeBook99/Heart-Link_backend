@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class BatchConfig {
 
-    @Bean
+    @Bean(name = "batchRestTemplate")
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }

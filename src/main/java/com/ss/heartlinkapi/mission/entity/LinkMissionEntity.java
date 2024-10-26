@@ -19,7 +19,7 @@ public class LinkMissionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long linkMissionId;
     @JoinColumn(name = "link_tag_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private LinkTagEntity linkTagId;
     private LocalDate start_date;
     private LocalDate end_date;

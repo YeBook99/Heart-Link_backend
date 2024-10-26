@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 public interface CoupleRepository extends JpaRepository<CoupleEntity, Long> {
 
@@ -19,4 +20,6 @@ public interface CoupleRepository extends JpaRepository<CoupleEntity, Long> {
     @Modifying
     @Query("update CoupleEntity c set c.matchCount = c.matchCount + 1 where c.coupleId = :coupleId")
     public int matchCountUp(Long coupleId);
+
+    public List<CoupleEntity> findCoupleEntityByBreakupDateIsNotNull();
 }
