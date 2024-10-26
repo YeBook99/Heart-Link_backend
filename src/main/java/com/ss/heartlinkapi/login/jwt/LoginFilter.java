@@ -93,7 +93,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		 String access = jwtUtil.createJwt("access", loginId, role, 600000L);
 		 String refresh = jwtUtil.createJwt("refresh", loginId, role, 86400000L);
 		 
-		 refreshTokenService.saveRefreshToken(loginId, refresh, 86400000L);
+		 refreshTokenService.saveRefreshToken(loginId, refresh);
 		 
 		 response.setHeader("Authorization","Bearer "+ access);
 		 response.setHeader("RefreshToken", refresh);	 
