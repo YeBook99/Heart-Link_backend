@@ -30,7 +30,11 @@ public class CustomUserDetails implements UserDetails{
 	public String getUsername() {
 		return userEntity.getLoginId();
 	}
-
+	
+	public Long getUserId() {
+		return userEntity.getUserId();
+	}
+	
 	@Override
 	public boolean isAccountNonExpired() {
 		return true; // 계정 만료
