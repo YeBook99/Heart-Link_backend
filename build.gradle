@@ -41,7 +41,6 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
-    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.12'
     implementation 'co.elastic.clients:elasticsearch-java:7.17.12'
     implementation 'org.glassfish:jakarta.json:2.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'

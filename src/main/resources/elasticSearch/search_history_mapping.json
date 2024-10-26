@@ -8,7 +8,17 @@
         "type": "keyword"
       },
       "keyword": {
-        "type": "text"
+        "type": "text",
+        "fields": {
+          "korean": {
+            "type": "text",
+            "analyzer": "nori_analyzer"
+          },
+          "english": {
+            "type": "text",
+            "analyzer": "english_analyzer"
+          }
+        }
       },
       "type": {
         "type": "keyword"
