@@ -1,5 +1,7 @@
 package com.ss.heartlinkapi.search.service;
 
+import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
+import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.post.entity.PostEntity;
@@ -33,6 +35,12 @@ public class SearchService {
 
     @Autowired
     private SearchRepository searchRepository;
+
+    @Autowired
+    private ElasticService elasticService;
+
+    @Autowired
+    private DeepLService deepLService;
 
     // 유저 아이디 검색
     @Transactional
@@ -92,29 +100,43 @@ public class SearchService {
     }
 
     // 키워드로 게시글 검색
+    @Transactional
     public List<PostEntity> searchByPost(String keyword, Long userId) {
         keyword = keyword.trim();
         List<PostEntity> findPost = postRepository.findAllByContentIgnoreCaseContaining(keyword);
         UserEntity user = userRepository.findById(userId).orElse(null);
 
         if(user == null || findPost == null) {
-            return null;
+            return Collections.emptyList();
         }
 
         SearchHistoryEntity searchHistory = searchRepository.findByKeywordAndTypeAndUserId(keyword, "content", user);
+        SearchHistoryEntity elasticEntity = new SearchHistoryEntity();
+        String deepLResult;
+        System.out.println("1111"+searchHistory);
 
         if(searchHistory != null) {
             searchHistory.setUpdatedAt(LocalDateTime.now());
             searchRepository.save(searchHistory);
+            deepLResult = deepLService.translate(searchHistory.getKeyword());
         } else {
-            SearchHistoryEntity searchHistoryEntity = new SearchHistoryEntity();
-            searchHistoryEntity.setUserId(user);
-            searchHistoryEntity.setKeyword(keyword);
-            searchHistoryEntity.setType("content");
-            searchHistoryEntity.setCreatedAt(LocalDateTime.now());
-            SearchHistoryEntity result = searchRepository.save(searchHistoryEntity);
-            System.out.println("Result : " + result);
+            searchHistory = new SearchHistoryEntity();
+            searchHistory.setUserId(user);
+            searchHistory.setKeyword(keyword);
+            searchHistory.setType("content");
+            searchHistory.setCreatedAt(LocalDateTime.now());
+            SearchHistoryEntity result = searchRepository.save(searchHistory);
+            deepLResult = deepLService.translate(searchHistory.getKeyword());
         }
+
+        // Elastic용 entity
+        elasticEntity.setKeyword(deepLResult);
+        elasticEntity.setType(searchHistory.getType());
+        elasticEntity.setCreatedAt(searchHistory.getUpdatedAt()==null?searchHistory.getCreatedAt():searchHistory.getUpdatedAt());
+        elasticEntity.setUpdatedAt(null);
+        elasticEntity.setSearchHistoryId(searchHistory.getSearchHistoryId());
+        elasticEntity.setUserId(user);
+        elasticService.addOrUpdateHistory(elasticEntity);
         return findPost;
     }
 
