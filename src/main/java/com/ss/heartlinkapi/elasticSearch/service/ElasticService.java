@@ -6,9 +6,7 @@ import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 
 import javax.annotation.PostConstruct;
@@ -25,7 +23,7 @@ public class ElasticService {
     private static final String INDEX_NAME = "search_history";
     private static final String MAPPING_FILE_PATH = "src/main/resources/elasticSearch/search_history_mapping.json";
 
-    @PostConstruct
+//    @PostConstruct
     public void initializeIndex(){
         try{
             if(!indexExists(INDEX_NAME)){
