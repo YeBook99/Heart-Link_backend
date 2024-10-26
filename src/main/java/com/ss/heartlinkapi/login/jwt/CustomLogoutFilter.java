@@ -49,7 +49,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 		}
 
 		// refresh 토큰 확인
-		String refresh = request.getHeader("Refresh-Token");
+		String refresh = request.getHeader("RefreshToken");
 
 		// null 체크
 		if (refresh == null) {

@@ -9,5 +9,4 @@ import com.ss.heartlinkapi.user.entity.RefreshToken;
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String>{
 	
     boolean existsByRefreshToken(String refreshToken);
-    void deleteById(String id);
 }
