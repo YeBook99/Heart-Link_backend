@@ -18,12 +18,12 @@ public class UserLinkMissionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userLinkId;
     @JoinColumn(name = "couple_id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private CoupleEntity coupleId;
     @JoinColumn(name = "link_mission_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private LinkMissionEntity linkMissionId;
-    private boolean status;
+    private boolean status = false;
 
 
 }

@@ -46,7 +46,9 @@ dependencies {
     implementation 'org.glassfish:jakarta.json:2.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {

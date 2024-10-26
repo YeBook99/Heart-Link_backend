@@ -9,13 +9,15 @@ import com.ss.heartlinkapi.search.repository.SearchRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.Column;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SearchService {
@@ -117,7 +119,26 @@ public class SearchService {
     }
 
     // 유저 아이디로 검색기록 가져오기
-    public List<SearchHistoryEntity> findHistoryByUserId(Long userId) {
-       return searchRepository.findByUserId(userId);
+    public List<Map<String, Object>> findHistoryByUserId(Long userId) {
+       UserEntity user = userRepository.findById(userId).orElse(null);
+       List<SearchHistoryEntity> history = searchRepository.findByUserId(user);
+       if(history.isEmpty()) {
+           return null;
+       }
+       List<Map<String, Object>> historyList = new ArrayList<>();
+       int size = history.size()<=5 ? history.size() : 5;
+       for(int i=0; i<size; i++) {
+           Map<String, Object> map = new HashMap<>();
+           map.put("type", history.get(i).getType());
+           map.put("keyword", history.get(i).getKeyword());
+           if(history.get(i).getUpdatedAt() != null) {
+               map.put("date", history.get(i).getUpdatedAt());
+           } else {
+               map.put("date", history.get(i).getCreatedAt());
+           }
+           historyList.add(map);
+       }
+
+       return historyList;
     }
 }

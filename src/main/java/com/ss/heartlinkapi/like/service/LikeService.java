@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.ss.heartlinkapi.like.dto.LikeDTO;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
 import com.ss.heartlinkapi.like.repository.LikeRepository;
+import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 
@@ -72,5 +74,19 @@ public class LikeService {
 		            .collect(Collectors.toList());
 	}
 	
+	// 내가 누른 좋아요 목록 조회
+	public List<PostFileDTO> getPostFilesByUserId(Long userId){
+		List<PostFileEntity> postFiles = likeRepository.findLikePostFilesByUserId(userId);
+		
+		return postFiles.stream()
+				.map(file -> new PostFileDTO(
+								file.getPostId().getPostId(),
+								file.getFileUrl(),
+								file.getFileType(),
+								file.getSortOrder()
+								))
+				.collect(Collectors.toList());
+
+	}
 
 }

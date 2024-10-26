@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.heartlinkapi.bookmark.service.BookmarkService;
+import com.ss.heartlinkapi.like.service.LikeService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
+import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
@@ -24,9 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 public class PostController {
 	
 	private final PostService postService;
+	private final LikeService likeService;
+	private final BookmarkService bookmarkService;
 	
-	public PostController(PostService postService) {
+	public PostController(PostService postService, LikeService likeService, BookmarkService bookmarkService) {
 		this.postService = postService;
+		this.likeService = likeService;
+		this.bookmarkService = bookmarkService;
 	}
 	
 	// 게시글 작성 a
@@ -97,11 +105,29 @@ public class PostController {
 	
 	// 게시글 상세보기
 	@GetMapping("/details/{postId}")
-	public ResponseEntity<PostDTO> getPostWithComments(@PathVariable Long postId){
-		PostDTO postDTO = postService.getPostById(postId);
+	public ResponseEntity<PostDTO> getPostWithComments(@PathVariable Long postId, @AuthenticationPrincipal UserEntity user){
+		PostDTO postDTO = postService.getPostById(postId, 1L); // 실제 코드에서는 1L 대신 user.getUserId() 
 		
 		return ResponseEntity.ok(postDTO);
 	}
+	
+	// 내가 누른 좋아요 목록 조회
+	@GetMapping("/{userId}/like")
+	public ResponseEntity<List<PostFileDTO>> getLikePostFilesByUserId(@PathVariable Long userId) {
+	    List<PostFileDTO> postFiles = likeService.getPostFilesByUserId(userId);
+	    
+	    return ResponseEntity.ok(postFiles);
+	}
+	
+	// 내가 누른 북마크 목록 조회
+	@GetMapping("/{userId}/bookmark")
+	public ResponseEntity<List<PostFileDTO>> getBokkmarkPostFilesByUserId(@PathVariable Long userId){
+		List<PostFileDTO> postFiles = bookmarkService.getBokkmarkPostFilesByUserId(userId);
+		
+		return ResponseEntity.ok(postFiles);
+		
+	}
+
 
 
 }

@@ -146,7 +146,7 @@ public class PostService {
 	}
 	
 	// 게시글 상세보기
-	public PostDTO getPostById(Long postId) {
+	public PostDTO getPostById(Long postId, Long userId) {
 	    Optional<PostEntity> optionalPost = postRepository.findById(postId);
 	    
 	    // 값이 존재하는 경우
@@ -157,7 +157,7 @@ public class PostService {
 	        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	        
 	        // 댓글 목록 가져오기
-	        List<CommentEntity> comments = commentRepository.findByPostId(post); // post.getPostId()로 수정
+	        List<CommentEntity> comments = commentRepository.findByPostIdAndNotReported(post, userId);
 	        List<CommentDTO> commentDTO = comments.stream()
 	            .map(comment -> {
 	            	List<ProfileEntity> commentProfiles = profileRepository.findAllByUserEntity(comment.getUserId());

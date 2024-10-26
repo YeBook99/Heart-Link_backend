@@ -70,6 +70,7 @@ public class SecurityConfig {
                         .antMatchers("/reissue").permitAll()
                         .antMatchers("/oauth2/**").permitAll()
                         .antMatchers("/user/auth/**").permitAll()
+                        .antMatchers("/user/sms/**").permitAll()
                         //토큰 role값 검증 확인용
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용
