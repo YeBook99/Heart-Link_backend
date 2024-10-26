@@ -34,7 +34,7 @@ public class NotificationService {
     }
 
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
-    public void notify(Long userId, String data) {
+    public void notify(Long userId, Object data) {
         sendToClient(userId, data);
     }
 
