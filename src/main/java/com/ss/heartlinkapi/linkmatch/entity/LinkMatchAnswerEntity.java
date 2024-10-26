@@ -26,7 +26,7 @@ public class LinkMatchAnswerEntity {
     private UserEntity userId;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "couple_id", nullable = false)
+    @JoinColumn(name = "couple_id")
     private CoupleEntity coupleId;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

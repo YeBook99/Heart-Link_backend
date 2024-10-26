@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
                         .antMatchers("/user/idcheck").permitAll()
                         .antMatchers("/reissue").permitAll()
+                        .antMatchers("/user/sms/**").permitAll()
                         //토큰 role값 검증 확인용
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용

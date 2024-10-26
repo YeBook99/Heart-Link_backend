@@ -3,6 +3,8 @@ package com.ss.heartlinkapi.couple.service;
 import com.ss.heartlinkapi.couple.dto.CoupleCode;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
+import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
+import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
@@ -13,7 +15,10 @@ import javax.transaction.Transactional;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -23,6 +28,9 @@ public class CoupleService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
 
     // 유저아이디로 커플아이디 조회
     public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
@@ -89,8 +97,6 @@ public class CoupleService {
         if(couple.getBreakupDate().isBefore(LocalDate.now())) {
             UserEntity user1 = couple.getUser1();
             UserEntity user2 = couple.getUser2();
-            System.out.println("111111 : "+user1);
-            System.out.println("222222 : "+user2);
 
             coupleRepository.delete(couple);
 
@@ -106,6 +112,29 @@ public class CoupleService {
         }
 
     }
+
+    // 커플 유예기간 매일 체크 기능 (배치 프로그램)
+    @Transactional
+    public void batchFinalUnlinkCouple() {
+        List<CoupleEntity> breakCouple = coupleRepository.findCoupleEntityByBreakupDateIsNotNull();
+        System.out.println("커어어어플"+breakCouple.get(0));
+        if(breakCouple != null && breakCouple.size() > 0) {
+            LocalDate today = LocalDate.now();
+            for(CoupleEntity couple : breakCouple) {
+                if(couple.getBreakupDate().isBefore(today)){
+                    List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
+                    System.out.println("answerList "+answerList.toString());
+                    for(LinkMatchAnswerEntity answer : answerList) {
+//                        System.out.println("answer "+answer);
+                        coupleMatchAnswerRepository.delete(answer);
+//                        System.out.println(answer+" 지웠땅!222");
+                    }
+                    coupleRepository.delete(couple);
+                }
+            }
+        }
+    }
+
 
     // 커플 코드 랜덤값 적용
     private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
