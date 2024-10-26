@@ -1,0 +1,22 @@
+{
+  "mappings": {
+    "properties": {
+      "searchHistoryId": {
+        "type": "keyword"
+      },
+      "userId": {
+        "type": "keyword"
+      },
+      "keyword": {
+        "type": "text"
+      },
+      "type": {
+        "type": "keyword"
+      },
+      "date": {
+        "type": "date",
+        "format": "uuuu-MM-dd'T'HH:mm:ss||epoch_millis"
+      }
+    }
+  }
+}
