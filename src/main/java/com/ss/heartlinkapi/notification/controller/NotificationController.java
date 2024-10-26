@@ -20,10 +20,4 @@ public class NotificationController {
         return notificationService.subscribe(userId);
     }
 
-//    sse 전송 확인 테스트용 도메인
-    @PostMapping("/send-data/{userId}")
-    public void sendData(@PathVariable Long userId) {
-        notificationService.notify(userId, "data");
-    }
-
 }
