@@ -1,11 +1,18 @@
 {
   "settings": {
     "analysis": {
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        }
+      },
       "analyzer": {
         "custom_analyzer": {
           "type": "custom",
-          "tokenizer": "standard",
-          "filter": ["lowercase", "stop"]
+          "tokenizer": "ngram_tokenizer",
+          "filter": ["word_delimiter", "lowercase", "stop"]
         }
       }
     }
@@ -13,10 +20,10 @@
   "mappings": {
     "properties": {
       "searchHistoryId": {
-        "type": "keyword"
+        "type": "long"
       },
       "userId": {
-        "type": "keyword"
+        "type": "long"
       },
       "keyword": {
         "type": "text",
