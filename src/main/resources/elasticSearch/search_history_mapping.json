@@ -1,31 +1,40 @@
 {
+  "settings": {
+    "analysis": {
+      "tokenizer": {
+        "ngram_tokenizer": {
+          "type": "ngram",
+          "min_gram": 1,
+          "max_gram": 20
+        }
+      },
+      "analyzer": {
+        "custom_analyzer": {
+          "type": "custom",
+          "tokenizer": "ngram_tokenizer",
+          "filter": ["word_delimiter", "lowercase", "stop"]
+        }
+      }
+    }
+  },
   "mappings": {
     "properties": {
       "searchHistoryId": {
-        "type": "keyword"
+        "type": "long"
       },
       "userId": {
-        "type": "keyword"
+        "type": "long"
       },
       "keyword": {
         "type": "text",
-        "fields": {
-          "korean": {
-            "type": "text",
-            "analyzer": "nori_analyzer"
-          },
-          "english": {
-            "type": "text",
-            "analyzer": "english_analyzer"
-          }
-        }
+        "analyzer": "custom_analyzer"
       },
       "type": {
         "type": "keyword"
       },
       "date": {
         "type": "date",
-        "format": "uuuu-MM-dd'T'HH:mm:ss||epoch_millis"
+        "format": "uuuu-MM-dd'T'HH:mm:ss||uuuu-MM-dd"
       }
     }
   }

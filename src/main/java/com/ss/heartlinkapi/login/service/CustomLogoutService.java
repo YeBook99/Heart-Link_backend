@@ -36,9 +36,9 @@ public class CustomLogoutService {
 		if(!refreshTokenRepository.existsByRefreshToken(refresh)) {
 			throw new IllegalArgumentException("이미 로그아웃되었습니다.");
 		}
-		
+		String loginId = jwtUtil.getLoginId(refresh);
 		// DB 리프레쉬 토큰 삭제
-		refreshTokenRepository.deleteByRefreshToken(refresh);
+		refreshTokenRepository.deleteById(loginId);
 
 	}
 	

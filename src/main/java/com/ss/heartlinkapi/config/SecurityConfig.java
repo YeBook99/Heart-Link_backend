@@ -25,6 +25,8 @@ import com.ss.heartlinkapi.login.service.CustomLogoutService;
 import com.ss.heartlinkapi.login.service.CustomUserDetailsService;
 import com.ss.heartlinkapi.login.service.JWTService;
 import com.ss.heartlinkapi.login.service.RefreshTokenService;
+import com.ss.heartlinkapi.oauth2.jwt.CustomSuccessHandler;
+import com.ss.heartlinkapi.oauth2.service.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -36,16 +38,21 @@ public class SecurityConfig {
 	private final JWTService jwtService;
 	private final RefreshTokenService refreshTokenService;
 	private final CustomLogoutService customLogoutService;
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final CustomSuccessHandler customSuccessHandler;
 
 	public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,
 			CustomUserDetailsService customUserDetailsService, JWTUtil jwtUtil, JWTService jwtService,
-			RefreshTokenService refreshTokenService, CustomLogoutService customLogoutService) {
+			RefreshTokenService refreshTokenService, CustomLogoutService customLogoutService,
+			CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler) {
 		this.authenticationConfiguration = authenticationConfiguration;
 		this.customUserDetailsService = customUserDetailsService;
 		this.jwtUtil = jwtUtil;
 		this.jwtService = jwtService;
 		this.refreshTokenService = refreshTokenService;
 		this.customLogoutService = customLogoutService;
+		this.customOAuth2UserService = customOAuth2UserService;
+		this.customSuccessHandler = customSuccessHandler;
 	}
 
 	@Bean
@@ -64,11 +71,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
                         .antMatchers("/user/idcheck").permitAll()
                         .antMatchers("/reissue").permitAll()
+                        .antMatchers("/oauth2/**").permitAll()
+                        .antMatchers("/user/auth/**").permitAll()
                         .antMatchers("/user/sms/**").permitAll()
                         //토큰 role값 검증 확인용
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용
-                        .antMatchers("/couple/**", "/admin/**", "/search/**").permitAll()
+                        .antMatchers("/couple/**", "/admin/**", "/search/**", "/es/**", "/ads/**").permitAll()
                         .antMatchers("/dm/**","/message","/report","/notifications/**").permitAll()
 						.antMatchers("/img/**").permitAll()
 						// 정훈 전용
@@ -76,8 +85,13 @@ public class SecurityConfig {
 						.antMatchers("/following/**").permitAll()
 						.antMatchers("/like/**").permitAll()
                         .anyRequest().authenticated());
+        // oauth2
+        http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler));
+        // JWTFilter
         http.addFilterBefore(new JWTFilter(jwtService), LoginFilter.class);
+        // login
         http.addFilterAt(new LoginFilter(customUserDetailsService, bCryptPasswordEncoder(), authenticationManager(),jwtUtil,refreshTokenService), UsernamePasswordAuthenticationFilter.class);
+        // logout
         http.addFilterBefore(new CustomLogoutFilter(customLogoutService), LogoutFilter.class);
 			return http.build();	
 	}

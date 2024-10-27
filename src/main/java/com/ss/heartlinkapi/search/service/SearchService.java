@@ -113,7 +113,6 @@ public class SearchService {
         SearchHistoryEntity searchHistory = searchRepository.findByKeywordAndTypeAndUserId(keyword, "content", user);
         SearchHistoryEntity elasticEntity = new SearchHistoryEntity();
         String deepLResult;
-        System.out.println("1111"+searchHistory);
 
         if(searchHistory != null) {
             searchHistory.setUpdatedAt(LocalDateTime.now());
