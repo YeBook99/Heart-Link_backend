@@ -37,7 +37,7 @@ public class PostController {
 		this.bookmarkService = bookmarkService;
 	}
 	
-	// 게시글 작성 a
+	// 게시글 작성 
 //	@PostMapping("/write")
 //	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
 //		
@@ -133,8 +133,6 @@ public class PostController {
 	@GetMapping("/{userId}/couple")
 	public ResponseEntity<List<PostFileDTO>> getCouplePostFiles(@PathVariable Long userId){
 		List<PostFileDTO> postFiles = postService.getPostFilesByUserId(userId);
-		
-		System.out.println("postFiles = " + postFiles);
 		
 		return ResponseEntity.ok(postFiles);
 	}

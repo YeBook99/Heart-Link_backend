@@ -1,29 +1,46 @@
 package com.ss.heartlinkapi.like.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.ss.heartlinkapi.comment.entity.CommentEntity;
+import com.ss.heartlinkapi.comment.repository.CommentRepository;
 import com.ss.heartlinkapi.like.dto.LikeDTO;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
 import com.ss.heartlinkapi.like.repository.LikeRepository;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 
+import co.elastic.clients.elasticsearch.security.get_token.UserRealm;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class LikeService {
 	
 	private final LikeRepository likeRepository;
 	private final ProfileRepository profileRepository;
+	private final PostRepository postRepository;
+	private final CommentRepository commentRepository;
+	private final UserRepository userRepository;
 	
-	public LikeService(LikeRepository likeRepository, ProfileRepository profileRepository) {
+	public LikeService(LikeRepository likeRepository, ProfileRepository profileRepository, PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
 		this.likeRepository = likeRepository;
 		this.profileRepository = profileRepository;
+		this.postRepository = postRepository;
+		this.commentRepository = commentRepository;
+		this.userRepository = userRepository;
 	}
 	
 	// 게시글 좋아요 목록 조회
@@ -88,5 +105,52 @@ public class LikeService {
 				.collect(Collectors.toList());
 
 	}
+	
+	// 좋아요 추가, 삭제
+	@Transactional
+	public void toggleLike(Long userId, Long postId, Long commentId) {
+	    UserEntity userEntity = userRepository.findById(userId)
+	            .orElseThrow(() -> new RuntimeException("User not found"));
+
+	    // 좋아요가 게시글에 대한 것일 경우
+	    if (postId != null) {
+	        LikeEntity like = likeRepository.findByUserIdAndPostId(userEntity, postId); // userEntity 사용
+
+	        if (like != null) {
+	            likeRepository.delete(like);
+	        } else {
+	            PostEntity post = postRepository.findById(postId)
+	                    .orElseThrow(() -> new RuntimeException("Post not found"));
+
+	            LikeEntity newLike = new LikeEntity();
+	            newLike.setUserId(userEntity); // UserEntity로 설정
+	            newLike.setPostId(post); // PostEntity로 설정
+	            likeRepository.save(newLike);
+	        }
+	    // 좋아요가 댓글에 대한 것일 경우
+	    } else if (commentId != null) {
+	        LikeEntity like = likeRepository.findByUserIdAndCommentId(userEntity, commentId); // userEntity 사용
+
+	        if (like != null) {
+	            likeRepository.delete(like);
+	        } else {
+	            CommentEntity comment = commentRepository.findById(commentId)
+	                    .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+	            LikeEntity newLike = new LikeEntity();
+	            newLike.setUserId(userEntity); // UserEntity로 설정
+	            newLike.setCommentId(comment); // CommentEntity로 설정
+	            likeRepository.save(newLike);
+	        }
+	    }
+	    
+	    log.info("토글에서 User ID: {}", userId);
+	    log.info("토글에서 Post ID: {}", postId);
+	    log.info("토글에서 Comment ID: {}", commentId);
+
+	}
+
+
+
 
 }

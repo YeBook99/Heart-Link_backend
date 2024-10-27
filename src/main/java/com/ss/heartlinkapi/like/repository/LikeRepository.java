@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.like.entity.LikeEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
 	
@@ -24,5 +25,11 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
            "JOIN PostFileEntity pf ON pf.postId = p AND pf.sortOrder = 1 " +
            "WHERE l.userId.id = :userId")
     List<PostFileEntity> findLikePostFilesByUserId(@Param("userId") Long userId);
+    
+    // 게시글 좋아요 추가, 삭제
+    LikeEntity findByUserIdAndPostId(UserEntity userId, Long postId);
+    
+    // 댓글 좋아요 추가, 삭제
+    LikeEntity findByUserIdAndCommentId(UserEntity userId, Long commentId);
 
 }
