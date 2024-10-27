@@ -2,7 +2,9 @@ package com.ss.heartlinkapi.post.service;
 
 import java.lang.System.Logger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -201,54 +203,33 @@ public class PostService {
 	        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
 	    }
 	}
-
 	
-//	// 특정 게시글 댓글 조회
-//	public PostDTO getPostWithComments(Long postId) {
-//		
-//		PostEntity post = postRepository.findById(postId).orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다."));
-//		UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
-//		List<CommentEntity> comments = commentRepository.findByPostId(post.getPostId());
-//		List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-//		
-//		// 게시글 + 게시글 첨부파일 데이터
-//		PostDTO postDTO = new PostDTO(
-//				post.getPostId(),
-//				post.getUserId().getLoginId(),
-//				post.getContent(),
-//				post.getCreatedAt(),
-//				post.getUpdatedAt(),
-//				post.getLikeCount(),
-//				post.getCommentCount(),
-//				post.getVisibility(),
-//				postFiles.stream()
-//	                .map(file -> new PostFileDTO(
-//	                    post.getPostId(),
-//	                    file.getFileUrl(),
-//	                    file.getFileType(),
-//	                    file.getSortOrder()))
-//	                .collect(Collectors.toList()),
-//	           partner != null ? partner.getLoginId() : "No Partner"
-//			);
-//		
-//		// 댓글 데이터
-//		List<CommentDTO> commentDTO = comments.stream()
-//				.map(comment -> new CommentDTO(
-//					comment.getCommentId(),
-//					comment.getPostId().getPostId(),
-//					comment.getParentId()  != null ? comment.getParentId().getCommentId() : null,
-//					comment.getUserId().getLoginId(),
-//					comment.getContent(),
-//					comment.getCreatedAt(),
-//					comment.getUpdatedAt()
-//				))
-//				.collect(Collectors.toList());
-//		
-//		postDTO.setComments(commentDTO);
-//		
-//				
-//		return postDTO;		
-//	}
+	// 사용자와 사용자의 커플 게시글 목록 가져오기
+	public List<PostFileDTO> getPostFilesByUserId(Long userId){
+		UserEntity partner = coupleService.getCouplePartner(userId);
+		List<PostFileEntity> myPostFiles = postFileRepository.findPostFilesByUserId(userId);
+		
+		List<PostFileEntity> partnerPostFiles = new ArrayList<>();
+	    if (partner != null) {
+	        partnerPostFiles = postFileRepository.findPostFilesByUserId(partner.getUserId());
+	    }
+		
+		List<PostFileEntity> allPostFiles = new ArrayList<>();
+		allPostFiles.addAll(myPostFiles);
+		allPostFiles.addAll(partnerPostFiles);
+		
+		
+		return allPostFiles.stream()
+				.map(file -> new PostFileDTO(
+								file.getPostId().getPostId(),
+								file.getFileUrl(),
+								file.getFileType(),
+								file.getSortOrder()
+								))
+				.collect(Collectors.toList());
+		
+	}
+	
 
 //	관리자 신고한 게시물 삭제
     public void deletePost(Long postId) {
