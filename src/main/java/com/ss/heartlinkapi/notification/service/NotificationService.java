@@ -28,6 +28,8 @@ public class NotificationService {
 
     private final EmitterRepository emitterRepository;
 
+    private final NotificationRepository notificationRepository;
+
     //    구독시 연결 해제 방지를 위해 더미데이터를 보내 연결을 유지시킨다.
     public SseEmitter subscribe(Long userId) {
 
@@ -39,18 +41,22 @@ public class NotificationService {
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
     public void notifyLike(String userName, Long postId) {
         NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/like" + postId, "http://localhost:9090/img/고먀미1.jpeg", userName + "님이 회원님의 글을 좋아합니다.");
+        saveNotification("NEW_LIKE", notificationLikeDTO.getMessage(), 4L );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
+
         sendToClient(4L, notificationLikeDTO);
     }
 
     public void notifyComment(String userName, Long postId, Long commentId) {
         NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:9090/comments/" + postId, "http://localhost:9090/img/고먀미1.jpeg", commentId, userName + "님이 댓글을 남겼습니다.");
+        saveNotification("NEW_COMMENT", notificationCommentDTO.getMessage(), 4L );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(4L, notificationCommentDTO);
     }
 
     public void notifyFollow(String userName, Long userId) {
         NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/follow", userName + "님이 회원님을 팔로우하였습니다.");
+        saveNotification("NEW_FOLLOW", notificationFollowDTO.getMessage(), 4L );
         sendToClient(userId, notificationFollowDTO);
     }
 
@@ -80,4 +86,18 @@ public class NotificationService {
 
         return emitter;
     }
+
+    private void saveNotification(String type, String message, Long userId){
+        UserEntity user = new UserEntity();
+        user.setUserId(userId);
+        NotificationEntity notificationEntity = new NotificationEntity().builder()
+                .user(user)
+                .message(message)
+                .isRead(true)
+                .type(Type.valueOf(type))
+                .build();
+
+        notificationRepository.save(notificationEntity);
+    }
+
 }
