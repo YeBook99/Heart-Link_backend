@@ -1,4 +1,4 @@
-package com.ss.heartlinkapi.search.config;
+package com.ss.heartlinkapi.elasticSearch.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
