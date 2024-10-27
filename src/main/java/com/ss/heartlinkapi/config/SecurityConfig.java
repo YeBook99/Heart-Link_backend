@@ -77,7 +77,7 @@ public class SecurityConfig {
                         //토큰 role값 검증 확인용
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용
-                        .antMatchers("/couple/**", "/admin/**", "/search/**").permitAll()
+                        .antMatchers("/couple/**", "/admin/**", "/search/**", "/es/**", "/ads/**").permitAll()
                         .antMatchers("/dm/**","/message","/report","/notifications/**").permitAll()
 						.antMatchers("/img/**").permitAll()
 						// 정훈 전용

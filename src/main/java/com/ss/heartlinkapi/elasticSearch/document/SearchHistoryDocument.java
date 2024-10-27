@@ -19,11 +19,10 @@ import java.time.LocalDateTime;
 public class SearchHistoryDocument {
     @Id
     @Field(type = FieldType.Keyword)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long documentId;
-    @Field(type = FieldType.Keyword)
+    private String documentId;
+    @Field(type = FieldType.Long)
     private Long searchHistoryId;
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Long)
     private Long userId;
     @Field(type = FieldType.Text)
     private String keyword;
