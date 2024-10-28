@@ -108,31 +108,59 @@ public class LikeService {
 	
 	// 게시글 좋아요 추가, 삭제
 	@Transactional
-	public boolean addOrRemoveLike(Long postId, Long userId) {
+	public boolean addOrRemoveLike(Long postId, Long userId, Long commentId) {
 	    UserEntity user = userRepository.findById(userId)
 	            .orElseThrow(() -> new IllegalArgumentException("User not found"));
-	    PostEntity post = postRepository.findById(postId)
-	            .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-
-	    // 이미 좋아요가 존재하는지 확인
-	    Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostId(user, post);
-
-	    if (existingLike.isPresent()) {
-	        // 이미 좋아요가 존재하면 삭제
-	        likeRepository.delete(existingLike.get());
-	        post.setLikeCount(post.getLikeCount() - 1);
+	    
+	    // 게시글 또는 댓글 엔티티 가져오기
+	    PostEntity post = null;
+	    CommentEntity comment = null;
+	    if (postId != null) {
+	        post = postRepository.findById(postId)
+	                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+	    } else if (commentId != null) {
+	        comment = commentRepository.findById(commentId)
+	                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 	    } else {
-	        // 좋아요가 존재하지 않으면 추가
-	        LikeEntity like = new LikeEntity();
-	        like.setUserId(user);
-	        like.setPostId(post);
-	        likeRepository.save(like);
-	        post.setLikeCount(post.getLikeCount() + 1);
+	        throw new IllegalArgumentException("Either postId or commentId must be provided");
 	    }
 
-	    postRepository.save(post);
+	    // 중복 좋아요 여부 확인
+	    Optional<LikeEntity> existingLike;
+	    if (post != null) {
+	        existingLike = likeRepository.findByUserIdAndPostId(user, post);
+	    } else {
+	        existingLike = likeRepository.findByUserIdAndCommentId(user, comment);
+	    }
+
+	    if (existingLike.isPresent()) {
+	        // 좋아요가 이미 있으면 삭제
+	        likeRepository.delete(existingLike.get());
+	        if (post != null) {
+	            post.setLikeCount(post.getLikeCount() - 1);
+	            postRepository.save(post);
+	        } else {
+	            comment.setLikeCount(comment.getLikeCount() - 1);
+	            commentRepository.save(comment);
+	        }
+	    } else {
+	        // 좋아요가 없으면 추가
+	        LikeEntity like = new LikeEntity();
+	        like.setUserId(user);
+	        if (post != null) {
+	            like.setPostId(post);
+	            post.setLikeCount(post.getLikeCount() + 1);
+	            postRepository.save(post);
+	        } else {
+	            like.setCommentId(comment);
+	            comment.setLikeCount(comment.getLikeCount() + 1);
+	            commentRepository.save(comment);
+	        }
+	        likeRepository.save(like);
+	    }
 	    return true;
 	}
+
 				
 
 

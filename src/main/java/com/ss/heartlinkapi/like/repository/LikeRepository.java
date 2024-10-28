@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
@@ -32,17 +33,10 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     // 게시글 좋아요 체크
     Boolean existsByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
     
-    // 좋아요 테이블 정보 가져오기
-    List<LikeEntity> findAllByUserId(@Param("userId") Long userId);
-    
-    // 게시글 좋아요 추가
-    
-    
-    
-    // 게시글 좋아요 삭제
-    void deleteByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
-
+    // 게시글 좋아요 증감
 	Optional<LikeEntity> findByUserIdAndPostId(UserEntity user, PostEntity post);
+
+	Optional<LikeEntity> findByUserIdAndCommentId(UserEntity user, CommentEntity comment);
     
     // 댓글 좋아요 추가, 삭제
 

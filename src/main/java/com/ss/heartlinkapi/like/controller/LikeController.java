@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.heartlinkapi.like.dto.LikeDTO;
 import com.ss.heartlinkapi.like.service.LikeService;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,10 +43,16 @@ public class LikeController {
         return ResponseEntity.ok(likes);
     }
     
-    @PostMapping("/{postId}/{userId}")
-    public String toggleLike(@PathVariable Long postId, @PathVariable Long userId) {
-        likeService.addOrRemoveLike(postId, userId);
-        return "Like toggled successfully";
+    // 좋아요 증감
+    @PostMapping("/toggle")
+    public String toggleLike(
+            @RequestParam(required = false) Long postId,
+            @RequestParam(required = false) Long commentId,
+            @AuthenticationPrincipal UserDetails user) {
+        
+        Long userId = 1L; // user.getUserId(); // userDetails에서 userId 추출
+        likeService.addOrRemoveLike(postId, userId, commentId);
+        return "좋아요 업데이트";
     }
 
 }

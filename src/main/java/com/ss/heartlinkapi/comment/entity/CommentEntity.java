@@ -55,6 +55,9 @@ public class CommentEntity {
 	@Column(name = "update_at")
 	private LocalDateTime updatedAt;			// 수정 시간
 	
+	@Column(name = "like_count", nullable = false)
+	private int likeCount = 0;
+	
 	
 
 }
