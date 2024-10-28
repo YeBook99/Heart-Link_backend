@@ -65,21 +65,6 @@ public class CoupleService {
         return coupleRepository.matchCountUp(coupleId);
     }
 
-
-    // 내 유저 아이디로 상대방 유저 아이디 가져오기
-    public UserEntity findLoverByUserId(Long userId) {
-        CoupleEntity couple = coupleRepository.findCoupleByUserId(userId);
-        if (couple == null) {
-            return null;
-        }
-        if (couple.getUser1().getUserId()==userId) {
-            return couple.getUser2();
-        } else if (couple.getUser2().getUserId()==userId) {
-            return couple.getUser1();
-        }
-        return null;
-    }
-
     // 커플 연결
     @Transactional
     public CoupleEntity coupleCodeMatch(UserEntity user1, CoupleCode code) {

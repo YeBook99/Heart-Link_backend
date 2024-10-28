@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchAnswer {
-    private Long userId;
     private Long questionId;
     private int selectedOption;
 }
