@@ -22,9 +22,12 @@ public class AdsController {
         this.adsService = adsService;
     }
 
+    // 유저의 검색기록으로 관련 광고 받아오기
     @GetMapping("/get")
-    public ResponseEntity<?> getAds(@AuthenticationPrincipal CustomUserDetails user){
-        List<Map<String, Object>> adsResult = adsService.getAds(user.getUserId());
+//    public ResponseEntity<?> getAds(@AuthenticationPrincipal CustomUserDetails user){
+    public ResponseEntity<?> getAds(@RequestParam Long userId){
+//        List<Map<String, Object>> adsResult = adsService.getAds(user.getUserId());
+        List<Map<String, Object>> adsResult = adsService.getAds(userId);
         return ResponseEntity.ok(adsResult);
     }
 }

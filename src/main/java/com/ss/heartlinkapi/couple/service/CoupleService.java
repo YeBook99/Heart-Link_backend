@@ -15,6 +15,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
@@ -34,6 +36,9 @@ public class CoupleService {
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
     @Autowired
     private CoupleMissionService coupleMissionService;
+
+    @PersistenceContext  // EntityManager 주입
+    private EntityManager entityManager;
 
     // 유저아이디로 커플아이디 조회
     public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
@@ -131,6 +136,7 @@ public class CoupleService {
 
     }
 
+    // 피드 삭제기능 추가되면 피드 삭제하고 나서 마저 하기
     // 커플 유예기간 매일 체크 기능 (배치 프로그램)
     @Transactional
     public void batchFinalUnlinkCouple() {
@@ -172,7 +178,12 @@ public class CoupleService {
                     try {
                         Optional<CoupleEntity> testCouple = coupleRepository.findById(couple.getCoupleId());
                         System.out.println("testCouple 커플 체크 : "+testCouple);
-                        coupleRepository.delete(testCouple.get());
+//                        entityManager.flush();
+//                        couple.setUser1(null);
+//                        couple.setUser2(null);
+//                        coupleRepository.save(couple);
+//                        entityManager.flush();
+                        coupleRepository.delete(couple);
                         System.out.println("커플도 삭제됐나?????");
                     } catch (Exception e) {
                         System.out.println("커플 객체 자체를 삭제 시도 실패.........");
