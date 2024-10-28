@@ -21,5 +21,12 @@ public interface CoupleRepository extends JpaRepository<CoupleEntity, Long> {
     @Query("update CoupleEntity c set c.matchCount = c.matchCount + 1 where c.coupleId = :coupleId")
     public int matchCountUp(Long coupleId);
 
+    // 연결 해지 예정 커플 리스트 반환
     public List<CoupleEntity> findCoupleEntityByBreakupDateIsNotNull();
+
+//    // 커플아이디로 커플 삭제
+//    public void deleteCoupleByCoupleId(Long coupleId);
+
+//    @Query(value = "delete from couple where id=:coupleId", nativeQuery = true)
+//    public void deleteCoupleById(@Param("coupleId") Long coupleId);
 }

@@ -13,15 +13,15 @@ import java.util.Date;
 @Table(name = "couple")
 public class CoupleEntity {
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long coupleId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "users1_id" , nullable = false)
+    @JoinColumn(name = "users1_id", nullable = true)
     private UserEntity user1;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "users2_id" , nullable = false)
+    @JoinColumn(name = "users2_id", nullable = true)
     private UserEntity user2;
 
     @Column(name = "created_at", nullable = false, updatable = false)

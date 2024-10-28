@@ -1,12 +1,14 @@
 package com.ss.heartlinkapi.search.controller;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,13 +29,13 @@ public class SearchController {
 
     // 유저 별 검색기록 확인
     @GetMapping("/history")
-    public ResponseEntity<?> searchHistory(@RequestParam Long userId){
+    public ResponseEntity<?> searchHistory(@AuthenticationPrincipal CustomUserDetails user){
         try{
-            if(userId == null){
+            if(user == null){
                 return ResponseEntity.badRequest().body("유저 아이디가 존재하지 않습니다.");
             }
 
-            List<Map<String, Object>> historyList = searchService.findHistoryByUserId(userId);
+            List<Map<String, Object>> historyList = searchService.findHistoryByUserId(user.getUserId());
             if(historyList == null){
                 return ResponseEntity.ok().body("검색 기록이 없습니다.");
             }
@@ -49,29 +51,29 @@ public class SearchController {
 
     // 유저, 태그, 피드 내용 별 검색 후 결과 반환
     @GetMapping("/keyword")
-    public ResponseEntity<?> search(@RequestParam String keyword, @RequestParam Long userId) {
+    public ResponseEntity<?> search(@RequestParam String keyword, @AuthenticationPrincipal CustomUserDetails user) {
         try {
 
-            if(keyword == null || keyword.isEmpty() || userId == null) {
+            if(keyword == null || keyword.isEmpty() || user == null) {
                 return ResponseEntity.badRequest().body(null);
             }
 
             if (keyword.startsWith("@")) {
                 System.out.println(keyword);
-                UserEntity user = searchService.searchByUserId(keyword, userId);
-                if(user == null) {
+                UserEntity userEntity = searchService.searchByUserId(keyword, user.getUserId());
+                if(userEntity == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
-                return ResponseEntity.ok(user.getUserId());
+                return ResponseEntity.ok(userEntity.getUserId());
             } else if (keyword.startsWith("&")) {
-                LinkTagEntity tag = searchService.searchByTag(keyword, userId);
+                LinkTagEntity tag = searchService.searchByTag(keyword, user.getUserId());
                 if(tag == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
                 return ResponseEntity.ok(tag.getId());
             } else {
                 System.out.println("키워드 : "+keyword);
-                List<PostEntity> post = searchService.searchByPost(keyword, userId);
+                List<PostEntity> post = searchService.searchByPost(keyword, user.getUserId());
                 if(post == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }

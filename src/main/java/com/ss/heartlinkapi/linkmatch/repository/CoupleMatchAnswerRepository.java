@@ -80,4 +80,6 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "WHERE YEAR(created_at) = :year " +
             "  AND MONTH(created_at) = :month", nativeQuery = true)
     int attendMatchCoupleCount(@Param("year") int year, @Param("month") int month);
+
+    void deleteAllByCoupleId(CoupleEntity couple);
 }

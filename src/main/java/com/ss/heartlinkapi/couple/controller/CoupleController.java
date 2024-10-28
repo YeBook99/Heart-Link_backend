@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @RestController
@@ -49,6 +50,43 @@ public class CoupleController {
             }
 
             return ResponseEntity.ok().body("기념일이 설정되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 기념일 날짜 조회
+    @GetMapping("/ddayDate/{coupleId}")
+    public ResponseEntity<?> getAnniversaryDay(@PathVariable Long coupleId) {
+        try {
+            CoupleEntity couple = coupleService.findById(coupleId);
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok().body(couple.getAnniversaryDate());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 기념일 날짜 조회
+    @GetMapping("/dday/{coupleId}")
+    public ResponseEntity<?> getDday(@PathVariable Long coupleId) {
+        try {
+            CoupleEntity couple = coupleService.findById(coupleId);
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            LocalDate anniversaryDate = couple.getAnniversaryDate();
+//            LocalDate
+
+            return ResponseEntity.ok().body(couple.getAnniversaryDate());
 
         } catch (Exception e) {
             e.printStackTrace();

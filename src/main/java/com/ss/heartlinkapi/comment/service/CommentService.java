@@ -19,22 +19,4 @@ public class CommentService {
 		this.commentRepository = commentRepository;
 	}
 	
-	// 게시글 댓글 가져오기
-//	@Transactional
-//	public List<CommentDTO> getComment(Long postId) {
-//		List<CommentEntity> comments = commentRepository.findByPostId(postId);
-//		
-//		return comments.stream()
-//			    .map(comment -> new CommentDTO(
-//			        comment.getCommentId(),
-//			        comment.getPostId().getPostId(), // PostEntity에서 Long으로
-//			        comment.getParentId() != null ? comment.getParentId().getCommentId() : null, // 부모 댓글 ID
-//			        comment.getUserId().getUserId(), // UserEntity에서 Long으로
-//			        comment.getContent(),
-//			        comment.getCreatedAt(),
-//			        comment.getUpdatedAt()
-//			    ))
-//			    .collect(Collectors.toList());
-//
-//	}
 }
