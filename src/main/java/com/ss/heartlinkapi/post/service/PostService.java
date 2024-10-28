@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -22,8 +23,10 @@ import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.entity.FileType;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
@@ -41,14 +44,16 @@ public class PostService {
 	private final CommentRepository commentRepository;
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
+	private final PostFileService postFileService;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
 		this.commentRepository = commentRepository;
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
+		this.postFileService = postFileService;
 	}
 
 	// 게시글 작성
@@ -256,6 +261,48 @@ public class PostService {
 		
 	}
 	
+	// 게시글 수정
+	@Transactional
+	public void updatePost(Long postId, String newContent, Visibility newVisibility, List<String> newFileUrls, List<String> newFileType, int newSortOrder) {
+		PostEntity post = postRepository.findById(postId)
+				.orElseThrow(() -> new EntityNotFoundException("Post not found"));
+		
+		// 게시글 내용 수정
+		if(newContent != null) {
+			post.setContent(newContent);
+		}
+		// 공개 범위 수정
+		if(newFileUrls != null) {
+			List<PostFileEntity> postFiles = postFileRepository.findByPostId(postId);
+			
+			for (int i = 0; i < newFileUrls.size(); i++) {
+				PostFileEntity postFile;
+				
+				if(i < postFiles.size()) {
+					// 기존 파일 업데이트
+					postFile = postFiles.get(i);
+				} else {
+					// 새 파일 추가
+					postFile = new PostFileEntity();
+					postFile.setPostId(post);
+					postFile.setSortOrder(i + 1);
+				}
+				
+				String newFileUrl = newFileUrls.get(i);
+				postFile.setFileUrl(newFileUrl);
+				postFile.setFileType(postFileService.determineFileType(newFileUrl));
+				
+				postFileRepository.save(postFile);
+				
+			}
+		}
+		
+		post.setUpdatedAt(LocalDateTime.now());
+		postRepository.save(post);
+		
+	}
+	
+
 
 //	관리자 신고한 게시물 삭제
     public void deletePost(Long postId) {
