@@ -15,14 +15,12 @@ public class ProfileService {
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
 	private final FollowRepository followRepository;
-	private final CoupleRepository coupleRepository;
 	
 	public ProfileService(ProfileRepository profileRepository, UserRepository userRepository,
-			FollowRepository followRepository, CoupleRepository coupleRepository) {
+			FollowRepository followRepository) {
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
 		this.followRepository = followRepository;
-		this.coupleRepository = coupleRepository;
 	}
 
 	// 유저 아이디로 유저 엔티티 가져오는 메서드
@@ -42,6 +40,16 @@ public class ProfileService {
 	public int selectFollowersCount(Long userId) {
 		return followRepository.countFollowersByUserId(userId);
 	}
+	
+	// 유저로 프로필 가져오기
+	public ProfileEntity findByUserEntity(UserEntity user) {
+		return profileRepository.findByUserEntity(user);
+	}
+	// 프로필 저장 메서드
+	public void save(ProfileEntity profileEntity) {
+		profileRepository.save(profileEntity);	
+	}
+	
 
 
 }
