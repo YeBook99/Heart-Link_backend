@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
 import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -47,14 +50,29 @@ public class AdsService {
 
         System.out.println("ads의 서비스의 searchList 쪼개고 난 뒤 : "+historyList);
 
-        Map<String, Object> adsList = getAdsList(historyList);
+        String adsList = getAdsList(historyList);
 
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject list = (JSONObject) parser.parse(adsList);
+            JSONObject response = (JSONObject) list.get("findItemsByKeywordsResponse");
+            JSONObject searchResult = (JSONObject) response.get("searchResult");
+            String timestamp = (String) response.get("timestamp"); // 조회 시간
+            String count = (String) searchResult.get("@count"); // 조회 개수
+
+
+            System.out.println(timestamp);
+            System.out.println(count);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
         return null;
 
     }
 
     // 키워드를 넘겨서 광고 상품 목록 받아오기
-    private Map<String, Object> getAdsList(List<String> keywords){
+    private String getAdsList(List<String> keywords){
         final String EBAY_GET_URL = "https://svcs.ebay.com/services/search/FindingService/v1";
         final String APPKEY = "-HeartLin-PRD-7b15e11a8-28f07714";
         int getItemCount = 10; // 가져올 아이템 갯수
@@ -77,25 +95,7 @@ public class AdsService {
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-        String result = response.getBody();
-        System.out.println("광고 리스트 결과 : "+result);
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(result);
-            System.out.println(jsonNode.toString());
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-
-//        findItemsByKeywordsResponse
-//                searchResult
-//        @count
-//        item[]
-
-
+        return response.getBody();
     }
 
     // 이베이 토큰 생성 (배치 프로그램으로 1시간 단위로 계속 발급)

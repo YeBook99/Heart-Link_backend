@@ -16,11 +16,9 @@ public class CoupleUnlinkCheck {
     @Autowired
     private CoupleService coupleService;
 
-//    @Transactional
-//    @Scheduled(cron = "0 * * * * ?")
-//    public void CoupleUnlinkCheck() {
-//        System.out.println("CoupleUnlinkCheck 배치");
-//        coupleService.batchFinalUnlinkCouple();
-//        System.out.println(LocalDateTime.now());
-//    }
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *")
+    public void CoupleUnlinkCheck() {
+        coupleService.batchFinalUnlinkCouple();
+    }
 }
