@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,7 +71,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 				throw new BadCredentialsException("비밀번호 불일치");
 			}
 			Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
-			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginId, password, authorities);
+			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customUserDetails, password, authorities);
 			return authenticationManager.authenticate(authToken);
 		}else {
 			throw new UsernameNotFoundException("UsernameNotFound : "+loginId);
@@ -100,6 +101,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 		 response.setHeader("Access-Control-Expose-Headers", "Authorization, RefreshToken");
 		 
 		 response.setStatus(HttpStatus.OK.value());
+
 	}
 	
 	@Override

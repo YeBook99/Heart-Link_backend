@@ -1,18 +1,24 @@
 package com.ss.heartlinkapi.login.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.login.jwt.JWTUtil;
 import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 
 @Service
 public class JWTService {
+	
 	private final JWTUtil jwtUtil;
+	private final UserRepository userRepository;
 
-	public JWTService(JWTUtil jwtUtil) {
+	public JWTService(JWTUtil jwtUtil, UserRepository userRepository) {
+		super();
 		this.jwtUtil = jwtUtil;
+		this.userRepository = userRepository;
 	}
 
 	public CustomUserDetails validateToken(String token) throws Exception {
@@ -29,8 +35,7 @@ public class JWTService {
 		String loginId = jwtUtil.getLoginId(token);
 		String stringRole = jwtUtil.getRole(token);
 		
-		UserEntity userEntity = new UserEntity();
-		userEntity.setLoginId(loginId);
+		UserEntity userEntity = userRepository.findByLoginId(loginId);
 		Role role = Role.valueOf(stringRole);
 		userEntity.setRole(role);
 		
