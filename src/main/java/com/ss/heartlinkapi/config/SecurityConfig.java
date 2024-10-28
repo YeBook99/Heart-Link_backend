@@ -85,6 +85,7 @@ public class SecurityConfig {
 						.antMatchers("/feed/**").permitAll()
 						.antMatchers("/following/**").permitAll()
 						.antMatchers("/like/**").permitAll()
+						.antMatchers("/bookmark/**").permitAll()
                         .anyRequest().authenticated());
         // oauth2
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler));

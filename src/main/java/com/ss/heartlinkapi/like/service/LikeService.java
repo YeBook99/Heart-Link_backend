@@ -25,7 +25,6 @@ import com.ss.heartlinkapi.user.repository.UserRepository;
 import co.elastic.clients.elasticsearch.security.get_token.UserRealm;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class LikeService {
 	
