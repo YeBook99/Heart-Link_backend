@@ -1,6 +1,8 @@
 package com.ss.heartlinkapi.notification.service;
 
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.notification.dto.NotificationCommentDTO;
+import com.ss.heartlinkapi.notification.dto.NotificationDTO;
 import com.ss.heartlinkapi.notification.dto.NotificationFollowDTO;
 import com.ss.heartlinkapi.notification.dto.NotificationLikeDTO;
 import com.ss.heartlinkapi.notification.entity.NotificationEntity;
@@ -14,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -100,4 +104,22 @@ public class NotificationService {
         notificationRepository.save(notificationEntity);
     }
 
+    public List<NotificationDTO> getNotifications(CustomUserDetails user) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserId(user.getUserId());
+
+        List<NotificationEntity> notifications = notificationRepository.findByUser(userEntity);
+
+        List<NotificationDTO> notificationDTOS = new ArrayList<>();
+
+        for(NotificationEntity notificationEntity : notifications) {
+            NotificationDTO notificationDTO = new NotificationDTO();
+            notificationDTO.setCreatedAt(notificationEntity.getCreatedDate());
+            notificationDTO.setMessage(notificationEntity.getMessage());
+
+            notificationDTOS.add(notificationDTO);
+        }
+
+        return notificationDTOS;
+    }
 }
