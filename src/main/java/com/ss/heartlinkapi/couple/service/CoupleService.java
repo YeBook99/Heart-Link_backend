@@ -20,10 +20,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CoupleService {
@@ -124,6 +121,10 @@ public class CoupleService {
     public void batchFinalUnlinkCouple() {
         List<CoupleEntity> breakCouple = coupleRepository.findCoupleEntityByBreakupDateIsNotNull();
         System.out.println("오늘 깨질 커플 리스트"+breakCouple);
+        for(CoupleEntity couple : breakCouple) {
+            System.out.println("1---1번째 유저 체크 "+couple.getUser1());
+            System.out.println("1---2번째 유저 체크 "+couple.getUser1());
+        }
         if(breakCouple != null && breakCouple.size() > 0) {
             LocalDate today = LocalDate.now();
             System.out.println("오늘 날짜"+today);
@@ -148,15 +149,24 @@ public class CoupleService {
                     }
                     System.out.println("커플삭제할거야");
                     System.out.println("삭제할 커플 아이디 : "+couple.getCoupleId());
+
+                    System.out.println("2---커플 체크 "+couple);
+                    System.out.println("2---1번째 유저 체크 "+couple.getUser1());
+                    System.out.println("2---2번째 유저 체크 "+couple.getUser2());
+
                     try {
-                        coupleRepository.delete(couple);
+                        Optional<CoupleEntity> testCouple = coupleRepository.findById(couple.getCoupleId());
+                        System.out.println("testCouple 커플 체크 : "+testCouple);
+                        coupleRepository.delete(testCouple.get());
                         System.out.println("커플도 삭제됐나?????");
                     } catch (Exception e) {
                         System.out.println("커플 객체 자체를 삭제 시도 실패.........");
                         e.printStackTrace();
                     }
 //                    try{
-//                        coupleRepository.deleteById(couple.getCoupleId());
+//                        System.out.println("커플 다시 조회 : "+coupleRepository.findById(couple.getCoupleId()));
+//                        coupleRepository.deleteCoupleByCoupleId(couple.getCoupleId());
+//                        System.out.println("삭제됐을거같은데ㅔㅔㅔㅔㅔ");
 //                    } catch (Exception e) {
 //                        System.out.println("삭제실패 왜실패야");
 //                        e.printStackTrace();
