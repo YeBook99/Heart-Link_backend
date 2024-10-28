@@ -56,6 +56,23 @@ public class CoupleController {
         }
     }
 
+    // 디데이 조회
+    @GetMapping("/dday/{coupleId}")
+    public ResponseEntity<?> getAnniversaryDay(@PathVariable Long coupleId) {
+        try {
+            CoupleEntity couple = coupleService.findById(coupleId);
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok().body(couple.getAnniversaryDate());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     // 디데이 수정
     @PutMapping("/dday/update")
     public ResponseEntity<?> updateAnniversaryDay(@RequestBody Dday dDayData) {

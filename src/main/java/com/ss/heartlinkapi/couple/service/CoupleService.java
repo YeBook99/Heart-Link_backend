@@ -5,12 +5,16 @@ import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
+import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
+import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
@@ -31,6 +35,8 @@ public class CoupleService {
 
     @Autowired
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
+    @Autowired
+    private CoupleMissionService coupleMissionService;
 
     // 유저아이디로 커플아이디 조회
     public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
@@ -117,19 +123,46 @@ public class CoupleService {
     @Transactional
     public void batchFinalUnlinkCouple() {
         List<CoupleEntity> breakCouple = coupleRepository.findCoupleEntityByBreakupDateIsNotNull();
-        System.out.println("커어어어플"+breakCouple.get(0));
+        System.out.println("오늘 깨질 커플 리스트"+breakCouple);
         if(breakCouple != null && breakCouple.size() > 0) {
             LocalDate today = LocalDate.now();
+            System.out.println("오늘 날짜"+today);
             for(CoupleEntity couple : breakCouple) {
                 if(couple.getBreakupDate().isBefore(today)){
+                    // 매치 답변 목록 삭제
                     List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
-                    System.out.println("answerList "+answerList.toString());
-                    for(LinkMatchAnswerEntity answer : answerList) {
-//                        System.out.println("answer "+answer);
-                        coupleMatchAnswerRepository.delete(answer);
-//                        System.out.println(answer+" 지웠땅!222");
+                    System.out.println("매치답변목록 "+answerList.toString());
+                    if(answerList != null && answerList.size() > 0) {
+                        System.out.println("매치답변 삭제 시도");
+                        coupleMatchAnswerRepository.deleteAllByCoupleId(couple);
+                        System.out.println("매치답변 삭제 완료");
                     }
-                    coupleRepository.delete(couple);
+                    // 매치 미션 목록 삭제
+                    List<UserLinkMissionEntity> userMissionList = coupleMissionService.findUserLinkMissionByCoupleId(couple);
+                    System.out.println("매치미션목록 "+userMissionList);
+
+                    if(userMissionList != null && userMissionList.size() > 0) {
+                        System.out.println("매치미션 삭제 시도");
+                        coupleMissionService.deleteUserMissionByCoupleId(couple.getCoupleId());
+                        System.out.println("매치미션 삭제 완료");
+                    }
+                    System.out.println("커플삭제할거야");
+                    System.out.println("삭제할 커플 아이디 : "+couple.getCoupleId());
+                    try {
+                        coupleRepository.delete(couple);
+                        System.out.println("커플도 삭제됐나?????");
+                    } catch (Exception e) {
+                        System.out.println("커플 객체 자체를 삭제 시도 실패.........");
+                        e.printStackTrace();
+                    }
+//                    try{
+//                        coupleRepository.deleteById(couple.getCoupleId());
+//                    } catch (Exception e) {
+//                        System.out.println("삭제실패 왜실패야");
+//                        e.printStackTrace();
+//
+//                    }
+                    System.out.println("커플삭제했어");
                 }
             }
         }
