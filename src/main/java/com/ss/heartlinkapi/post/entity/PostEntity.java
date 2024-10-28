@@ -36,7 +36,7 @@ public class PostEntity {
 	private Long postId; // 게시글 id
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity userId; // 게시글 작성자 id
 	
 	@Column(name = "content")
