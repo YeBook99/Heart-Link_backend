@@ -3,7 +3,9 @@ package com.ss.heartlinkapi.post.entity;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -15,12 +17,17 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.ss.heartlinkapi.bookmark.entity.BookmarkEntity;
+import com.ss.heartlinkapi.comment.entity.CommentEntity;
+import com.ss.heartlinkapi.like.entity.LikeEntity;
+import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 import lombok.Data;
@@ -58,4 +65,24 @@ public class PostEntity {
 	
 	@Enumerated(EnumType.STRING)
 	private Visibility visibility; // 공개 범위
+	
+	
+	// Cascade 설정
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentEntity> comments;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LikeEntity> likes;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportEntity> reports;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostFileEntity> postFiles;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookmarkEntity> bookmarks;
+    
+    
+    // mention도 추가
 }
