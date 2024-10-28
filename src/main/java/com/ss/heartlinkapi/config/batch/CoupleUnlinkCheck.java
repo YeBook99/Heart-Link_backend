@@ -6,24 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Component
 public class CoupleUnlinkCheck {
 
-    private final CoupleService coupleService;
+    @Autowired
+    private CoupleService coupleService;
 
-    public CoupleUnlinkCheck(CoupleService coupleService) {
-        this.coupleService = coupleService;
-    }
-
-
+//    @Transactional
 //    @Scheduled(cron = "0 * * * * ?")
-////    @Scheduled(cron = "0 0 0 * * ?")
 //    public void CoupleUnlinkCheck() {
-//        System.out.println("배치다아아아CoupleUnlinkCheck");
+//        System.out.println("CoupleUnlinkCheck 배치");
 //        coupleService.batchFinalUnlinkCouple();
 //        System.out.println(LocalDateTime.now());
 //    }

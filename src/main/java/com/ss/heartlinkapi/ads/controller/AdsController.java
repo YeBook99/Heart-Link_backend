@@ -1,7 +1,9 @@
 package com.ss.heartlinkapi.ads.controller;
 
 import com.ss.heartlinkapi.ads.service.AdsService;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,8 +23,8 @@ public class AdsController {
     }
 
     @GetMapping("/get")
-    public ResponseEntity<?> getAds(@RequestParam Long userId){
-        List<Map<String, Object>> adsResult = adsService.getAds(userId);
+    public ResponseEntity<?> getAds(@AuthenticationPrincipal CustomUserDetails user){
+        List<Map<String, Object>> adsResult = adsService.getAds(user.getUserId());
         return ResponseEntity.ok(adsResult);
     }
 }
