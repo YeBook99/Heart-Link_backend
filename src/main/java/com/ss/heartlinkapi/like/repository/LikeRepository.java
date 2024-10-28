@@ -30,14 +30,12 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
            "WHERE l.userId.id = :userId")
     List<PostFileEntity> findLikePostFilesByUserId(@Param("userId") Long userId);
     
-    // 게시글 좋아요 체크
-    Boolean existsByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
     
     // 게시글 좋아요 증감
 	Optional<LikeEntity> findByUserIdAndPostId(UserEntity user, PostEntity post);
 
+	// 댓글 좋아요 증감
 	Optional<LikeEntity> findByUserIdAndCommentId(UserEntity user, CommentEntity comment);
     
-    // 댓글 좋아요 추가, 삭제
 
 }

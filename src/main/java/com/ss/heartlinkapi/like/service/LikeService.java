@@ -106,7 +106,7 @@ public class LikeService {
 
 	}
 	
-	// 게시글 좋아요 추가, 삭제
+	// 좋아요 추가, 삭제
 	@Transactional
 	public boolean addOrRemoveLike(Long postId, Long userId, Long commentId) {
 	    UserEntity user = userRepository.findById(userId)
@@ -127,8 +127,11 @@ public class LikeService {
 
 	    // 중복 좋아요 여부 확인
 	    Optional<LikeEntity> existingLike;
+	    
+	    // 게시글에 대한 좋아요
 	    if (post != null) {
 	        existingLike = likeRepository.findByUserIdAndPostId(user, post);
+	    // 댓글에 대한 좋아요
 	    } else {
 	        existingLike = likeRepository.findByUserIdAndCommentId(user, comment);
 	    }
