@@ -1,9 +1,5 @@
 package com.ss.heartlinkapi.mission.controller;
 
-import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
-import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
-import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
-import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +18,17 @@ import java.util.Map;
 public class CoupleMissionController {
 
     @Autowired
-    private CoupleMissionService MissionService;
+    private CoupleMissionService missionService;
+
+    @GetMapping("/missionAllList")
+    public ResponseEntity<?> selectAllMissionDate(){
+        List<LinkMissionEntity> allMissions = missionService.findAllMissions();
+
+        for(LinkMissionEntity linkMissionEntity : allMissions){
+            linkMissionEntity.getStart_date();
+        }
+
+    }
 
     // 매월 미션태그 조회
     @GetMapping("/missionslink")
@@ -41,13 +44,13 @@ public class CoupleMissionController {
             }
 
             // 매월 미션 리스트 조회
-            List<LinkMissionEntity> missionList = MissionService.findMissionByYearMonth(year, month);
+            List<LinkMissionEntity> missionList = missionService.findMissionByYearMonth(year, month);
 
             if(missionList == null || missionList.isEmpty()){
                 return ResponseEntity.notFound().build();
             }
             // 미션 리스트의 태그 조회
-            List<Map<String, Object>> tagList =  MissionService.findMissionTag(missionList);
+            List<Map<String, Object>> tagList =  missionService.findMissionTag(missionList);
 
             return ResponseEntity.ok(tagList);
 

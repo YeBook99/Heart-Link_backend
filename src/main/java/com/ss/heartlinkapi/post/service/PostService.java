@@ -243,8 +243,7 @@ public class PostService {
 		} else {
 			throw new RuntimeException("게시글이 존재하지 않거나 접근 권한이 없습니다.");
 		}
-		
-		
+
 	}
 	
 	// 모든 게시글 삭제

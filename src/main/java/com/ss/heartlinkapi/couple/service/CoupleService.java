@@ -40,9 +40,14 @@ public class CoupleService {
     @PersistenceContext  // EntityManager 주입
     private EntityManager entityManager;
 
-    // 유저아이디로 커플아이디 조회
+    // 유저아이디로 커플객체 조회
     public CoupleEntity findByUser1_IdOrUser2_Id(Long id) {
         return coupleRepository.findCoupleByUserId(id);
+    }
+
+    // 유저객체로 커플객체 조회
+    public CoupleEntity findCoupleEntity(UserEntity user) {
+        return coupleRepository.findCoupleByUserId(user.getUserId());
     }
 
     // 커플 아이디로 커플 객체 반환
