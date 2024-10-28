@@ -36,6 +36,10 @@ public class AdsService {
         List<SearchHistoryDocument> searchList = elasticService.findByUserId(userId);
         List<String> historyList = new ArrayList<>();
 
+        if(searchList.isEmpty()) {
+
+        }
+
         for (SearchHistoryDocument history : searchList) {
             String[] keywords = history.getKeyword().split(" "); // 키워드 쪼개기
             historyList.addAll(Arrays.asList(keywords)); // 쪼갠 키워드를 리스트에 추가
@@ -43,7 +47,7 @@ public class AdsService {
 
         System.out.println("ads의 서비스의 searchList 쪼개고 난 뒤 : "+historyList);
 
-        getAdsList(historyList);
+        Map<String, Object> adsList = getAdsList(historyList);
 
         return null;
 
@@ -53,7 +57,7 @@ public class AdsService {
     private Map<String, Object> getAdsList(List<String> keywords){
         final String EBAY_GET_URL = "https://svcs.ebay.com/services/search/FindingService/v1";
         final String APPKEY = "-HeartLin-PRD-7b15e11a8-28f07714";
-        int getItemCount = 3; // 가져올 아이템 갯수
+        int getItemCount = 10; // 가져올 아이템 갯수
 
 
         headers = new HttpHeaders();
@@ -78,11 +82,19 @@ public class AdsService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(result);
+            System.out.println(jsonNode.toString());
             return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+
+
+//        findItemsByKeywordsResponse
+//                searchResult
+//        @count
+//        item[]
+
 
     }
 

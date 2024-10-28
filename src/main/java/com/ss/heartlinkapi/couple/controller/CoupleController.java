@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @RestController
@@ -74,7 +75,7 @@ public class CoupleController {
         }
     }
 
-    // 기념일 날짜 조회
+    // D-DAY 일수 조회
     @GetMapping("/dday/{coupleId}")
     public ResponseEntity<?> getDday(@PathVariable Long coupleId) {
         try {
@@ -84,9 +85,10 @@ public class CoupleController {
             }
 
             LocalDate anniversaryDate = couple.getAnniversaryDate();
-//            LocalDate
+            LocalDate today = LocalDate.now();
 
-            return ResponseEntity.ok().body(couple.getAnniversaryDate());
+            Long dday = ChronoUnit.DAYS.between(anniversaryDate, today);
+            return ResponseEntity.ok().body(dday+1);
 
         } catch (Exception e) {
             e.printStackTrace();
