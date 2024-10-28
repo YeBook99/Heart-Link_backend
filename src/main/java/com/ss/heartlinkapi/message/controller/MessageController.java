@@ -1,11 +1,13 @@
 package com.ss.heartlinkapi.message.controller;
 
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.message.dto.*;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,10 +28,10 @@ public class MessageController {
     private final MessageService messageService;
 
     //    사용자와 대화중인 상대방들의 list를 출력
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ChatUserDTO>> getAllChatList(@PathVariable("userId") Long userId) {
+    @GetMapping
+    public ResponseEntity<List<ChatUserDTO>> getAllChatList(@AuthenticationPrincipal CustomUserDetails user) {
         List<ChatUserDTO> list = new ArrayList<>();
-        list = messageRoomService.getAllChatList(userId);
+        list = messageRoomService.getAllChatList(user.getUserId());
         log.info("접근함");
         return ResponseEntity.ok(list);
     }
