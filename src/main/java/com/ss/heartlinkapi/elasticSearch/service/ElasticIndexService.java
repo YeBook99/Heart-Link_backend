@@ -22,7 +22,7 @@ public class ElasticIndexService {
     private static final String INDEX_NAME = "search_history";
     private static final String MAPPING_FILE_PATH = "src/main/resources/elasticSearch/search_history_mapping.json";
 
-//    @PostConstruct
+    @PostConstruct
     public void initializeIndex(){
         try{
             if(!indexExists(INDEX_NAME)){

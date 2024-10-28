@@ -50,7 +50,7 @@ public class NotificationService {
     }
 
     public void notifyFollow(String userName, Long userId) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/follow", userName + "님이 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/follow", userName + "님이 회원님을 팔로우하였습니다.");
         sendToClient(userId, notificationFollowDTO);
     }
 

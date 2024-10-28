@@ -113,19 +113,30 @@ public class PostController {
 	
 	// 내가 누른 좋아요 목록 조회
 	@GetMapping("/{userId}/like")
-	public ResponseEntity<List<PostFileDTO>> getLikePostFilesByUserId(@PathVariable Long userId) {
-	    List<PostFileDTO> postFiles = likeService.getPostFilesByUserId(userId);
+	public ResponseEntity<List<PostFileDTO>> getLikePostFilesByUserId(@PathVariable Long userId) { // @AuthenticationPrincipal UserEntity user 사용?
+	    List<PostFileDTO> postFiles = likeService.getPostFilesByUserId(userId); 				   // user.getUserId() 
 	    
 	    return ResponseEntity.ok(postFiles);
 	}
 	
 	// 내가 누른 북마크 목록 조회
 	@GetMapping("/{userId}/bookmark")
-	public ResponseEntity<List<PostFileDTO>> getBokkmarkPostFilesByUserId(@PathVariable Long userId){
-		List<PostFileDTO> postFiles = bookmarkService.getBokkmarkPostFilesByUserId(userId);
+	public ResponseEntity<List<PostFileDTO>> getBokkmarkPostFilesByUserId(@PathVariable Long userId){  // @AuthenticationPrincipal UserEntity user 사용?
+		List<PostFileDTO> postFiles = bookmarkService.getBokkmarkPostFilesByUserId(userId);			   // user.getUserId() 
 		
 		return ResponseEntity.ok(postFiles);
 		
+	}
+	
+	
+	// 사용자와 사용자의 커플 게시글 목록 조회
+	@GetMapping("/{userId}/couple")
+	public ResponseEntity<List<PostFileDTO>> getCouplePostFiles(@PathVariable Long userId){
+		List<PostFileDTO> postFiles = postService.getPostFilesByUserId(userId);
+		
+		System.out.println("postFiles = " + postFiles);
+		
+		return ResponseEntity.ok(postFiles);
 	}
 
 

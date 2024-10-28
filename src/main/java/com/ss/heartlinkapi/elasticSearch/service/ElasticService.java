@@ -5,6 +5,9 @@ import com.ss.heartlinkapi.elasticSearch.repository.ElasticHistoryRepository;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ElasticService {
 
@@ -38,4 +41,11 @@ public class ElasticService {
     private SearchHistoryDocument findHistoryById(Long historyEntityId) {
         return elasticHistoryRepository.findById(historyEntityId).orElse(null);
     }
+
+    // 인덱스에서 유저 아이디로 최근 검색 순으로 검색기록 찾기
+    public List<SearchHistoryDocument> findByUserId(Long userId) {
+        List<SearchHistoryDocument> searchList = elasticHistoryRepository.findByUserIdOrderByDateDesc(userId);
+        return searchList;
+    }
+
 }
