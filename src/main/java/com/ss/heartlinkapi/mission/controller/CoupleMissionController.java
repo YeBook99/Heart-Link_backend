@@ -25,7 +25,7 @@ public class CoupleMissionController {
         List<LinkMissionEntity> allMissions = missionService.findAllMissions();
 
         for(LinkMissionEntity linkMissionEntity : allMissions){
-
+            linkMissionEntity.getStart_date();
         }
 
     }
