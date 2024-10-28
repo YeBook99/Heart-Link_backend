@@ -42,9 +42,9 @@ public class LikeController {
     }
     
     @PostMapping("/{postId}/{userId}")
-    public ResponseEntity<Void> likePost(@PathVariable Long userId, @PathVariable Long postId) {
-        likeService.likePost(userId, postId);
-        return ResponseEntity.ok().build();
+    public String toggleLike(@PathVariable Long postId, @PathVariable Long userId) {
+        likeService.addOrRemoveLike(postId, userId);
+        return "Like toggled successfully";
     }
 
 }

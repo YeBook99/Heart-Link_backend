@@ -108,24 +108,31 @@ public class LikeService {
 	
 	// 게시글 좋아요 추가, 삭제
 	@Transactional
-    public void likePost(Long userId, Long postId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        PostEntity post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+	public boolean addOrRemoveLike(Long postId, Long userId) {
+	    UserEntity user = userRepository.findById(userId)
+	            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+	    PostEntity post = postRepository.findById(postId)
+	            .orElseThrow(() -> new IllegalArgumentException("Post not found"));
 
-        // Create a new LikeEntity
-        LikeEntity like = new LikeEntity();
-        like.setUserId(user);
-        like.setPostId(post);
-        
-        // Save the like
-        likeRepository.save(like);
+	    // 이미 좋아요가 존재하는지 확인
+	    Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostId(user, post);
 
-        // Update the post's like count
-        post.setLikeCount(post.getLikeCount() + 1);
-        postRepository.save(post);
-    }
+	    if (existingLike.isPresent()) {
+	        // 이미 좋아요가 존재하면 삭제
+	        likeRepository.delete(existingLike.get());
+	        post.setLikeCount(post.getLikeCount() - 1);
+	    } else {
+	        // 좋아요가 존재하지 않으면 추가
+	        LikeEntity like = new LikeEntity();
+	        like.setUserId(user);
+	        like.setPostId(post);
+	        likeRepository.save(like);
+	        post.setLikeCount(post.getLikeCount() + 1);
+	    }
+
+	    postRepository.save(post);
+	    return true;
+	}
 				
 
 
