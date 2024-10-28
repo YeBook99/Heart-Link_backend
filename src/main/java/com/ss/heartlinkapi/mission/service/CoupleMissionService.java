@@ -105,4 +105,14 @@ public class CoupleMissionService {
 
     }
 
+    // 유저 미션 테이블에서 커플 아이디로 조회하기
+    public List<UserLinkMissionEntity> findUserLinkMissionByCoupleId(CoupleEntity couple) {
+        return userLinkMissionRepository.findAllByCoupleId(couple);
+    }
+
+    // 유저 미션 삭제
+    public void deleteUserMissionByCoupleId(Long coupleId) {
+        userLinkMissionRepository.deleteAllByCoupleId(coupleId);
+    }
+
 }
