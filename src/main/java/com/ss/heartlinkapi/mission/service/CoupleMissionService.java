@@ -115,4 +115,8 @@ public class CoupleMissionService {
         userLinkMissionRepository.deleteAllByCoupleId(coupleId);
     }
 
+    // 모든 미션 리스트 조회
+    public List<LinkMissionEntity> findAllMissions() {
+        return missionRepository.findAll();
+    }
 }
