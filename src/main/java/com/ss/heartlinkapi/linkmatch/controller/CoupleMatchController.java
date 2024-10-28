@@ -7,9 +7,11 @@ import com.ss.heartlinkapi.linkmatch.service.CoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchStatisticsService;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -52,15 +54,15 @@ public class CoupleMatchController {
 
     // 커플 매치 답변 저장
     @PostMapping("/missionmatch/questions/choose")
-    public ResponseEntity<?> matchChoose(@RequestBody MatchAnswer matchAnswer) {
+    public ResponseEntity<?> matchChoose(@RequestBody MatchAnswer matchAnswer, @AuthenticationPrincipal CustomUserDetails user) {
         // 오류 500 검사
         try {
             // 오류 400 검사
             if (matchAnswer == null || matchAnswer.getQuestionId() == null
-                    || matchAnswer.getSelectedOption() > 1 || matchAnswer.getSelectedOption() < 0 || matchAnswer.getUserId() == null) {
+                    || matchAnswer.getSelectedOption() > 1 || matchAnswer.getSelectedOption() < 0 || user.getUserId() == null) {
                 return ResponseEntity.badRequest().build();
             }
-            LinkMatchAnswerEntity result = coupleMatchService.answerSave(matchAnswer);
+            LinkMatchAnswerEntity result = coupleMatchService.answerSave(matchAnswer, user.getUserId());
             // 오류 404 검사
             if (result != null) {
                 // 매칭 성공 여부 확인

@@ -32,14 +32,14 @@ public class CoupleMatchService {
     private UserRepository userRepository;
 
     // 커플 답변 저장
-    public LinkMatchAnswerEntity answerSave(MatchAnswer matchAnswer) {
+    public LinkMatchAnswerEntity answerSave(MatchAnswer matchAnswer, Long userId) {
 
         LinkMatchAnswerEntity answerEntity = new LinkMatchAnswerEntity();
 
-        answerEntity.setUserId(userRepository.findById(matchAnswer.getUserId()).orElse(null));
+        answerEntity.setUserId(userRepository.findById(userId).orElse(null));
         LinkMatchEntity match = matchRepository.findById(matchAnswer.getQuestionId()).orElse(null);
         answerEntity.setMatchId(match);
-        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(matchAnswer.getUserId());
+        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userId);
         answerEntity.setCoupleId(couple);
         Date now = new Date();
         LocalDate today = now.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
