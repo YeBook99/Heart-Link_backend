@@ -146,9 +146,19 @@ public class PostController {
 		
 		postService.deleteMyPost(postId, userId);
 		
-		return ResponseEntity.ok("삭제 완료");
+		return ResponseEntity.ok("게시글 삭제 완료");
 		
 	}
+	
+	// 모든 게시글 삭제
+	@DeleteMapping("/user")
+	public ResponseEntity<?> deleteAllPostsByUser(@AuthenticationPrincipal UserDetails user){
+		Long userId = 5L; // user.getUserId(); // userDetails에서 userId 추출
+		
+		postService.deleteAllPostByUser(userId);
+		return ResponseEntity.ok("모든 게시글 삭제 완료");
+	}
+	
 
 
 
