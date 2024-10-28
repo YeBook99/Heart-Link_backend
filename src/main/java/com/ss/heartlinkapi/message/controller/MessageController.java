@@ -4,6 +4,8 @@ import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.message.dto.*;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequestMapping("/dm")
 @RequiredArgsConstructor
 @Slf4j
+@Api(tags = {"DM"})
 public class MessageController {
 
     private final MessageRoomService messageRoomService;
@@ -29,6 +32,9 @@ public class MessageController {
 
     //    사용자와 대화중인 상대방들의 list를 출력
     @GetMapping
+    @ApiOperation(
+            value = "대화중인 상대방 목록"
+            , notes = "userId를 통해 대화중인 상대방 목록을 조회한다.")
     public ResponseEntity<HashMap<String, Object>> getAllChatList(@AuthenticationPrincipal CustomUserDetails user) {
 
         HashMap<String, Object> response = new HashMap<>();
@@ -40,6 +46,9 @@ public class MessageController {
     }
 
     //    상대방과의 대화 내역을 출력
+    @ApiOperation(
+            value = "상대방과 대화중인 메세지 출력"
+            , notes = "msgRoomId를 통해 상대방과의 대화 메세지를 조회한다.")
     @GetMapping("/{msgRoomId}/detail")
     public ResponseEntity<List<ChatMsgListDTO>> getAllChatMessage(@PathVariable("msgRoomId") Long msgRoomId) {
         List<ChatMsgListDTO> list = messageService.getAllChatMessage(msgRoomId);
