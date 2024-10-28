@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.bookmark.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,11 +20,11 @@ public class BookmarkController {
 	}
 	
 	@PostMapping("/{postId}")
-	public String toggleBookmark(Long postId, @AuthenticationPrincipal UserDetails user) {
+	public ResponseEntity<String> toggleBookmark(Long postId, @AuthenticationPrincipal UserDetails user) {
 	    Long userId = 1L; // user.getUserId(); // userDetails에서 userId 추출
 	    boolean result = bookmarkService.addOrRemoveBookmark(postId, userId);
 
-	    return result ? "북마크 추가됨" : "북마크 삭제됨";
+	    return ResponseEntity.ok(result ? "북마크 추가됨" : "북마크 삭제됨");
 	}
 
 	

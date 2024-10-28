@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -135,6 +137,17 @@ public class PostController {
 		List<PostFileDTO> postFiles = postService.getPostFilesByUserId(userId);
 		
 		return ResponseEntity.ok(postFiles);
+	}
+	
+	// 내 게시글 삭제
+	@DeleteMapping("/{postId}/delete")
+	public ResponseEntity<?> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetails user){
+		Long userId = 5L; // user.getUserId(); // userDetails에서 userId 추출
+		
+		postService.deleteMyPost(postId, userId);
+		
+		return ResponseEntity.ok("삭제 완료");
+		
 	}
 
 
