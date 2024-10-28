@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .antMatchers("/oauth2/**").permitAll()
                         .antMatchers("/user/auth/**").permitAll()
                         .antMatchers("/user/sms/**").permitAll()
+                        .antMatchers("/user/**").permitAll()
                         //토큰 role값 검증 확인용
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용
@@ -87,10 +88,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
         // oauth2
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler));
-        // JWTFilter
-        http.addFilterBefore(new JWTFilter(jwtService), LoginFilter.class);
         // login
         http.addFilterAt(new LoginFilter(customUserDetailsService, bCryptPasswordEncoder(), authenticationManager(),jwtUtil,refreshTokenService), UsernamePasswordAuthenticationFilter.class);
+        // JWTFilter
+        http.addFilterBefore(new JWTFilter(jwtService), LoginFilter.class);
         // logout
         http.addFilterBefore(new CustomLogoutFilter(customLogoutService), LogoutFilter.class);
 			return http.build();	

@@ -35,7 +35,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 		
 		String loginId = customUserDetails.getLoginId();
-		
+
 		String role = null;
 		Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		if(!authorities.isEmpty()) {
