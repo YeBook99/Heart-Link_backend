@@ -41,7 +41,6 @@ public class MessageService {
             String content = entity.getContent();
             String emoji = entity.getEmoji();
             String imgUrl = "hello.jpg";
-            LocalDateTime lastMessageTime = entity.getCreatedAt();
             boolean isRead = entity.isRead();
 
             ChatMsgListDTO chatMsgListDTO = ChatMsgListDTO.builder()
@@ -49,7 +48,6 @@ public class MessageService {
                     .senderId(senderId)
                     .content(content)
                     .emoji(emoji)
-                    .lastMessageTime(lastMessageTime)
                     .imageUrl(imgUrl)
                     .isRead(isRead)
                     .build();
