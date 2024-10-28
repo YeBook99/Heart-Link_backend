@@ -44,14 +44,14 @@ public class LikeController {
     
     // 좋아요 증감
     @PostMapping("/toggle")
-    public String toggleLike(
+    public ResponseEntity<String> toggleLike(
             @RequestParam(required = false) Long postId,
             @RequestParam(required = false) Long commentId,
             @AuthenticationPrincipal UserDetails user) {
         
         Long userId = 1L; // user.getUserId(); // userDetails에서 userId 추출
         likeService.addOrRemoveLike(postId, userId, commentId);
-        return "좋아요 업데이트";
+        return ResponseEntity.ok("좋아요 업데이트");
     }
 
 }

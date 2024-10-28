@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.management.RuntimeErrorException;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -227,6 +228,19 @@ public class PostService {
 								file.getSortOrder()
 								))
 				.collect(Collectors.toList());
+		
+	}
+	
+	// 게시글 삭제
+	public void deleteMyPost(Long postId, Long userId) {
+		PostEntity post = postRepository.findByPostIdAndUserId_UserId(postId, userId);
+		
+		if (post != null) {
+			postRepository.delete(post);
+		} else {
+			throw new RuntimeException("게시글이 존재하지 않거나 접근 권한이 없습니다.");
+		}
+		
 		
 	}
 	
