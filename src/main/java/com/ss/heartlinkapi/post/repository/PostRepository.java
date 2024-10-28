@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface PostRepository extends JpaRepository<PostEntity, Long>{
 
@@ -36,6 +37,10 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	// 키워드가 포함된 게시글 내용 검색
 	List<PostEntity> findAllByContentIgnoreCaseContaining(String keyword);
 
+	// 게시글 삭제
 	PostEntity findByPostIdAndUserId_UserId(Long postId, Long userId);
+
+	// 모든 게시글 삭제
+	void deleteByUserId(UserEntity user);
 
 }

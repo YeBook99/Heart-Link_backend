@@ -29,6 +29,7 @@ import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 
 
 @Service
@@ -39,13 +40,15 @@ public class PostService {
 	private final CoupleService coupleService;
 	private final CommentRepository commentRepository;
 	private final ProfileRepository profileRepository;
+	private final UserRepository userRepository;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
 		this.commentRepository = commentRepository;
 		this.profileRepository = profileRepository;
+		this.userRepository = userRepository;
 	}
 
 	// 게시글 작성
@@ -241,6 +244,16 @@ public class PostService {
 			throw new RuntimeException("게시글이 존재하지 않거나 접근 권한이 없습니다.");
 		}
 
+	}
+	
+	// 모든 게시글 삭제
+	@Transactional
+	public void deleteAllPostByUser(Long userId) {
+		UserEntity user = userRepository.findById(userId)
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		
+		postRepository.deleteByUserId(user);
+		
 	}
 	
 
