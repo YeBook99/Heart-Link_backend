@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -29,18 +29,20 @@ public class MessageController {
 
     //    사용자와 대화중인 상대방들의 list를 출력
     @GetMapping
-    public ResponseEntity<List<ChatUserDTO>> getAllChatList(@AuthenticationPrincipal CustomUserDetails user) {
-        List<ChatUserDTO> list = new ArrayList<>();
-        list = messageRoomService.getAllChatList(user.getUserId());
-        log.info("접근함");
-        return ResponseEntity.ok(list);
+    public ResponseEntity<HashMap<String, Object>> getAllChatList(@AuthenticationPrincipal CustomUserDetails user) {
+
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("username",user.getUsername());
+        List<ChatUserDTO> list = messageRoomService.getAllChatList(user.getUserId());
+        response.put("chatList", list);
+
+        return ResponseEntity.ok(response);
     }
 
     //    상대방과의 대화 내역을 출력
     @GetMapping("/{msgRoomId}/detail")
     public ResponseEntity<List<ChatMsgListDTO>> getAllChatMessage(@PathVariable("msgRoomId") Long msgRoomId) {
-        List<ChatMsgListDTO> list = new ArrayList<>();
-        list = messageService.getAllChatMessage(msgRoomId);
+        List<ChatMsgListDTO> list = messageService.getAllChatMessage(msgRoomId);
 
         return ResponseEntity.ok(list);
     }
