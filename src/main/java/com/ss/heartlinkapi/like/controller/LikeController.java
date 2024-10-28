@@ -18,12 +18,11 @@ import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("/like")
 public class LikeController {
 	
-	private LikeService likeService;
+	private final LikeService likeService;
 	
 	public LikeController(LikeService likeService) {
 		this.likeService = likeService;
