@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/couple")
@@ -24,10 +23,19 @@ public class CoupleMissionController {
     public ResponseEntity<?> selectAllMissionDate(){
         List<LinkMissionEntity> allMissions = missionService.findAllMissions();
 
+        Set<Integer> years = new HashSet<>();
+        Set<Integer> months = new HashSet<>();
+
         for(LinkMissionEntity linkMissionEntity : allMissions){
-            linkMissionEntity.getStart_date();
+            years.add(linkMissionEntity.getStart_date().getYear());
+            months.add(linkMissionEntity.getStart_date().getMonthValue());
         }
 
+        Map<String, Set<Integer>> allMissionDate = new HashMap<>();
+        allMissionDate.put("years", years);
+        allMissionDate.put("months", months);
+
+        return ResponseEntity.ok(allMissionDate);
     }
 
     // 매월 미션태그 조회

@@ -8,9 +8,11 @@ import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
 import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,10 @@ public class CoupleService {
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
     @Autowired
     private CoupleMissionService coupleMissionService;
+
+    @Autowired
+    @Lazy
+    private PostService postService;
 
     @PersistenceContext  // EntityManager 주입
     private EntityManager entityManager;
@@ -63,21 +69,6 @@ public class CoupleService {
     // 커플 매칭 카운트 증가
     public int matchCountUp(Long coupleId) {
         return coupleRepository.matchCountUp(coupleId);
-    }
-
-
-    // 내 유저 아이디로 상대방 유저 아이디 가져오기
-    public UserEntity findLoverByUserId(Long userId) {
-        CoupleEntity couple = coupleRepository.findCoupleByUserId(userId);
-        if (couple == null) {
-            return null;
-        }
-        if (couple.getUser1().getUserId()==userId) {
-            return couple.getUser2();
-        } else if (couple.getUser2().getUserId()==userId) {
-            return couple.getUser1();
-        }
-        return null;
     }
 
     // 커플 연결
@@ -177,17 +168,17 @@ public class CoupleService {
                     System.out.println("삭제할 커플 아이디 : "+couple.getCoupleId());
 
                     System.out.println("2---커플 체크 "+couple);
-                    System.out.println("2---1번째 유저 체크 "+couple.getUser1());
-                    System.out.println("2---2번째 유저 체크 "+couple.getUser2());
 
                     try {
-                        Optional<CoupleEntity> testCouple = coupleRepository.findById(couple.getCoupleId());
-                        System.out.println("testCouple 커플 체크 : "+testCouple);
 //                        entityManager.flush();
 //                        couple.setUser1(null);
 //                        couple.setUser2(null);
 //                        coupleRepository.save(couple);
 //                        entityManager.flush();
+                        System.out.println("2---1번째 유저 체크 "+couple.getUser1());
+                        System.out.println("2---2번째 유저 체크 "+couple.getUser2());
+                        postService.deleteAllPostByUser(couple.getUser1().getUserId());
+                        postService.deleteAllPostByUser(couple.getUser2().getUserId());
                         coupleRepository.delete(couple);
                         System.out.println("커플도 삭제됐나?????");
                     } catch (Exception e) {
