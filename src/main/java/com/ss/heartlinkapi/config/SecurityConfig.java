@@ -81,6 +81,7 @@ public class SecurityConfig {
                         .antMatchers("/couple/**", "/admin/**", "/search/**", "/es/**", "/ads/**").permitAll()
                         .antMatchers("/dm/**","/message","/report","/notifications/**").permitAll()
 						.antMatchers("/img/**").permitAll()
+						.antMatchers("/v2/api-docs", "/swagger-resources/**","/swagger-ui/**","/webjars/**").permitAll()
 						// 정훈 전용
 						.antMatchers("/feed/**").permitAll()
 						.antMatchers("/following/**").permitAll()
