@@ -49,7 +49,7 @@ public class ReissueController {
 		try {
 			if (result.getStatusCode() == HttpStatus.OK) {
 				response.setHeader("Authorization", result.getBody().get("accessToken"));
-				response.setHeader("Refresh-Token", result.getBody().get("refreshToken"));
+				response.setHeader("RefreshToken", result.getBody().get("refreshToken"));
 				response.getWriter().write(new ObjectMapper().writeValueAsString(result.getBody()));
 			} else {
 				response.getWriter().write(new ObjectMapper().writeValueAsString(result.getBody()));
