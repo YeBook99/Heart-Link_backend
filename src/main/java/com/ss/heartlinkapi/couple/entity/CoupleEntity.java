@@ -18,10 +18,10 @@ public class CoupleEntity {
     private Long coupleId;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "users1_id", nullable = true)
+    @JoinColumn(name = "users1_id", nullable = false)
     private UserEntity user1;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "users2_id", nullable = true)
+    @JoinColumn(name = "users2_id", nullable = false)
     private UserEntity user2;
 
     @Column(name = "created_at", nullable = false, updatable = false)

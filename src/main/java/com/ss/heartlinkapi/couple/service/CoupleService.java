@@ -111,95 +111,35 @@ public class CoupleService {
         return coupleRepository.save(couple);
     }
 
-    // 커플 해지 유예기간 지나고 최종 해지
-    public boolean finalUnlinkCouple(CoupleEntity couple) {
-        if(couple.getBreakupDate().isBefore(LocalDate.now())) {
-            UserEntity user1 = couple.getUser1();
-            UserEntity user2 = couple.getUser2();
-
-            coupleRepository.delete(couple);
-
-            user1.setCoupleCode(generateRandomCode());
-            user2.setCoupleCode(generateRandomCode());
-
-            userRepository.save(user1);
-            userRepository.save(user2);
-
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    // 피드 삭제기능 추가되면 피드 삭제하고 나서 마저 하기
-    // 커플 유예기간 매일 체크 기능 (배치 프로그램)
+    // 커플 유예기간 매일 체크 후 삭제 기능 (배치 프로그램)
     @Transactional
     public void batchFinalUnlinkCouple() {
         List<CoupleEntity> breakCouple = coupleRepository.findCoupleEntityByBreakupDateIsNotNull();
-        System.out.println("오늘 깨질 커플 리스트"+breakCouple);
         for(CoupleEntity couple : breakCouple) {
-            System.out.println("1---1번째 유저 체크 "+couple.getUser1());
-            System.out.println("1---2번째 유저 체크 "+couple.getUser1());
         }
         if(breakCouple != null && breakCouple.size() > 0) {
             LocalDate today = LocalDate.now();
-            System.out.println("오늘 날짜"+today);
             for(CoupleEntity couple : breakCouple) {
                 if(couple.getBreakupDate().isBefore(today)){
                     // 매치 답변 목록 삭제
                     List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
-                    System.out.println("매치답변목록 "+answerList.toString());
                     if(answerList != null && answerList.size() > 0) {
-                        System.out.println("매치답변 삭제 시도");
                         coupleMatchAnswerRepository.deleteAllByCoupleId(couple);
-                        System.out.println("매치답변 삭제 완료");
                     }
                     // 매치 미션 목록 삭제
                     List<UserLinkMissionEntity> userMissionList = coupleMissionService.findUserLinkMissionByCoupleId(couple);
-                    System.out.println("매치미션목록 "+userMissionList);
-
                     if(userMissionList != null && userMissionList.size() > 0) {
-                        System.out.println("매치미션 삭제 시도");
                         coupleMissionService.deleteUserMissionByCoupleId(couple.getCoupleId());
-                        System.out.println("매치미션 삭제 완료");
                     }
-                    System.out.println("커플삭제할거야");
-                    System.out.println("삭제할 커플 아이디 : "+couple.getCoupleId());
-
-                    System.out.println("2---커플 체크 "+couple);
-
                     try {
-//                        entityManager.flush();
-//                        couple.setUser1(null);
-//                        couple.setUser2(null);
-//                        coupleRepository.save(couple);
-//                        entityManager.flush();
-                        System.out.println("2---1번째 유저 체크 "+couple.getUser1());
-                        System.out.println("2---2번째 유저 체크 "+couple.getUser2());
-                        postService.deleteAllPostByUser(couple.getUser1().getUserId());
-                        postService.deleteAllPostByUser(couple.getUser2().getUserId());
-                        coupleRepository.delete(couple);
-                        System.out.println("커플도 삭제됐나?????");
+                        coupleRepository.deleteById(couple.getCoupleId());
                     } catch (Exception e) {
-                        System.out.println("커플 객체 자체를 삭제 시도 실패.........");
                         e.printStackTrace();
                     }
-//                    try{
-//                        System.out.println("커플 다시 조회 : "+coupleRepository.findById(couple.getCoupleId()));
-//                        coupleRepository.deleteCoupleByCoupleId(couple.getCoupleId());
-//                        System.out.println("삭제됐을거같은데ㅔㅔㅔㅔㅔ");
-//                    } catch (Exception e) {
-//                        System.out.println("삭제실패 왜실패야");
-//                        e.printStackTrace();
-//
-//                    }
-                    System.out.println("커플삭제했어");
                 }
             }
         }
     }
-
 
     // 커플 코드 랜덤값 적용
     private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

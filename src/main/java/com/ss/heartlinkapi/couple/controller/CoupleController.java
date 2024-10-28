@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @RestController
@@ -51,44 +49,6 @@ public class CoupleController {
             }
 
             return ResponseEntity.ok().body("기념일이 설정되었습니다.");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    // 기념일 날짜 조회
-    @GetMapping("/ddayDate/{coupleId}")
-    public ResponseEntity<?> getAnniversaryDay(@PathVariable Long coupleId) {
-        try {
-            CoupleEntity couple = coupleService.findById(coupleId);
-            if(couple == null) {
-                return ResponseEntity.notFound().build();
-            }
-
-            return ResponseEntity.ok().body(couple.getAnniversaryDate());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    // D-DAY 일수 조회
-    @GetMapping("/dday/{coupleId}")
-    public ResponseEntity<?> getDday(@PathVariable Long coupleId) {
-        try {
-            CoupleEntity couple = coupleService.findById(coupleId);
-            if(couple == null) {
-                return ResponseEntity.notFound().build();
-            }
-
-            LocalDate anniversaryDate = couple.getAnniversaryDate();
-            LocalDate today = LocalDate.now();
-
-            Long dday = ChronoUnit.DAYS.between(anniversaryDate, today);
-            return ResponseEntity.ok().body(dday+1);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -238,33 +198,33 @@ public class CoupleController {
         }
     }
 
-    // 유예기간 종료 후 최종 연결 해지
-    @DeleteMapping("/{coupleId}/finalUnlink")
-    public ResponseEntity<?> finalUnlinkCouple(@PathVariable Long coupleId) {
-        System.out.println("finalUnlinkCouple");
-
-        try{
-            if(coupleId == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            CoupleEntity couple = coupleService.findById(coupleId);
-
-            if(couple == null) {
-                return ResponseEntity.notFound().build();
-            }
-            boolean result = coupleService.finalUnlinkCouple(couple);
-
-            if(result) {
-                return ResponseEntity.noContent().build();
-            } else {
-                return ResponseEntity.badRequest().body("아직 커플 유예기간입니다.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
+//    // 유예기간 종료 후 최종 연결 해지
+//    @DeleteMapping("/{coupleId}/finalUnlink")
+//    public ResponseEntity<?> finalUnlinkCouple(@PathVariable Long coupleId) {
+//        System.out.println("finalUnlinkCouple");
+//
+//        try{
+//            if(coupleId == null) {
+//                return ResponseEntity.badRequest().build();
+//            }
+//
+//            CoupleEntity couple = coupleService.findById(coupleId);
+//
+//            if(couple == null) {
+//                return ResponseEntity.notFound().build();
+//            }
+//            boolean result = coupleService.finalUnlinkCouple(couple);
+//
+//            if(result) {
+//                return ResponseEntity.noContent().build();
+//            } else {
+//                return ResponseEntity.badRequest().body("아직 커플 유예기간입니다.");
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.internalServerError().build();
+//        }
+//    }
 
     // 유예기간 없이 즉시 연결 해지
     @DeleteMapping("/{coupleId}/finalNowUnlink")
