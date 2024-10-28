@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.like.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,17 +41,10 @@ public class LikeController {
         return ResponseEntity.ok(likes);
     }
     
-    @PostMapping("/toggle")
-    public String toggleLike(@RequestParam Long postId, @RequestParam(required = false) Long commentId) { // @AuthenticationPrincipal UserEntity userEntity
-    	
-//    	Long userId = userEntity.getUserId(); // 로그인한 사용자 ID 가져오기
-//        likeService.toggleLike(userId, postId, commentId);
-    	
-    	// 하드코딩된 사용자 ID
-        Long userId = 1L; // 실제로는 @AuthenticationPrincipal을 통해 가져와야 함
-        log.info("toggleLike 실행! postId = ", postId, commentId);
-        likeService.toggleLike(userId, postId, commentId);
-        return "좋아요 업데이트!";
+    @PostMapping("/{postId}/{userId}")
+    public ResponseEntity<Void> likePost(@PathVariable Long userId, @PathVariable Long postId) {
+        likeService.likePost(userId, postId);
+        return ResponseEntity.ok().build();
     }
 
 }

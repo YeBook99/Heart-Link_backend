@@ -106,51 +106,27 @@ public class LikeService {
 
 	}
 	
-	// 좋아요 추가, 삭제
+	// 게시글 좋아요 추가, 삭제
 	@Transactional
-	public void toggleLike(Long userId, Long postId, Long commentId) {
-	    UserEntity userEntity = userRepository.findById(userId)
-	            .orElseThrow(() -> new RuntimeException("User not found"));
+    public void likePost(Long userId, Long postId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
-	    // 좋아요가 게시글에 대한 것일 경우
-	    if (postId != null) {
-	        LikeEntity like = likeRepository.findByUserIdAndPostId(userEntity, postId); // userEntity 사용
+        // Create a new LikeEntity
+        LikeEntity like = new LikeEntity();
+        like.setUserId(user);
+        like.setPostId(post);
+        
+        // Save the like
+        likeRepository.save(like);
 
-	        if (like != null) {
-	            likeRepository.delete(like);
-	        } else {
-	            PostEntity post = postRepository.findById(postId)
-	                    .orElseThrow(() -> new RuntimeException("Post not found"));
-
-	            LikeEntity newLike = new LikeEntity();
-	            newLike.setUserId(userEntity); // UserEntity로 설정
-	            newLike.setPostId(post); // PostEntity로 설정
-	            likeRepository.save(newLike);
-	        }
-	    // 좋아요가 댓글에 대한 것일 경우
-	    } else if (commentId != null) {
-	        LikeEntity like = likeRepository.findByUserIdAndCommentId(userEntity, commentId); // userEntity 사용
-
-	        if (like != null) {
-	            likeRepository.delete(like);
-	        } else {
-	            CommentEntity comment = commentRepository.findById(commentId)
-	                    .orElseThrow(() -> new RuntimeException("Comment not found"));
-
-	            LikeEntity newLike = new LikeEntity();
-	            newLike.setUserId(userEntity); // UserEntity로 설정
-	            newLike.setCommentId(comment); // CommentEntity로 설정
-	            likeRepository.save(newLike);
-	        }
-	    }
-	    
-	    log.info("토글에서 User ID: {}", userId);
-	    log.info("토글에서 Post ID: {}", postId);
-	    log.info("토글에서 Comment ID: {}", commentId);
-
-	}
-
-
+        // Update the post's like count
+        post.setLikeCount(post.getLikeCount() + 1);
+        postRepository.save(post);
+    }
+				
 
 
 }

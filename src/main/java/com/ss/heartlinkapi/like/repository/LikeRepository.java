@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.like.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -26,10 +27,19 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
            "WHERE l.userId.id = :userId")
     List<PostFileEntity> findLikePostFilesByUserId(@Param("userId") Long userId);
     
-    // 게시글 좋아요 추가, 삭제
-    LikeEntity findByUserIdAndPostId(UserEntity userId, Long postId);
+    // 게시글 좋아요 체크
+    Boolean existsByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long PostId);
+    
+    // 좋아요 테이블 정보 가져오기
+    List<LikeEntity> findAllByUserId(@Param("userId") Long userId);
+    
+    // 게시글 좋아요 추가
+    
+    
+    
+    // 게시글 좋아요 삭제
+    void deleteByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long PostId);
     
     // 댓글 좋아요 추가, 삭제
-    LikeEntity findByUserIdAndCommentId(UserEntity userId, Long commentId);
 
 }
