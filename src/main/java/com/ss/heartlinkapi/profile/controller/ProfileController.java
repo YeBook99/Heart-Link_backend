@@ -39,7 +39,23 @@ public class ProfileController {
 		this.coupleService = coupleService;
 		this.loginService = loginService;
 	}
-
+	
+	/***************** 로그인한 유저 아이디 반환 ******************/
+	@GetMapping("/")
+	public ResponseEntity<?> selectProfile(@AuthenticationPrincipal CustomUserDetails loginUser) {
+		
+		if (loginUser == null) {
+		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유저 정보 없음");
+		}
+		
+		try {
+		    Long loginUserId = loginUser.getUserId();
+		    return ResponseEntity.ok(loginUserId);
+		} catch (Exception e) {
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버오류 : "+e);
+		}
+	}
+	
 	/***************** 프로필 조회 ******************/
 	@GetMapping("/{userId}")
 	public ResponseEntity<?> selectProfile(@PathVariable Long userId,
@@ -67,6 +83,7 @@ public class ProfileController {
 				coupleUserId);
 		return ResponseEntity.ok(profileDTO);
 	}
+	
 
 	/***************** 내 프로필에서 비밀번호 변경 ******************/
 
