@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -22,8 +23,11 @@ import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
+import com.ss.heartlinkapi.post.entity.FileType;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
@@ -41,14 +45,16 @@ public class PostService {
 	private final CommentRepository commentRepository;
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
+	private final PostFileService postFileService;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
 		this.commentRepository = commentRepository;
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
+		this.postFileService = postFileService;
 	}
 
 	// 게시글 작성
@@ -84,6 +90,7 @@ public class PostService {
 			}
 
 	}
+	
 	
 	// 내 팔로잉 게시물 조회
 	public List<PostDTO> getPublicPostByFollowerId(Long followerId) {
@@ -256,6 +263,45 @@ public class PostService {
 		
 	}
 	
+	// 게시글 수정
+	@Transactional
+	public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
+	    // 게시글 조회 및 권한 확인
+	    PostEntity post = postRepository.findById(postId)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
+
+	    if (!post.getUserId().getUserId().equals(userId)) {
+	        throw new IllegalArgumentException("권한이 없습니다. 게시글 작성자와 동일한 사용자가 아닙니다.");
+	    }
+
+	    // 게시글 내용 및 가시성 업데이트
+	    post.setContent(updateDTO.getContent());
+	    post.setVisibility(updateDTO.getVisibility());
+
+	    // 새로운 파일 URL 목록 가져오기
+	    List<String> newFileUrls = Optional.ofNullable(updateDTO.getNewFileUrls()).orElse(Collections.emptyList());
+
+	    // 해당 게시글의 모든 파일 삭제
+	    postFileRepository.deleteByPostId(postId);
+
+	    // 새로운 파일 추가 및 정렬 순서 할당
+	    int sortOrder = 1;
+	    for (String newFileUrl : newFileUrls) {
+	        PostFileEntity newFile = new PostFileEntity();
+	        newFile.setPostId(post);
+	        newFile.setFileUrl(newFileUrl);
+	        newFile.setFileType(postFileService.determineFileType(newFileUrl));
+	        newFile.setSortOrder(sortOrder++);  // sortOrder 증가
+
+	        postFileRepository.save(newFile);
+	    }
+	}
+
+
+
+
+	
+
 
 //	관리자 신고한 게시물 삭제
     public void deletePost(Long postId) {

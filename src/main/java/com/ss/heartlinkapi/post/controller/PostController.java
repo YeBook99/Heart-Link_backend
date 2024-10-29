@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import com.ss.heartlinkapi.bookmark.service.BookmarkService;
 import com.ss.heartlinkapi.like.service.LikeService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.service.PostService;
@@ -157,6 +159,24 @@ public class PostController {
 		
 		postService.deleteAllPostByUser(userId);
 		return ResponseEntity.ok("모든 게시글 삭제 완료");
+	}
+	
+	// 게시글 수정
+	@PutMapping("/{postId}/update")
+	public ResponseEntity<?> updatePost(
+			@PathVariable Long postId,
+		    @RequestBody PostUpdateDTO postUpdateDTO,
+		    @AuthenticationPrincipal UserDetails user){
+		
+		Long userId = 4L; // user.getUserId(); // userDetails에서 userId 추출
+		
+		try {
+			postService.updatePost(postId, userId, postUpdateDTO);
+			return ResponseEntity.ok("게시글 수정 완료");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 	
 
