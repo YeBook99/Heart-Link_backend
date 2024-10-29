@@ -26,10 +26,12 @@ public class LoginService {
 		this.passwordEncoder = passwordEncoder;
 	}
 	
+	/************ 로그인 아이디 중복 확인 ************/
 	public boolean checkId(String loginId) {
 		return userRepository.existsByLoginId(loginId);
 	}
 	
+	/************ 전화번호로 유저 존재 여부 확인 ************/
 	public boolean isUser(String phone) {
 		return userRepository.existsByPhone(phone);	
 	}
@@ -60,8 +62,26 @@ public class LoginService {
 	    }
 	}
 	
+	/************ 로그인 아이디로 유저 찾기 ************/
 	public UserEntity findByLoginId(String loginId) {
 		return userRepository.findByLoginId(loginId);
+	}
+	
+	/************ 전화번호로 유저 찾기 ************/
+	public UserEntity findByPhone(String phone) {
+		return userRepository.findByPhone(phone);
+	}
+	
+	/************ 전화번호 업데이트 ************/
+	public boolean updatePassword(UserEntity user,String password) {
+		String encodedPassword = passwordEncoder.encode(password);
+		user.setPassword(encodedPassword);
+		return userRepository.save(user) != null;
+	}
+	
+	/************ 비밀번호 일치 확인 ************/
+	public boolean checkPassword(UserEntity user, String Password) {
+		return passwordEncoder.matches(Password, user.getPassword());
 	}
 	
 }

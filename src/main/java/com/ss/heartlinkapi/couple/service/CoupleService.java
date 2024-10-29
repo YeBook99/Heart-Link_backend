@@ -73,9 +73,9 @@ public class CoupleService {
 
     // 커플 연결
     @Transactional
-    public CoupleEntity coupleCodeMatch(UserEntity user1, CoupleCode code) {
-        String coupleCode = code.getCode().toUpperCase().trim();
-        UserEntity user2 = userRepository.findByCoupleCode(coupleCode);
+    public CoupleEntity coupleCodeMatch(UserEntity user1, String code) {
+        code = code.toUpperCase().trim();
+        UserEntity user2 = userRepository.findByCoupleCode(code);
 
         CoupleEntity newCouple = new CoupleEntity();
         newCouple.setUser1(user1);
@@ -85,9 +85,9 @@ public class CoupleService {
     }
 
     // 커플코드 연결 전 확인
-    public int codeCheck(CoupleCode code){
-        String coupleCode = code.getCode().toUpperCase().trim();
-        UserEntity user = userRepository.findByCoupleCode(coupleCode);
+    public int codeCheck(String code){
+        code = code.toUpperCase().trim();
+        UserEntity user = userRepository.findByCoupleCode(code);
         if(user == null) {
             return 1; // 존재하지 않는 커플코드
         }

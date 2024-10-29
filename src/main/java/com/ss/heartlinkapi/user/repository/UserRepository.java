@@ -3,8 +3,6 @@ package com.ss.heartlinkapi.user.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ss.heartlinkapi.user.entity.UserEntity;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
 	boolean existsByPhone(String phone);

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.heartlinkapi.login.service.CheckPhone;
 import com.ss.heartlinkapi.sms.dto.VerificationDTO;
 import com.ss.heartlinkapi.sms.service.SmsService;
 
@@ -27,7 +28,7 @@ public class SmsController {
 	public ResponseEntity<?> sendVerificationCode(@RequestParam String phoneNumber){
 		
 		// 전화번호 유효성 검사
-		if(!checkPhone(phoneNumber)) {
+		if(!CheckPhone.isPhoneValid(phoneNumber)) {
 			 return ResponseEntity.badRequest().body("유효하지 않은 전화번호입니다.");
 		}
 		
@@ -64,8 +65,5 @@ public class SmsController {
 	    }
 	}
 	
-	
-	private boolean checkPhone(String phone) {
-		return phone.matches("^\\d{3}-\\d{4}-\\d{4}$");
-	}
+
 }

@@ -8,18 +8,17 @@ import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchStatisticsService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/couple")
@@ -40,9 +39,14 @@ public class CoupleMatchController {
         // 오류 500 검사
         try {
             LinkMatchEntity result = coupleMatchService.getMatchQuestion();
+            Map<String, Object> matchData = new HashMap<>();
+            matchData.put("linkMatchId", result.getLinkMatchId());
+            matchData.put("match1", result.getMatch1());
+            matchData.put("match2", result.getMatch2());
+            matchData.put("displayDate", result.getDisplayDate());
             // 오류 404 검사
             if (result != null) {
-                return ResponseEntity.ok(result);
+                return ResponseEntity.ok(matchData);
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -95,17 +99,20 @@ public class CoupleMatchController {
     }
 
     // 매치 답변 내역 조회
-    @GetMapping("/missionmatch/answerList/{coupleId}")
-    public ResponseEntity<?> getMatchAnswerList(@PathVariable Long coupleId) {
+    @GetMapping("/missionmatch/answerList")
+    public ResponseEntity<?> getMatchAnswerList(@AuthenticationPrincipal CustomUserDetails userDetails) {
         // 오류 500 검사
         try{
             // 오류 400 검사
-            if(coupleId == null) {
+            if(userDetails == null) {
                 return ResponseEntity.badRequest().build();
             }
-            CoupleEntity couple = coupleService.findById(coupleId);
-        List<LinkMatchAnswerEntity> answerList = coupleMatchService.findAnswerListByCoupleId(couple);
-        return ResponseEntity.ok(answerList);
+
+        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
+
+        List<Map<String, Object>> answerList = coupleMatchService.findAnswerListByCoupleId(couple, userDetails.getUserId());
+
+        return ResponseEntity.ok().body(answerList);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
@@ -113,19 +120,21 @@ public class CoupleMatchController {
     }
 
     // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트, 월별 매칭 횟수 조회)
-    @GetMapping("/statistics/dailyMatch/{coupleId}")
-    public ResponseEntity<?> getStatisticsDailyMatchById(@PathVariable Long coupleId) {
+    @GetMapping("/statistics/dailyMatch")
+    public ResponseEntity<?> getStatisticsDailyMatchById(@AuthenticationPrincipal CustomUserDetails userDetails) {
         try{
             Date todayDate = new Date();
             LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
             LinkMatchEntity todayMatch = statisticsService.findMatchByDate(today);
 
-            if(todayMatch == null) {
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
+
+            if(todayMatch == null || couple == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, coupleId);
+            Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, couple.getCoupleId());
 
             if(rateResult == null) {
                 return ResponseEntity.notFound().build();
