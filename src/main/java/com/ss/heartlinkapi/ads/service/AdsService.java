@@ -39,6 +39,13 @@ public class AdsService {
         this.headers = new HttpHeaders();
     }
 
+    public void getPickAds(String url){
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        System.out.println(response.getBody());
+    }
+
     // 회원 아이디로 광고 가져오기
     public List<Map<String, Object>> getAds(Long userId) {
 
