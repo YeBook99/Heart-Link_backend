@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
 import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
@@ -51,18 +52,20 @@ public class AdsService {
         System.out.println("ads의 서비스의 searchList 쪼개고 난 뒤 : "+historyList);
 
         String adsList = getAdsList(historyList);
-
+        System.out.println(adsList);
         try {
             JSONParser parser = new JSONParser();
             JSONObject list = (JSONObject) parser.parse(adsList);
-            JSONObject response = (JSONObject) list.get("findItemsByKeywordsResponse");
-            JSONObject searchResult = (JSONObject) response.get("searchResult");
-            String timestamp = (String) response.get("timestamp"); // 조회 시간
-            String count = (String) searchResult.get("@count"); // 조회 개수
-
-
-            System.out.println(timestamp);
+            JSONArray response = (JSONArray) list.get("findItemsByKeywordsResponse");
+            JSONObject responseObject = (JSONObject) response.get(0);
+            JSONObject searchResult = (JSONObject) responseObject.get("searchResult");
+            JSONObject searchResultArray = (JSONObject) searchResult.get(0);
+            String count = (String) searchResultArray.get("@count"); // 조회 개수
             System.out.println(count);
+//            String timestamp = (String) response.get("timestamp"); // 조회 시간
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;
