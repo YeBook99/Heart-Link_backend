@@ -33,7 +33,7 @@ public class ProfileService {
 	}
 	/******* 팔로잉 수 가져오는 메서드 *******/
 	public int selectFollowingCount(Long userId) {
-		return followRepository.countFollowingIdsByFollowerId(userId);
+		return followRepository.countFollowingByFollowerId(userId);
 	}
 	/******* 팔로워 수 가져오는 메서드 *******/
 	public int selectFollowersCount(Long userId) {
