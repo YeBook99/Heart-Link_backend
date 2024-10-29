@@ -10,13 +10,15 @@ import com.ss.heartlinkapi.follow.entity.FollowEntity;
 
 public interface FollowRepository extends JpaRepository<FollowEntity, Long>{
 	
-	// 특정 사용자의 팔로잉 회원 정보
-	@Query("SELECT f FROM FollowEntity f WHERE f.follower.id =:userId")
-	List<FollowEntity> findFollowingIdsByFollowerId(@Param("userId") Long userId);
+	/******* 유저가 팔로우하고 있는 팔로우엔티티 리스트 반환 ******/
+	List<FollowEntity> findByFollowerUserId(Long userId);
+	
+	/******* 유저를 팔로우하고 있는 팔로우엔티티 리스트 반환 ******/
+    List<FollowEntity> findByFollowingUserId(Long userId);
 	
 	// 특정 사용자의 팔로잉 회원 수
 	@Query("SELECT COUNT(f) FROM FollowEntity f WHERE f.follower.id = :userId")
-	int countFollowingIdsByFollowerId(@Param("userId") Long userId);
+	int countFollowingByFollowerId(@Param("userId") Long userId);
 	
 	// 특정 사용자가 팔로우하는 회원 수
 	@Query("SELECT COUNT(f) FROM FollowEntity f WHERE f.following.id = :userId")
