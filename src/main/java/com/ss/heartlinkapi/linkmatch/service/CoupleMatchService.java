@@ -7,6 +7,7 @@ import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
 import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchRepository;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,32 +30,34 @@ public class CoupleMatchService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
 
     // 커플 답변 저장
-    public LinkMatchAnswerEntity answerSave(MatchAnswer matchAnswer, Long userId) {
+    public LinkMatchAnswerEntity answerSave(MatchAnswer matchAnswer, UserEntity user) {
 
-        LinkMatchAnswerEntity answerEntity = new LinkMatchAnswerEntity();
-
-        answerEntity.setUserId(userRepository.findById(userId).orElse(null));
         LinkMatchEntity match = matchRepository.findById(matchAnswer.getQuestionId()).orElse(null);
-        answerEntity.setMatchId(match);
-        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userId);
-        answerEntity.setCoupleId(couple);
+        LinkMatchAnswerEntity isAnswer = coupleMatchAnswerRepository.findByUserIdAndCreatedAt(user, match.getDisplayDate());
         Date now = new Date();
         LocalDate today = now.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        answerEntity.setCreatedAt(today);
-        answerEntity.setChoice(matchAnswer.getSelectedOption());
 
-        try{
-            LinkMatchAnswerEntity entity = answerRepository.save(answerEntity);
-
-            int result = answerRepository.checkTodayMatching(couple.getCoupleId());
-            return entity;
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
+        if(isAnswer == null) {
+            isAnswer = new LinkMatchAnswerEntity();
+            isAnswer.setUserId(userRepository.findById(user.getUserId()).orElse(null));
+            isAnswer.setMatchId(match);
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(user.getUserId());
+            isAnswer.setCoupleId(couple);
+            isAnswer.setCreatedAt(today);
+            isAnswer.setChoice(matchAnswer.getSelectedOption());
+        } else {
+            isAnswer.setChoice(matchAnswer.getSelectedOption());
+            isAnswer.setCreatedAt(today);
         }
 
+            LinkMatchAnswerEntity entity = answerRepository.save(isAnswer);
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(user.getUserId());
+            int result = answerRepository.checkTodayMatching(couple.getCoupleId());
+            return entity;
     }
 
     // 오늘의 매치 질문 조회

@@ -29,6 +29,7 @@ public class AdsController {
         return ResponseEntity.ok(adsResult);
     }
 
+    // 애드픽 테스트용
     @GetMapping("/pickGet")
     public ResponseEntity<?> getAds(){
         String url = "https://adpick.co.kr/apis/offers.php?affid=62b120&os=ios&adtype=CPA&category=game&order=rand";

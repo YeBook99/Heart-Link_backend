@@ -66,7 +66,7 @@ public class CoupleMatchController {
                     || matchAnswer.getSelectedOption() > 1 || matchAnswer.getSelectedOption() < 0 || user.getUserId() == null) {
                 return ResponseEntity.badRequest().build();
             }
-            LinkMatchAnswerEntity result = coupleMatchService.answerSave(matchAnswer, user.getUserId());
+            LinkMatchAnswerEntity result = coupleMatchService.answerSave(matchAnswer, user.getUserEntity());
             // 오류 404 검사
             if (result != null) {
                 // 매칭 성공 여부 확인

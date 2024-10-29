@@ -34,8 +34,8 @@ public class AdminCoupleMatchController {
                 questionData.put("match1", entity.getMatch1());
                 questionData.put("match2", entity.getMatch2());
                 questionData.put("displayDate", entity.getDisplayDate());
+                questionsData.add(questionData);
             }
-
             return ResponseEntity.ok(questionsData);
         } catch (Exception e) {
             e.printStackTrace();
