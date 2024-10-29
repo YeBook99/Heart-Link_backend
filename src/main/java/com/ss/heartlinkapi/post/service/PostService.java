@@ -102,6 +102,7 @@ public class PostService {
 	                    UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	                    return new PostDTO(
 	                            post.getPostId(),
+	                            post.getUserId().getUserId(),
 	                            post.getUserId().getLoginId(),
 	                            post.getContent(),
 	                            post.getCreatedAt(),
@@ -118,7 +119,8 @@ public class PostService {
 	                                    file.getSortOrder()))
 	                                .collect(Collectors.toList()),
 	                                null,
-		                    partner != null ? partner.getLoginId() : "No Partner"
+		                    partner != null ? partner.getLoginId() : "No Partner",
+		             	    partner != null ? partner.getUserId() : null
 		                );
 	                })
 	                .collect(Collectors.toList());
@@ -136,6 +138,7 @@ public class PostService {
 	    			UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 	    			return new PostDTO(
 	    					post.getPostId(),
+	    					post.getUserId().getUserId(),
                             post.getUserId().getLoginId(),
                             post.getContent(),
                             post.getCreatedAt(),
@@ -152,7 +155,8 @@ public class PostService {
                                     file.getSortOrder()))
                                 .collect(Collectors.toList()),
                                 null,
-	                    partner != null ? partner.getLoginId() : "No Partner"
+	                    partner != null ? partner.getLoginId() : "No Partner",
+	             	    partner != null ? partner.getUserId() : null
 	    					);
 	    		})
 	    		.collect(Collectors.toList());
@@ -192,6 +196,7 @@ public class PostService {
 	        
 	        return new PostDTO(
 	            post.getPostId(),
+	            post.getUserId().getUserId(),
 	            post.getUserId().getLoginId(),
 	            post.getContent(),
 	            post.getCreatedAt(),
@@ -208,7 +213,8 @@ public class PostService {
 	                    file.getSortOrder()))
 	                .collect(Collectors.toList()),
 	            commentDTO.isEmpty() ? Collections.emptyList() : commentDTO, // 댓글이 없으면 빈 리스트
-	            partner != null ? partner.getLoginId() : "No Partner"
+	            partner != null ? partner.getLoginId() : "No Partner",
+	           partner != null ? partner.getUserId() : null
 	        );
 	    } else {
 	        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
