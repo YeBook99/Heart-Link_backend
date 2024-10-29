@@ -18,11 +18,11 @@ import com.ss.heartlinkapi.follow.service.FollowService;
 
 @RestController
 @RequestMapping("/follow")
-public class FollowingController {
+public class FollowController {
 
 	private final FollowService followService;
 
-	public FollowingController(FollowService followService) {
+	public FollowController(FollowService followService) {
 		this.followService = followService;
 	}
 
