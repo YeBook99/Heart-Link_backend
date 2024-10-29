@@ -23,6 +23,7 @@ import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
 import com.ss.heartlinkapi.post.entity.FileType;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
@@ -263,41 +264,34 @@ public class PostService {
 	
 	// 게시글 수정
 	@Transactional
-	public void updatePost(Long postId, String newContent, Visibility newVisibility, List<String> newFileUrls, List<String> newFileType, int newSortOrder) {
+	public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
 		PostEntity post = postRepository.findById(postId)
-				.orElseThrow(() -> new EntityNotFoundException("Post not found"));
+				.orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
 		
-		// 게시글 내용 수정
-		if(newContent != null) {
-			post.setContent(newContent);
-		}
-		// 공개 범위 수정
-		if(newFileUrls != null) {
-			List<PostFileEntity> postFiles = postFileRepository.findByPostId(postId);
-			
-			for (int i = 0; i < newFileUrls.size(); i++) {
-				PostFileEntity postFile;
-				
-				if(i < postFiles.size()) {
-					// 기존 파일 업데이트
-					postFile = postFiles.get(i);
-				} else {
-					// 새 파일 추가
-					postFile = new PostFileEntity();
-					postFile.setPostId(post);
-					postFile.setSortOrder(i + 1);
-				}
-				
-				String newFileUrl = newFileUrls.get(i);
-				postFile.setFileUrl(newFileUrl);
-				postFile.setFileType(postFileService.determineFileType(newFileUrl));
-				
-				postFileRepository.save(postFile);
-				
-			}
+		post.setContent(updateDTO.getContent());
+		post.setVisibility(updateDTO.getVisibility());
+		
+		List<String> existingFileUrls = updateDTO.getExistingFileUrls();
+		List<String> newFileUrls = updateDTO.getNewFileUrls();
+		
+		List<PostFileEntity> updatedFiles = post.getPostFiles().stream()
+				.filter(file -> existingFileUrls.contains(file.getFileUrl()))
+				.collect(Collectors.toList());
+		
+		int nextSortOrder = updatedFiles.size();
+		for (String newFileUrl : newFileUrls) {
+			PostFileEntity newFile = new PostFileEntity();
+			newFile.setPostId(post);
+			newFile.setFileUrl(newFileUrl);
+			newFile.setFileType(postFileService.determineFileType(newFileUrl));
+			newFile.setSortOrder(nextSortOrder++);
+			updatedFiles.add(newFile);
 		}
 		
-		post.setUpdatedAt(LocalDateTime.now());
+		post.getPostFiles().clear();
+		post.getPostFiles().addAll(updatedFiles);
+		
+		
 		postRepository.save(post);
 		
 	}
