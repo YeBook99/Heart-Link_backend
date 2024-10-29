@@ -15,5 +15,6 @@ public class PostFileDTO {
 	private String fileUrl; 	// 파일 경로
 	private FileType fileType; 	// 파일 타입
 	private int sortOrder;		// 정렬 순서
+	
 
 }
