@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @RestController
@@ -52,6 +53,43 @@ public class CoupleController {
             }
 
             return ResponseEntity.ok().body("기념일이 설정되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 기념일 날짜 조회
+    @GetMapping("/ddayDate")
+    public ResponseEntity<?> getAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user) {
+        try {
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(user.getUserId());
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok().body(couple.getAnniversaryDate());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // D-DAY 일수 조회
+    @GetMapping("/dday")
+    public ResponseEntity<?> getDday(@AuthenticationPrincipal CustomUserDetails user) {
+        try {
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(user.getUserId());
+            if(couple == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            LocalDate anniversaryDate = couple.getAnniversaryDate();
+            LocalDate today = LocalDate.now();
+            Long dday = ChronoUnit.DAYS.between(anniversaryDate, today);
+            return ResponseEntity.ok().body(dday+1);
 
         } catch (Exception e) {
             e.printStackTrace();
