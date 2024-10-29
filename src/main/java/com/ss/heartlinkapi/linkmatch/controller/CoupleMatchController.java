@@ -110,20 +110,9 @@ public class CoupleMatchController {
 
         CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
 
-        List<LinkMatchAnswerEntity> answerList = coupleMatchService.findAnswerListByCoupleId(couple);
+        List<Map<String, Object>> answerList = coupleMatchService.findAnswerListByCoupleId(couple, userDetails.getUserId());
 
-        List<Map<String,Object>> answerData = new ArrayList<>();
-        for(LinkMatchAnswerEntity linkMatchAnswerEntity : answerList) {
-            Map<String, Object> matchData = new HashMap<>();
-            matchData.put("userId",linkMatchAnswerEntity.getUserId());
-            matchData.put("coupleId",linkMatchAnswerEntity.getCoupleId());
-            matchData.put("matchId",linkMatchAnswerEntity.getMatchId());
-            matchData.put("choice",linkMatchAnswerEntity.getChoice());
-            matchData.put("createAt",linkMatchAnswerEntity.getCreatedAt());
-            answerData.add(matchData);
-        }
-
-        return ResponseEntity.ok(answerData);
+        return ResponseEntity.ok().body(answerList);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

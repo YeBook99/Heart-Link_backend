@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class CoupleMatchService {
@@ -71,7 +70,28 @@ public class CoupleMatchService {
     }
 
     // 매치 답변 내역 조회
-    public List<LinkMatchAnswerEntity> findAnswerListByCoupleId(CoupleEntity couple) {
-        return answerRepository.findByCoupleId(couple);
+    public List<Map<String, Object>> findAnswerListByCoupleId(CoupleEntity couple, Long userId) {
+        List<LinkMatchAnswerEntity> coupleList = answerRepository.findByCoupleId(couple);
+        List<Map<String, Object>> answerList = new ArrayList<>();
+        for(LinkMatchAnswerEntity answerEntity : coupleList) {
+            Map<String, Object> totalAnswerMap = new HashMap<>();
+            LinkMatchEntity matchQuestion = matchRepository.findById(answerEntity.getMatchId().getLinkMatchId()).orElse(null);
+            totalAnswerMap.put("match1", matchQuestion.getMatch1());
+            totalAnswerMap.put("match2", matchQuestion.getMatch2());
+            if(answerEntity.getUserId().getUserId()==userId) {
+                Map<String, Object> myAnswerMap = new HashMap<>();
+                myAnswerMap.put("myChoice", answerEntity.getChoice());
+                myAnswerMap.put("myDate", answerEntity.getCreatedAt());
+                totalAnswerMap.put("myAnswer", myAnswerMap);
+            } else {
+                Map<String, Object> partnerAnswerMap = new HashMap<>();
+                partnerAnswerMap.put("partnerChoice", answerEntity.getChoice());
+                partnerAnswerMap.put("partnerDate", answerEntity.getCreatedAt());
+                totalAnswerMap.put("partnerAnswer", partnerAnswerMap);
+            }
+            answerList.add(totalAnswerMap);
+        }
+        // 상대 답, 내 답, 날짜, 매치1, 매치2
+        return answerList;
     }
 }
