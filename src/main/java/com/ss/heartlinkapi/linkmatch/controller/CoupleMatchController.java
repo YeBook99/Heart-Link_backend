@@ -8,18 +8,17 @@ import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchStatisticsService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/couple")
@@ -40,9 +39,14 @@ public class CoupleMatchController {
         // 오류 500 검사
         try {
             LinkMatchEntity result = coupleMatchService.getMatchQuestion();
+            Map<String, Object> matchData = new HashMap<>();
+            matchData.put("linkMatchId", result.getLinkMatchId());
+            matchData.put("match1", result.getMatch1());
+            matchData.put("match2", result.getMatch2());
+            matchData.put("displayDate", result.getDisplayDate());
             // 오류 404 검사
             if (result != null) {
-                return ResponseEntity.ok(result);
+                return ResponseEntity.ok(matchData);
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -107,7 +111,19 @@ public class CoupleMatchController {
         CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
 
         List<LinkMatchAnswerEntity> answerList = coupleMatchService.findAnswerListByCoupleId(couple);
-        return ResponseEntity.ok(answerList);
+
+        List<Map<String,Object>> answerData = new ArrayList<>();
+        for(LinkMatchAnswerEntity linkMatchAnswerEntity : answerList) {
+            Map<String, Object> matchData = new HashMap<>();
+            matchData.put("userId",linkMatchAnswerEntity.getUserId());
+            matchData.put("coupleId",linkMatchAnswerEntity.getCoupleId());
+            matchData.put("matchId",linkMatchAnswerEntity.getMatchId());
+            matchData.put("choice",linkMatchAnswerEntity.getChoice());
+            matchData.put("createAt",linkMatchAnswerEntity.getCreatedAt());
+            answerData.add(matchData);
+        }
+
+        return ResponseEntity.ok(answerData);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
