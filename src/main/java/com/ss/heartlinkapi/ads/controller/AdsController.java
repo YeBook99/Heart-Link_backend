@@ -28,4 +28,11 @@ public class AdsController {
         List<Map<String, Object>> adsResult = adsService.getAds(user.getUserId());
         return ResponseEntity.ok(adsResult);
     }
+
+    @GetMapping("/pickGet")
+    public ResponseEntity<?> getAds(){
+        String url = "https://adpick.co.kr/apis/offers.php?affid=62b120&os=ios&adtype=CPA&category=game&order=rand";
+        adsService.getPickAds(url);
+        return ResponseEntity.ok().build();
+    }
 }

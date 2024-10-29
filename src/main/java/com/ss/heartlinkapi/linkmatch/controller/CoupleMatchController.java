@@ -95,15 +95,17 @@ public class CoupleMatchController {
     }
 
     // 매치 답변 내역 조회
-    @GetMapping("/missionmatch/answerList/{coupleId}")
-    public ResponseEntity<?> getMatchAnswerList(@PathVariable Long coupleId) {
+    @GetMapping("/missionmatch/answerList")
+    public ResponseEntity<?> getMatchAnswerList(@AuthenticationPrincipal CustomUserDetails userDetails) {
         // 오류 500 검사
         try{
             // 오류 400 검사
-            if(coupleId == null) {
+            if(userDetails == null) {
                 return ResponseEntity.badRequest().build();
             }
-            CoupleEntity couple = coupleService.findById(coupleId);
+
+        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
+
         List<LinkMatchAnswerEntity> answerList = coupleMatchService.findAnswerListByCoupleId(couple);
         return ResponseEntity.ok(answerList);
         } catch (Exception e) {
@@ -113,19 +115,21 @@ public class CoupleMatchController {
     }
 
     // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트, 월별 매칭 횟수 조회)
-    @GetMapping("/statistics/dailyMatch/{coupleId}")
-    public ResponseEntity<?> getStatisticsDailyMatchById(@PathVariable Long coupleId) {
+    @GetMapping("/statistics/dailyMatch")
+    public ResponseEntity<?> getStatisticsDailyMatchById(@AuthenticationPrincipal CustomUserDetails userDetails) {
         try{
             Date todayDate = new Date();
             LocalDate today = todayDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
             LinkMatchEntity todayMatch = statisticsService.findMatchByDate(today);
 
-            if(todayMatch == null) {
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
+
+            if(todayMatch == null || couple == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, coupleId);
+            Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, couple.getCoupleId());
 
             if(rateResult == null) {
                 return ResponseEntity.notFound().build();

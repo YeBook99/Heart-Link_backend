@@ -19,6 +19,7 @@ public class CoupleMissionController {
     @Autowired
     private CoupleMissionService missionService;
 
+    // 모든 미션이 있는 연, 월 조회
     @GetMapping("/missionAllList")
     public ResponseEntity<?> selectAllMissionDate(){
         List<LinkMissionEntity> allMissions = missionService.findAllMissions();
