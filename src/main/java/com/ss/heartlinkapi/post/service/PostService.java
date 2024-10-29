@@ -265,36 +265,48 @@ public class PostService {
 	// 게시글 수정
 	@Transactional
 	public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
-		PostEntity post = postRepository.findById(postId)
-				.orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
-		
-		post.setContent(updateDTO.getContent());
-		post.setVisibility(updateDTO.getVisibility());
-		
-		List<String> existingFileUrls = updateDTO.getExistingFileUrls();
-		List<String> newFileUrls = updateDTO.getNewFileUrls();
-		
-		List<PostFileEntity> updatedFiles = post.getPostFiles().stream()
-				.filter(file -> existingFileUrls.contains(file.getFileUrl()))
-				.collect(Collectors.toList());
-		
-		int nextSortOrder = updatedFiles.size();
-		for (String newFileUrl : newFileUrls) {
-			PostFileEntity newFile = new PostFileEntity();
-			newFile.setPostId(post);
-			newFile.setFileUrl(newFileUrl);
-			newFile.setFileType(postFileService.determineFileType(newFileUrl));
-			newFile.setSortOrder(nextSortOrder++);
-			updatedFiles.add(newFile);
-		}
-		
-		post.getPostFiles().clear();
-		post.getPostFiles().addAll(updatedFiles);
-		
-		
-		postRepository.save(post);
-		
+	    PostEntity post = postRepository.findById(postId)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
+	    
+	    // 게시글 내용 및 가시성 업데이트
+	    post.setContent(updateDTO.getContent());
+	    post.setVisibility(updateDTO.getVisibility());
+	    
+	    List<String> existingFileUrls = Optional.ofNullable(updateDTO.getExistingFileUrls()).orElse(Collections.emptyList()); // 기존 파일 URLs
+	    List<String> newFileUrls = Optional.ofNullable(updateDTO.getNewFileUrls()).orElse(Collections.emptyList()); // 새로운 파일 URLs
+	    List<String> filesToDelete = Optional.ofNullable(updateDTO.getFilesToDelete()).orElse(Collections.emptyList()); // 삭제할 파일 URLs
+
+	    // 기존 파일 목록에서 삭제할 파일 제거
+	    List<PostFileEntity> updatedFiles = Optional.ofNullable(post.getPostFiles()).orElse(new ArrayList<>()).stream()
+	            .filter(file -> !filesToDelete.contains(file.getFileUrl()))
+	            .collect(Collectors.toList());
+
+	    // 새로운 파일 추가
+	    int nextSortOrder = updatedFiles.size();
+	    for (String newFileUrl : newFileUrls) {
+	        PostFileEntity newFile = new PostFileEntity();
+	        newFile.setPostId(post);
+	        newFile.setFileUrl(newFileUrl);
+	        newFile.setFileType(postFileService.determineFileType(newFileUrl));
+	        newFile.setSortOrder(nextSortOrder++);
+	        updatedFiles.add(newFile);
+	    }
+	    
+	    // 정렬 순서 재설정
+	    for (int i = 0; i < updatedFiles.size(); i++) {
+	        updatedFiles.get(i).setSortOrder(i + 1); // 1부터 시작
+	    }
+
+	    // 게시글의 파일 목록 업데이트
+	    post.getPostFiles().clear();
+	    post.getPostFiles().addAll(updatedFiles);
+	    
+	    postRepository.save(post);
 	}
+
+
+
+
 	
 
 
