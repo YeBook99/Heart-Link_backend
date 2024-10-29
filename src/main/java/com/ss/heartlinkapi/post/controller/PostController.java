@@ -168,7 +168,7 @@ public class PostController {
 		    @RequestBody PostUpdateDTO postUpdateDTO,
 		    @AuthenticationPrincipal UserDetails user){
 		
-		Long userId = 6L; // user.getUserId(); // userDetails에서 userId 추출
+		Long userId = 4L; // user.getUserId(); // userDetails에서 userId 추출
 		
 		try {
 			postService.updatePost(postId, userId, postUpdateDTO);
