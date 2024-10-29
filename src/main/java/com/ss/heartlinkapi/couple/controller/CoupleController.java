@@ -198,36 +198,9 @@ public class CoupleController {
         }
     }
 
-//    // 유예기간 종료 후 최종 연결 해지
-//    @DeleteMapping("/{coupleId}/finalUnlink")
-//    public ResponseEntity<?> finalUnlinkCouple(@PathVariable Long coupleId) {
-//        System.out.println("finalUnlinkCouple");
-//
-//        try{
-//            if(coupleId == null) {
-//                return ResponseEntity.badRequest().build();
-//            }
-//
-//            CoupleEntity couple = coupleService.findById(coupleId);
-//
-//            if(couple == null) {
-//                return ResponseEntity.notFound().build();
-//            }
-//            boolean result = coupleService.finalUnlinkCouple(couple);
-//
-//            if(result) {
-//                return ResponseEntity.noContent().build();
-//            } else {
-//                return ResponseEntity.badRequest().body("아직 커플 유예기간입니다.");
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.internalServerError().build();
-//        }
-//    }
-
     // 유예기간 없이 즉시 연결 해지
     @DeleteMapping("/{coupleId}/finalNowUnlink")
+
     public ResponseEntity<?> finalNowUnlinkCouple(@PathVariable Long coupleId) {
         try{
             if(coupleId == null) {

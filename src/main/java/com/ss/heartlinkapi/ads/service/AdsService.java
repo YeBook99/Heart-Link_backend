@@ -33,9 +33,6 @@ public class AdsService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private String token;
 
-    @Value("${}")
-    private eBayAppKey;
-
     public AdsService(ElasticService elasticService, DeepLService deepLService) {
         this.elasticService = elasticService;
         this.restTemplate = new RestTemplate();
@@ -98,9 +95,6 @@ public class AdsService {
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-
-
         return response.getBody();
     }
 
