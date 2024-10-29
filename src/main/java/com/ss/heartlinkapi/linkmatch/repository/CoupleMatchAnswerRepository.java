@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.linkmatch.repository;
 
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -82,4 +83,7 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
     int attendMatchCoupleCount(@Param("year") int year, @Param("month") int month);
 
     void deleteAllByCoupleId(CoupleEntity couple);
+
+    // 유저와 날짜에 맞는 객체가 있다면 조회 후 반환
+    LinkMatchAnswerEntity findByUserIdAndCreatedAt(UserEntity user, LocalDate createdAt);
 }
