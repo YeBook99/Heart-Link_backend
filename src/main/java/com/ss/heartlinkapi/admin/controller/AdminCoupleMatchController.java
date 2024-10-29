@@ -65,10 +65,10 @@ public class AdminCoupleMatchController {
 
     // 매치 질문 수정
     @PutMapping("/questions/{questionId}/update")
-    public ResponseEntity<?> updateMatchQuestion(@PathVariable Long questionId, @RequestBody LinkMatchEntity questionText) {
+    public ResponseEntity<?> updateMatchQuestion(@RequestBody LinkMatchEntity questionText) {
         // 오류 500 검사
         try{
-            LinkMatchEntity result = adminCoupleMatchService.updateMatchQuestion(questionId, questionText);
+            LinkMatchEntity result = adminCoupleMatchService.updateMatchQuestion(questionText.getLinkMatchId(), questionText);
             // 오류 400 검사
             if(questionText == null || questionText.getMatch1() == null || questionText.getMatch2() == null
             || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
