@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
+
 @RestController
 @RequestMapping("/admin")
 public class AdminCoupleMissionController {
@@ -26,7 +28,7 @@ public class AdminCoupleMissionController {
     public ResponseEntity<?> addMissionTag(@RequestBody LinkMissionDTO missionTag) {
         try{
 
-            if(missionTag == null || missionTag.getMissionTagName().isEmpty() || missionTag.getMissionEndDate()==null || missionTag.getMissionStartDate()==null){
+            if(missionTag == null || missionTag.getMissionTagName().isEmpty()){
                 return ResponseEntity.badRequest().build();
             }
 
@@ -60,10 +62,11 @@ public class AdminCoupleMissionController {
     }
 
     // 링크 미션 태그 수정
-    @PutMapping("/missionslink/{missionId}/update")
+    @Transactional
+    @PutMapping("/missionslink/update/{missionId}")
     public ResponseEntity<?> updateMissionTag(@PathVariable Long missionId, @RequestBody LinkMissionDTO missionTag) {
         try{
-            if(missionId == null || missionTag == null || missionTag.getMissionEndDate()==null || missionTag.getMissionStartDate()==null || missionTag.getMissionTagName().isEmpty()){
+            if(missionId == null || missionTag == null){
                 return ResponseEntity.badRequest().build();
             }
             LinkMissionEntity mission = adminMissionService.findByMissionId(missionId);
@@ -80,7 +83,7 @@ public class AdminCoupleMissionController {
     }
 
     // 링크 미션 태그 삭제
-    @DeleteMapping("/missionslink/{missionId}/delete")
+    @DeleteMapping("/missionslink/delete/{missionId}")
     public ResponseEntity<?> deleteMissionTag(@PathVariable Long missionId) {
         try{
             LinkMissionEntity findMission = adminMissionService.findByMissionId(missionId);

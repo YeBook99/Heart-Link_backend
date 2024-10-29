@@ -11,6 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class LinkMissionDTO {
     private String missionTagName;
-    private LocalDate missionStartDate;
-    private LocalDate missionEndDate;
+    private int year;
+    private int month;
 }

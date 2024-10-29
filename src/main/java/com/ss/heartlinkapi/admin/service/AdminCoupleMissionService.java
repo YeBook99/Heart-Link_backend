@@ -8,6 +8,9 @@ import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+
 @Service
 public class AdminCoupleMissionService {
 
@@ -22,8 +25,12 @@ public class AdminCoupleMissionService {
     public LinkMissionEntity addMissionTag(LinkTagEntity linkTag, LinkMissionDTO linkMissionDTO) {
         LinkMissionEntity linkMissionEntity = new LinkMissionEntity();
         linkMissionEntity.setLinkTagId(linkTag);
-        linkMissionEntity.setStart_date(linkMissionDTO.getMissionStartDate());
-        linkMissionEntity.setEnd_date(linkMissionDTO.getMissionEndDate());
+        LocalDate startDate = LocalDate.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth(), 1);
+        int lastDay = YearMonth.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth()).atEndOfMonth().getDayOfMonth();
+        LocalDate endDate = LocalDate.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth(), lastDay);
+
+        linkMissionEntity.setStart_date(startDate);
+        linkMissionEntity.setEnd_date(endDate);
         LinkMissionEntity result = missionRepository.save(linkMissionEntity);
         return result;
     }
@@ -36,23 +43,23 @@ public class AdminCoupleMissionService {
 
     // 미션 태그 수정
     public LinkMissionEntity updateMission(LinkMissionEntity beforeMission, LinkMissionDTO afterMission) {
-        beforeMission.setStart_date(afterMission.getMissionStartDate());
-        beforeMission.setEnd_date(afterMission.getMissionEndDate());
+        LocalDate startDate = LocalDate.of(afterMission.getYear(), afterMission.getMonth(), 1);
+        int lastDay = YearMonth.of(afterMission.getYear(), afterMission.getMonth()).atEndOfMonth().getDayOfMonth();
+        LocalDate endDate = LocalDate.of(afterMission.getYear(), afterMission.getMonth(), lastDay);
+        beforeMission.setStart_date(startDate);
+        beforeMission.setEnd_date(endDate);
 
         LinkTagEntity findTag = linkTagRepository.findByKeywordContains(afterMission.getMissionTagName());
 
         if(findTag != null) {
-            System.out.println("여긴가1");
             // 기존 태그가 존재할 때 기존 태그 사용
             beforeMission.setLinkTagId(findTag);
             return missionRepository.save(beforeMission);
         } else {
-            System.out.println("여긴가2");
             // 기존에 태그가 존재하지 않을 때 새 태그 추가
             LinkTagEntity newTag = new LinkTagEntity();
             newTag.setKeyword(afterMission.getMissionTagName());
             linkTagRepository.save(newTag);
-            System.out.println("여긴가3");
             beforeMission.setLinkTagId(newTag);
             return missionRepository.save(beforeMission);
         }
