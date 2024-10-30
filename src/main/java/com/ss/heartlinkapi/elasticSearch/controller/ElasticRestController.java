@@ -1,8 +1,11 @@
 package com.ss.heartlinkapi.elasticSearch.controller;
 
+import com.ss.heartlinkapi.elasticSearch.document.ElasticTagDocument;
 import com.ss.heartlinkapi.elasticSearch.document.ElasticUserDocument;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.linktag.service.LinkTagService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,9 @@ public class ElasticRestController {
     @Autowired
     private ElasticService elasticService;
 
+    @Autowired
+    private LinkTagService linkTagService;
+
     // 테스트 조회
     @GetMapping("/test")
     public ResponseEntity<?> test(@RequestParam Long userId){
@@ -31,6 +37,13 @@ public class ElasticRestController {
     @PostMapping("/addUser")
     public ResponseEntity<?> testAddUser(@RequestBody UserEntity userEntity){
         ElasticUserDocument result = elasticService.addUser(userEntity);
+        return ResponseEntity.ok(result);
+    }
+
+    // 테스트 태그 추가
+    @PostMapping("/addTag")
+    public ResponseEntity<?> testAddTag(@RequestParam String tagName){
+        LinkTagEntity result = linkTagService.saveTag(tagName);
         return ResponseEntity.ok(result);
     }
 }

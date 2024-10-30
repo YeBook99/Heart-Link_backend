@@ -23,6 +23,9 @@ public class ElasticIndexService {
     private static final String MAPPING_FILE_PATH = "src/main/resources/elasticSearch/search_history_mapping.json";
     private static final String USER_INDEX_NAME = "user_info";
     private static final String USER_MAPPING_PATH = "src/main/resources/elasticSearch/user_info_mapping.json";
+    private static final String TAG_INDEX_NAME = "tag_info";
+    private static final String TAG_MAPPING_PATH = "src/main/resources/elasticSearch/tag_info_mapping.json";
+
 
     // 검색기록 인덱스 생성
     @PostConstruct
@@ -45,13 +48,20 @@ public class ElasticIndexService {
                 // 인덱스가 이미 존재할 경우
                 System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+USER_INDEX_NAME);
             }
+
+            if(!indexExists(TAG_INDEX_NAME)){
+                // 인덱스가 존재하지 않을 경우
+                createIndex(TAG_INDEX_NAME, TAG_MAPPING_PATH);
+                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+TAG_INDEX_NAME);
+            } else {
+                // 인덱스가 이미 존재할 경우
+                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+TAG_INDEX_NAME);
+            }
         } catch (Exception e){
             e.printStackTrace();
             System.out.println("엘라스틱서치 인덱스 생성 실패");
         }
     }
-
-
 
     // 엘라스틱 서치에서 이미 해당 인덱스가 존재하는지 체크
     private boolean indexExists(String indexName) throws Exception{
@@ -66,10 +76,9 @@ public class ElasticIndexService {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> mapping = objectMapper.readValue(mappingJson, Map.class);
 
-
         // mappings의 properties 부분을 가져오기
         Map<String, Object> properties = (Map<String, Object>) ((Map<String, Object>) mapping.get("mappings")).get("properties");
-        Map<String, Object> settings = (Map<String, Object>) mapping.get("settings");
+        Map<String, Object> settings = (Map<String, Object>) mapping.getOrDefault("settings", new HashMap<>());
 
         // Map<String, Object> -> Map<String, Property> 변환
         Map<String, Property> propertyMap = convertToProperties(properties);
@@ -78,8 +87,8 @@ public class ElasticIndexService {
         elasticsearchClient.indices().create(CreateIndexRequest.of(c ->
                 c.index(indexName)
                         .settings(s -> s // settings를 Map으로 변환
-                                .numberOfShards(settings.get("number_of_shards").toString())
-                                .numberOfReplicas(settings.get("number_of_replicas").toString())
+                                .numberOfShards(settings.getOrDefault("number_of_shards", "1").toString())
+                                .numberOfReplicas(settings.getOrDefault("number_of_replicas", "0").toString())
                         )
                         .mappings(m -> m.properties(propertyMap))
         ));

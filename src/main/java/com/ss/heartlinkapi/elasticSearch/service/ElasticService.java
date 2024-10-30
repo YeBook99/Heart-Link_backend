@@ -1,9 +1,12 @@
 package com.ss.heartlinkapi.elasticSearch.service;
 
+import com.ss.heartlinkapi.elasticSearch.document.ElasticTagDocument;
 import com.ss.heartlinkapi.elasticSearch.document.ElasticUserDocument;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
 import com.ss.heartlinkapi.elasticSearch.repository.ElasticHistoryRepository;
+import com.ss.heartlinkapi.elasticSearch.repository.ElasticTagInfoRepository;
 import com.ss.heartlinkapi.elasticSearch.repository.ElasticUserInfoRepository;
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.stereotype.Service;
@@ -16,10 +19,12 @@ public class ElasticService {
 
     private final ElasticHistoryRepository elasticHistoryRepository;
     private final ElasticUserInfoRepository userInfoRepository;
+    private final ElasticTagInfoRepository tagInfoRepository;
 
-    public ElasticService(ElasticHistoryRepository elasticHistoryRepository, ElasticUserInfoRepository userInfoRepository) {
+    public ElasticService(ElasticHistoryRepository elasticHistoryRepository, ElasticUserInfoRepository userInfoRepository, ElasticTagInfoRepository tagInfoRepository) {
         this.elasticHistoryRepository = elasticHistoryRepository;
         this.userInfoRepository = userInfoRepository;
+        this.tagInfoRepository = tagInfoRepository;
     }
 
     // 검색기록 추가
@@ -62,4 +67,11 @@ public class ElasticService {
         return userInfoRepository.save(elasticUserDocument);
     }
 
+    // 태그 추가
+    public ElasticTagDocument addTag(LinkTagEntity tagEntity) {
+        ElasticTagDocument elasticTagDocument = new ElasticTagDocument();
+        elasticTagDocument.setTagName(tagEntity.getKeyword());
+        elasticTagDocument.setTagId(tagEntity.getId());
+        return tagInfoRepository.save(elasticTagDocument);
+    }
 }
