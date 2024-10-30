@@ -4,7 +4,10 @@ import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.search.repository.SearchRepository;
@@ -41,6 +44,9 @@ public class SearchService {
 
     @Autowired
     private DeepLService deepLService;
+
+    @Autowired
+    private PostFileRepository postFileRepository;
 
     // 유저 아이디 검색
     @Transactional
@@ -161,5 +167,74 @@ public class SearchService {
        }
 
        return historyList;
+    }
+
+    // 검색창 옆에 띄울 게시글 목록 가져오기
+    // 좋아요 많은 순+검색기록 관련 순으로 섞고 나서 연관없는 게시글 최근순으로 가져오기
+    public List<Map<String, Object>> getPost(CustomUserDetails user) {
+        System.out.println("1");
+        List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
+        System.out.println("2");
+        List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
+        System.out.println("23232323"+searchHistoryList);
+        System.out.println("3");
+        List<PostEntity> searchPostList = new ArrayList<>(); // 검색기록 키워드가 포함된 피드 목록 생성
+        for(SearchHistoryEntity searchHistory : searchHistoryList) { // 검색기록 리스트 순회
+            if(searchHistory.getType().equals("content")) { // 만약 검색기록의 타입이 content일 때
+                System.out.println("4");
+                // 해당 키워드로 게시글 리스트 모두 조회
+                List<PostEntity> keywordFindPostList = postRepository.findAllByContentIgnoreCaseContaining(searchHistory.getKeyword());
+                for(PostEntity post : keywordFindPostList) { // 게시글을 검색기록 키워드가 포함된 목록에 저장
+                    System.out.println("5");
+                    searchPostList.add(post);
+                }
+            }
+        }
+
+        List<PostEntity> mixPostList = mixPostList(manyLikePostList, searchPostList);
+        System.out.println("어딘데대체");
+        System.out.println("666666"+mixPostList);
+
+        List<Map<String, Object>> postMap = new ArrayList<>();
+        System.out.println("7"+postMap);
+
+        for(PostEntity post : mixPostList) {
+            System.out.println("8"+post);
+            Map<String, Object> map = new HashMap<>();
+            System.out.println(postFileRepository.findByPostId(post.getPostId()));
+//            PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
+            System.out.println("9");
+            map.put("postId",post.getPostId());
+//            map.put("postImgUrl",file.getFileUrl());
+            map.put("likeCount",post.getLikeCount());
+            map.put("commentCount",post.getCommentCount());
+            postMap.add(map);
+        }
+
+        System.out.println("10");
+        return postMap;
+
+    }
+
+    // 게시글 섞기 (좋아요 많은 순 + 검색기록에 따른 게시글 리스트)
+    private List<PostEntity> mixPostList(List<PostEntity> manyLikePostList, List<PostEntity> searchPostList) {
+        System.out.println("mixPostList 메서등드으ㅡ으 11");
+        if(searchPostList.isEmpty()) { // 검색기록에 따른 피드 내용이 없을 경우
+            System.out.println("mixPostList 메서등드으ㅡ으 22");
+            System.out.println("mixPostList 메서등드으ㅡ으 22"+manyLikePostList);
+            return manyLikePostList;
+        }
+
+        System.out.println("mixPostList 메서등드으ㅡ으 33");
+        Set<PostEntity> mergedSet = new LinkedHashSet<>(searchPostList);
+
+        System.out.println("mixPostList 메서등드으ㅡ으 44");
+        for (PostEntity post : manyLikePostList) {
+            System.out.println("mixPostList 메서등드으ㅡ으 55");
+            mergedSet.add(post); // 검색기록 순의 글 목록에 좋아요 순 글 목록을 중복없이 합치기
+        }
+
+        System.out.println("mixPostList 메서등드으ㅡ으 66");
+        return new ArrayList<>(mergedSet);
     }
 }

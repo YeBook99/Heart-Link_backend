@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.oauth2.service;
 import java.util.List;
 import java.util.Random;
 
+import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -34,14 +35,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	private final ProfileRepository profileRepository;
 	private final PhoneService phoneService;
 	private final LoginIdService loginIdService;
+	private final ElasticService elasticService;
 
 	public CustomOAuth2UserService(UserRepository userRepository, SocialRepository socialRepository,
-			ProfileRepository profileRepository, PhoneService phoneService, LoginIdService loginIdService) {
+			ProfileRepository profileRepository, PhoneService phoneService, LoginIdService loginIdService, ElasticService elasticService) {
 		this.userRepository = userRepository;
 		this.socialRepository = socialRepository;
 		this.profileRepository = profileRepository;
 		this.phoneService = phoneService;
 		this.loginIdService = loginIdService;
+		this.elasticService = elasticService;
 	}
 
 	@Override
@@ -180,6 +183,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 		// 디비에 값 저장
 		userRepository.save(userEntity);
+		elasticService.addUser(userEntity);
 		socialRepository.save(socialEntity);
 		profileRepository.save(profileEntity);
 		
