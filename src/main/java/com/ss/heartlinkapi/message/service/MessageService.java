@@ -1,16 +1,15 @@
 package com.ss.heartlinkapi.message.service;
 
-import com.ss.heartlinkapi.block.entity.BlockEntity;
 import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.dto.SaveMsgDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,6 +36,7 @@ public class MessageService {
 
         for (MessageEntity entity : messageEntities) {
 
+            Long id = entity.getId();
             Long senderId = entity.getSenderId();
             String content = entity.getContent();
             String emoji = entity.getEmoji();
@@ -45,7 +45,7 @@ public class MessageService {
             boolean isRead = entity.isRead();
 
             ChatMsgListDTO chatMsgListDTO = ChatMsgListDTO.builder()
-                    .msgRoomId(msgRoomId)
+                    .messageId(id)
                     .senderId(senderId)
                     .content(content)
                     .emoji(emoji)
@@ -60,7 +60,7 @@ public class MessageService {
     }
 
 //    사용자가 보낸 채팅을 저장
-    public void saveChatMessage(ChatMsgListDTO chatMsgListDTO) {
+    public void saveChatMessage(SaveMsgDTO chatMsgListDTO) {
 
         MessageEntity messageEntity = new MessageEntity();
         

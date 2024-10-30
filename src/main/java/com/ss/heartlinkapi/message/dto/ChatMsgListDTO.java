@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ChatMsgListDTO {
-    private Long msgRoomId;
+    private Long messageId;
     private Long senderId;
     private String content;
     private String emoji;
