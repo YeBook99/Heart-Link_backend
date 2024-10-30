@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,17 +14,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "follow")
 public class FollowEntity {
 	
@@ -40,7 +39,7 @@ public class FollowEntity {
 	@JoinColumn(name = "following_id")
 	private UserEntity following;		// 팔로우되는 회원 아이디
 	
-	private boolean status;				// 팔로우 상태(false -> 대기중)
+	private boolean status = true;				// 팔로우 상태(false -> 대기중)
 	
 	@CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
