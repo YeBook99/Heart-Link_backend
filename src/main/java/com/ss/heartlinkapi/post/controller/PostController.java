@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.heartlinkapi.bookmark.service.BookmarkService;
 import com.ss.heartlinkapi.like.service.LikeService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
@@ -60,17 +63,21 @@ public class PostController {
 	
 	// 사용자ID 안받고 하는 임시 게시글 작성 코드
 	@PostMapping("/write")
-	public ResponseEntity<?> writePost(@RequestParam("post") PostDTO postDTO, @RequestParam("files") List<MultipartFile> files) {
+	public ResponseEntity<?> writePost(
+	        @RequestParam("post") String postJson, // JSON 문자열로 받음
+	        @RequestParam("files") List<MultipartFile> files) throws JsonMappingException, JsonProcessingException {
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    PostDTO postDTO = objectMapper.readValue(postJson, PostDTO.class);
+
 	    // 임시 UserEntity 생성
 	    UserEntity testUser = new UserEntity();
 	    testUser.setUserId(1L);  // 임의의 사용자 ID
-//	    testUser.setUsername("testUser");  // 임의의 사용자 이름
-	    
+
 	    // 첨부파일이 없을 때 예외
 	    if (files == null || files.isEmpty()) {
-	    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("첨부파일이 최소 1개 이상 포함되어야 합니다.");
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("첨부파일이 최소 1개 이상 포함되어야 합니다.");
 	    }
-	    
+
 	    try {
 	        postService.savePost(postDTO, files, testUser);
 	        return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -79,6 +86,7 @@ public class PostController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 작성 중 오류가 발생하였습니다.");
 	    }
 	}
+
 	
 	// 내 게시물 조회
 	@GetMapping("/{userId}")
