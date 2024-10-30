@@ -20,6 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -69,25 +70,30 @@ public class PostEntity {
 	
 	
 	// Cascade 설정
-//    @OneToMany(mappedBy = "postId", orphanRemoval = true)
-//    @JsonManagedReference
-//    private List<CommentEntity> comments;
-//
-//    @OneToMany(mappedBy = "postId", orphanRemoval = true)
-//    @JsonManagedReference
-//    private List<LikeEntity> likes;
-//
-//    @OneToMany(mappedBy = "postId", orphanRemoval = true)
-//    @JsonManagedReference
-//    private List<ReportEntity> reports;
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+    private List<CommentEntity> comments;
 
-//    @OneToMany(mappedBy = "postId", orphanRemoval = true)
-//    @JsonManagedReference
-//    private List<PostFileEntity> postFiles;
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<LikeEntity> likes;
 
-//    @OneToMany(mappedBy = "postId", orphanRemoval = true)
-//    @JsonManagedReference
-//    private List<BookmarkEntity> bookmarks;
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<ReportEntity> reports;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<PostFileEntity> postFiles;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<BookmarkEntity> bookmarks;
     
     
     // mention도 추가
