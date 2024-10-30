@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ss.heartlinkapi.bookmark.service.BookmarkService;
 import com.ss.heartlinkapi.like.service.LikeService;
@@ -57,23 +60,23 @@ public class PostController {
 	
 	// 사용자ID 안받고 하는 임시 게시글 작성 코드
 	@PostMapping("/write")
-	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO) {
+	public ResponseEntity<?> writePost(@RequestParam("post") PostDTO postDTO, @RequestParam("files") List<MultipartFile> files) {
 	    // 임시 UserEntity 생성
 	    UserEntity testUser = new UserEntity();
 	    testUser.setUserId(1L);  // 임의의 사용자 ID
 //	    testUser.setUsername("testUser");  // 임의의 사용자 이름
 	    
 	    // 첨부파일이 없을 때 예외
-	    if (postDTO.getFiles() == null || postDTO.getFiles().isEmpty()) {
+	    if (files == null || files.isEmpty()) {
 	    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("첨부파일이 최소 1개 이상 포함되어야 합니다.");
 	    }
 	    
 	    try {
-	        postService.savePost(postDTO, testUser);
+	        postService.savePost(postDTO, files, testUser);
 	        return ResponseEntity.status(HttpStatus.CREATED).build();
 	    } catch (Exception e) {
 	        e.printStackTrace();
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 작성 중 오류가 발생하였습니다.");
 	    }
 	}
 	
@@ -144,7 +147,7 @@ public class PostController {
 	// 내 게시글 삭제
 	@DeleteMapping("/{postId}/delete")
 	public ResponseEntity<?> deletePost(@PathVariable Long postId, @AuthenticationPrincipal UserDetails user){
-		Long userId = 5L; // user.getUserId(); // userDetails에서 userId 추출
+		Long userId = 2L; // user.getUserId(); // userDetails에서 userId 추출
 		
 		postService.deleteMyPost(postId, userId);
 		
