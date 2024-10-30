@@ -41,7 +41,7 @@ public class ProfileController {
 	}
 	
 	/***************** 로그인한 유저 아이디 반환 ******************/
-	@GetMapping("/")
+	@GetMapping("")
 	public ResponseEntity<?> selectProfile(@AuthenticationPrincipal CustomUserDetails loginUser) {
 		
 		if (loginUser == null) {

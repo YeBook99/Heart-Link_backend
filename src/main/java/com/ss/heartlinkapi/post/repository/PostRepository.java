@@ -21,15 +21,16 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	           "ORDER BY p.createdAt DESC")
 	List<PostEntity> findPublicPostsByFollowerId(@Param("userId") Long userId);
 
-	// 내 팔로잉이 아닌 사람의 게시글 조회
 	@Query("SELECT p FROM PostEntity p " +
-	           "WHERE p.userId.userId NOT IN (SELECT f.following.id FROM FollowEntity f WHERE f.follower.id = :userId) " +
-	           "AND p.visibility = com.ss.heartlinkapi.post.entity.Visibility.PUBLIC " +
-	           "AND NOT EXISTS (SELECT r FROM ReportEntity r WHERE r.postId.postId = p.postId AND r.userId.id = :userId) " +
-	           "AND NOT EXISTS (SELECT b FROM BlockEntity b WHERE (b.blockerId.id = :userId AND b.blockedId.id = p.userId.userId) " + 
-	           "OR (b.blockedId.id = :userId AND b.coupleId.id = p.userId.userId)) " +  // 차단된 유저나 차단한 유저의 게시물 필터링
-	           "ORDER BY p.createdAt DESC")
+		       "WHERE p.userId.userId NOT IN (SELECT f.following.id FROM FollowEntity f WHERE f.follower.id = :userId) " +
+		       "AND p.userId.userId != :userId " +  // 자신의 게시글을 제외
+		       "AND p.visibility = com.ss.heartlinkapi.post.entity.Visibility.PUBLIC " +
+		       "AND NOT EXISTS (SELECT r FROM ReportEntity r WHERE r.postId.postId = p.postId AND r.userId.id = :userId) " +
+		       "AND NOT EXISTS (SELECT b FROM BlockEntity b WHERE (b.blockerId.id = :userId AND b.blockedId.id = p.userId.userId) " + 
+		       "OR (b.blockedId.id = :userId AND b.coupleId.id = p.userId.userId)) " +  
+		       "ORDER BY p.createdAt DESC")
 	List<PostEntity> findNonFollowedAndNonReportedPosts(@Param("userId") Long userId);
+
 	
 	// 게시글 상세보기
 	Optional<PostEntity> findById(Long postId);
