@@ -48,4 +48,7 @@ public class ElasticService {
         return searchList;
     }
 
+    // 유저 추가
+
+
 }

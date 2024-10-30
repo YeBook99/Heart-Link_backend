@@ -96,7 +96,6 @@ public class SearchController {
     }
 
     // 검색창과 함께 띄울 게시글 조회
-    // 서버때문에 테스트 필요.
     @GetMapping("/getSearchPost")
     public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user) {
         try {
@@ -115,6 +114,8 @@ public class SearchController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    // @로 아이디 조회
 
 
 

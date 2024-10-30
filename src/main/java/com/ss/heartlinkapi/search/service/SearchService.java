@@ -176,6 +176,7 @@ public class SearchService {
         List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
         System.out.println("2");
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
+        System.out.println("23232323"+searchHistoryList);
         System.out.println("3");
         List<PostEntity> searchPostList = new ArrayList<>(); // 검색기록 키워드가 포함된 피드 목록 생성
         for(SearchHistoryEntity searchHistory : searchHistoryList) { // 검색기록 리스트 순회
@@ -191,13 +192,14 @@ public class SearchService {
         }
 
         List<PostEntity> mixPostList = mixPostList(manyLikePostList, searchPostList);
-        System.out.println("6");
+        System.out.println("어딘데대체");
+        System.out.println("666666"+mixPostList);
 
         List<Map<String, Object>> postMap = new ArrayList<>();
-        System.out.println("7");
+        System.out.println("7"+postMap);
 
         for(PostEntity post : mixPostList) {
-            System.out.println("8");
+            System.out.println("8"+post);
             Map<String, Object> map = new HashMap<>();
             System.out.println(postFileRepository.findByPostId(post.getPostId()));
 //            PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
@@ -216,16 +218,23 @@ public class SearchService {
 
     // 게시글 섞기 (좋아요 많은 순 + 검색기록에 따른 게시글 리스트)
     private List<PostEntity> mixPostList(List<PostEntity> manyLikePostList, List<PostEntity> searchPostList) {
+        System.out.println("mixPostList 메서등드으ㅡ으 11");
         if(searchPostList.isEmpty()) { // 검색기록에 따른 피드 내용이 없을 경우
+            System.out.println("mixPostList 메서등드으ㅡ으 22");
+            System.out.println("mixPostList 메서등드으ㅡ으 22"+manyLikePostList);
             return manyLikePostList;
         }
 
+        System.out.println("mixPostList 메서등드으ㅡ으 33");
         Set<PostEntity> mergedSet = new LinkedHashSet<>(searchPostList);
 
+        System.out.println("mixPostList 메서등드으ㅡ으 44");
         for (PostEntity post : manyLikePostList) {
+            System.out.println("mixPostList 메서등드으ㅡ으 55");
             mergedSet.add(post); // 검색기록 순의 글 목록에 좋아요 순 글 목록을 중복없이 합치기
         }
 
+        System.out.println("mixPostList 메서등드으ㅡ으 66");
         return new ArrayList<>(mergedSet);
     }
 }
