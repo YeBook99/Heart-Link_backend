@@ -9,5 +9,6 @@ public class FollowerDTO {
 	private Long followerUserId;
 	private String followerLoginId;
 	private String followerImg;
+	private boolean status;
 }
 
