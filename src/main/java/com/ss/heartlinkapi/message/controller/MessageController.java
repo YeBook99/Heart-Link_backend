@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/dm")
@@ -32,7 +33,7 @@ public class MessageController {
     public ResponseEntity<HashMap<String, Object>> getAllChatList(@AuthenticationPrincipal CustomUserDetails user) {
 
         HashMap<String, Object> response = new HashMap<>();
-        response.put("username",user.getUsername());
+        response.put("username", user.getUsername());
         List<ChatUserDTO> list = messageRoomService.getAllChatList(user.getUserId());
         response.put("chatList", list);
 
@@ -41,13 +42,17 @@ public class MessageController {
 
     //    상대방과의 대화 내역을 출력
     @GetMapping("/{msgRoomId}/detail")
-    public ResponseEntity<List<ChatMsgListDTO>> getAllChatMessage(@PathVariable("msgRoomId") Long msgRoomId) {
-        List<ChatMsgListDTO> list = messageService.getAllChatMessage(msgRoomId);
+    public ResponseEntity<HashMap<String, Object>> getAllChatMessage(@AuthenticationPrincipal CustomUserDetails user, @PathVariable("msgRoomId") Long msgRoomId) {
 
-        return ResponseEntity.ok(list);
+        HashMap<String, Object> response = new HashMap<>();
+        List<ChatMsgListDTO> list = messageService.getAllChatMessage(msgRoomId);
+        response.put("userId", user.getUserId());
+        response.put("msgList", list);
+
+        return ResponseEntity.ok(response);
     }
 
-//    텍스트 메세지를 저장
+    //    텍스트 메세지를 저장
     @PostMapping("/messages/text")
     public ResponseEntity<String> createTextMessage(@RequestBody TextMessageDTO textMessageDTO) {
 
@@ -66,40 +71,52 @@ public class MessageController {
 
     //    이미지 파일 또는 gif를 메시지 저장
     @PostMapping("/messages/img")
-    public void saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
-                                @RequestParam("msgRoomId") Long msgRoomId,
-                                @RequestParam("senderId") Long senderId) {
+    public ResponseEntity<String> saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
+                                                   @RequestParam("msgRoomId") Long msgRoomId,
+                                                   @RequestParam("senderId") Long senderId) {
 
 //        이미지가 비었는지 확인
         if (multipartFile.isEmpty()) {
-            log.error("이미지가 없습니다.");
+            return ResponseEntity.badRequest().body("no image");
+        } else {
+            try {
 
-        }
+//                파일 확장자가 이미지류인지 확인
+                String fileExtension = multipartFile.getOriginalFilename() != null
+                        ? multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf("."))
+                        : "";
 
-        try {
+                if (!fileExtension.matches("(?i)\\.(jpg|jpeg|png|gif)$")) {
+                    return ResponseEntity.badRequest().body("not support image");
+                }
+
 //            현재 heartlink-api폴더 경로를 가져옴.
-            String currentPath = Paths.get("").toAbsolutePath().toString();
+                String currentPath = Paths.get("").toAbsolutePath().toString();
 
 //            img파일 위치 경로에 파일 이름을 더해 filePath에 저장
-            String filePath = currentPath + "/src/main/resources/static/img/" + multipartFile.getOriginalFilename();
-            multipartFile.transferTo(new File(filePath));
+                String newFileName = UUID.randomUUID().toString() + fileExtension;
+                String filePath = currentPath + "/src/main/resources/static/img/" + newFileName;
+
+
+                multipartFile.transferTo(new File(filePath));
 
 //            이미지를 가져올 경로를 저장하는 과정
-            String ImportPath = "http://localhost:9090/img/" + multipartFile.getOriginalFilename();
+                String ImportPath = "http://localhost:9090/img/" + newFileName;
 
-            ChatMsgListDTO chatMsgListDTO = new ChatMsgListDTO().builder()
-                    .msgRoomId(msgRoomId)
-                    .senderId(senderId)
-                    .emoji(null)
-                    .imageUrl(ImportPath)
-                    .lastMessageTime(LocalDateTime.now())
-                    .isRead(false)
-                    .build();
+                ChatMsgListDTO chatMsgListDTO = new ChatMsgListDTO().builder()
+                        .msgRoomId(msgRoomId)
+                        .senderId(senderId)
+                        .emoji(null)
+                        .imageUrl(ImportPath)
+                        .isRead(false)
+                        .build();
 
-            messageService.saveChatMessage(chatMsgListDTO);
+                messageService.saveChatMessage(chatMsgListDTO);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.ok("save image");
         }
     }
 
@@ -135,9 +152,9 @@ public class MessageController {
     public ResponseEntity<String> blockMessage(@RequestBody BlockUserCheckDTO blockUserCheckDTO) {
 
         boolean result = false;
-        result =  messageService.blockMessage(blockUserCheckDTO);
+        result = messageService.blockMessage(blockUserCheckDTO);
 
-        if(result)
+        if (result)
             return ResponseEntity.ok("block user");
         else
             return ResponseEntity.ok("nonblock user");
