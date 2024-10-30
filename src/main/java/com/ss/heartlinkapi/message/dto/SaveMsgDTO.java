@@ -11,10 +11,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Builder
-public class ChatUserDTO {
+public class SaveMsgDTO {
     private Long msgRoomId;
-    private String userName;
-    private String userImg;
-    private String lastMessage;
-    private boolean isLogin;
+    private Long senderId;
+    private String content;
+    private String emoji;
+    private String imageUrl;
+    private LocalDateTime lastMessageTime;
+    private boolean isRead;
+
 }
