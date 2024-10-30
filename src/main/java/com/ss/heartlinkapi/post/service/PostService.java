@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.post.service;
 
 import java.io.File;
 import java.lang.System.Logger;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,7 +80,7 @@ public class PostService {
 	    postRepository.save(post);
 
 	    // 파일 저장 경로 지정
-	    String uploadDir = "C:\\heartlink\\heartlink-api\\src\\main\\resources\\static\\img\\";
+	    String uploadDir = Paths.get("").toAbsolutePath().toString();
 	    
 	    int sortOrder = 1; // 정렬 순서 초기화
 
@@ -90,13 +91,13 @@ public class PostService {
 	                String originalFileName = file.getOriginalFilename();
 	                String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf(".")) : "";
 	                
-	                if (!fileExtension.matches("\\.(jpg|jpeg|png)$")) {
+	                if (!fileExtension.matches("\\.(jpg|jpeg|png|mp4|avi|mov)$")) {
 	                    throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
 	                }
 	                
 	                // 파일 이름에 UUID 추가
 	                String newFileName = UUID.randomUUID().toString() + fileExtension;
-	                File destinationFile = new File(uploadDir + newFileName);
+	                File destinationFile = new File(uploadDir + "/src/main/resources/static/img/" + newFileName);
 	                file.transferTo(destinationFile);
 	                
 	                // 파일 URL 생성
@@ -112,7 +113,6 @@ public class PostService {
 	                // PostFileEntity 저장
 	                postFileRepository.save(postFile);
 	                
-	                // 추가된 파일 정보 로그 출력
 	                System.out.println("파일 저장 완료: " + fileUrl);
 
 	            } catch (Exception e) {
