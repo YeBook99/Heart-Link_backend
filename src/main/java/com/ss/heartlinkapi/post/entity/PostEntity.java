@@ -20,10 +20,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ss.heartlinkapi.bookmark.entity.BookmarkEntity;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
@@ -69,19 +71,29 @@ public class PostEntity {
 	
 	// Cascade 설정
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
     private List<CommentEntity> comments;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LikeEntity> likes;
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<LikeEntity> likes;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportEntity> reports;
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<ReportEntity> reports;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostFileEntity> postFiles;
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<PostFileEntity> postFiles;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookmarkEntity> bookmarks;
+    @JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<BookmarkEntity> bookmarks;
     
     
     // mention도 추가

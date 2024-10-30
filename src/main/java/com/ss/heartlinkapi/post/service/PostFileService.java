@@ -14,10 +14,14 @@ public class PostFileService {
 		this.postFileRepository = postFileRepository;
 	}
 	
+	// 게시글 작성 시 파일 업로드 메서드
+//	private final String UPLOAD_DIR
+	
+	
 	// 파일 타입 설정
 	public FileType determineFileType(String fileUrl) {
 		
-		if(fileUrl.endsWith(".jpg") || fileUrl.endsWith(".jpeg") || fileUrl.endsWith(".png") || fileUrl.endsWith(".gif")) {
+		if(fileUrl.endsWith(".jpg") || fileUrl.endsWith(".jpeg") || fileUrl.endsWith(".png")) {
 
 			return FileType.IMAGE;
 		}else if(fileUrl.endsWith(".mp4") || fileUrl.endsWith(".avi") || fileUrl.endsWith(".mov")) {

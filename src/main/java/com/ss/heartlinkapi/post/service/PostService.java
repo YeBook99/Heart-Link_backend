@@ -1,6 +1,8 @@
 package com.ss.heartlinkapi.post.service;
 
+import java.io.File;
 import java.lang.System.Logger;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,13 +10,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import org.apache.kafka.common.Uuid;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
@@ -34,6 +39,8 @@ import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
+
+import io.jsonwebtoken.io.IOException;
 
 
 @Service
@@ -59,37 +66,89 @@ public class PostService {
 
 	// 게시글 작성
 	@Transactional
-	public void savePost(PostDTO postDTO, UserEntity user) {
+	public void savePost(PostDTO postDTO, List<MultipartFile> files, UserEntity user) {
 		
-		List<PostFileDTO> fileList = postDTO.getFiles();
+		// 파일 개수 제한 검사
+	    if (files.size() > 10) {
+	        throw new IllegalArgumentException("첨부파일은 최대 10개까지만 허용됩니다.");
+	    }
+	    
+		// VIDEO 파일 개수 제한 검사
+	    long videoFileCount = files.stream()
+		    .filter(file -> {
+		        String originalFileName = file.getOriginalFilename();
+		        String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf(".")) : "";
+		        return postFileService.determineFileType(fileExtension) == FileType.VIDEO;
+		    })
+		    .count();
+	    
+	    if (videoFileCount > 1) {
+	        throw new IllegalArgumentException("비디오 파일은 최대 1개까지만 업로드할 수 있습니다.");
+	    }
 		
 		
-		PostEntity post = new PostEntity();
+	    // PostEntity 생성
+	    PostEntity post = new PostEntity();
+	    post.setUserId(user);
+	    post.setContent(postDTO.getContent());
+	    post.setVisibility(postDTO.getVisibility());
+	    post.setCreatedAt(LocalDateTime.now());
+	    post.setLikeCount(0);
+	    post.setCommentCount(0);
 
-		post.setUserId(user);
-		post.setContent(postDTO.getContent());
-		post.setVisibility(postDTO.getVisibility());
-		post.setCreatedAt(LocalDateTime.now());
-		post.setLikeCount(0);
-		post.setCommentCount(0);
-		
+	    // PostEntity 저장
+	    postRepository.save(post);
 
-		postRepository.save(post);
+	    // 파일 저장 경로 지정
+	    String uploadDir = Paths.get("").toAbsolutePath().toString();
+	    
+	    int sortOrder = 1; // 정렬 순서 초기화
 
-		
-			int sortOrder = 1;
-			for (PostFileDTO postFileDTO : fileList) {
-				PostFileEntity postFile = new PostFileEntity();
-				postFile.setPostId(post);
-				postFile.setFileUrl(postFileDTO.getFileUrl());
-				postFile.setFileType(postFileDTO.getFileType());
-				postFile.setSortOrder(sortOrder);
+	    
+	    for (MultipartFile file : files) {
+	        if (!file.isEmpty()) {
+	            try {
+	                // 파일 확장자 추출 및 검증
+	                String originalFileName = file.getOriginalFilename();
+	                String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf(".")) : "";
+	                
+	                if (!fileExtension.matches("\\.(jpg|jpeg|png|mp4|avi|mov)$")) {
+	                    throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
+	                }
+	                
+	                // 파일 이름에 UUID 추가
+	                String newFileName = UUID.randomUUID().toString() + fileExtension;
+	                File destinationFile = new File(uploadDir + "/src/main/resources/static/img/" + newFileName);
+	                file.transferTo(destinationFile);
+	                
+	                // 파일 URL 생성
+	                String fileUrl = "src/main/resources/static/img/" + newFileName;
+	                
+	                // PostFileEntity 생성
+	                PostFileEntity postFile = new PostFileEntity();
+	                postFile.setPostId(post); // postId 설정
+	                postFile.setFileUrl(fileUrl);
+	                postFile.setFileType(postFileService.determineFileType(fileExtension));
+	                postFile.setSortOrder(sortOrder++);
+	                
+	                // PostFileEntity 저장
+	                postFileRepository.save(postFile);
+	                
+	                System.out.println("파일 저장 완료: " + fileUrl);
 
-				postFileRepository.save(postFile);
-				sortOrder++;
-			}
-
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	                // 파일 저장 실패 로그 출력
+	                System.err.println("파일 저장 실패: " + file.getOriginalFilename() + " - " + e.getMessage());
+	            }
+	        } else {
+	            // 비어 있는 파일 경고 로그 출력
+	            System.err.println("비어 있는 파일: " + file.getOriginalFilename());
+	        }
+	    }
 	}
+
+
 	
 	
 	// 내 팔로잉 게시물 조회

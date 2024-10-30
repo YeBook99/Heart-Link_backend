@@ -47,9 +47,9 @@ public class LikeController {
     public ResponseEntity<String> toggleLike(
             @RequestParam(required = false) Long postId,
             @RequestParam(required = false) Long commentId,
-            @AuthenticationPrincipal UserDetails user) {
+            @AuthenticationPrincipal CustomUserDetails user) {
         
-        Long userId = 1L; // user.getUserId(); // userDetails에서 userId 추출
+        Long userId = user.getUserId();
         likeService.addOrRemoveLike(postId, userId, commentId);
         return ResponseEntity.ok("좋아요 업데이트");
     }
