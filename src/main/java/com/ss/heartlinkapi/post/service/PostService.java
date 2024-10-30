@@ -67,6 +67,26 @@ public class PostService {
 	// 게시글 작성
 	@Transactional
 	public void savePost(PostDTO postDTO, List<MultipartFile> files, UserEntity user) {
+		
+		// 파일 개수 제한 검사
+	    if (files.size() > 10) {
+	        throw new IllegalArgumentException("첨부파일은 최대 10개까지만 허용됩니다.");
+	    }
+	    
+		// VIDEO 파일 개수 제한 검사
+	    long videoFileCount = files.stream()
+		    .filter(file -> {
+		        String originalFileName = file.getOriginalFilename();
+		        String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf(".")) : "";
+		        return postFileService.determineFileType(fileExtension) == FileType.VIDEO;
+		    })
+		    .count();
+	    
+	    if (videoFileCount > 1) {
+	        throw new IllegalArgumentException("비디오 파일은 최대 1개까지만 업로드할 수 있습니다.");
+	    }
+		
+		
 	    // PostEntity 생성
 	    PostEntity post = new PostEntity();
 	    post.setUserId(user);
@@ -84,6 +104,7 @@ public class PostService {
 	    
 	    int sortOrder = 1; // 정렬 순서 초기화
 
+	    
 	    for (MultipartFile file : files) {
 	        if (!file.isEmpty()) {
 	            try {
