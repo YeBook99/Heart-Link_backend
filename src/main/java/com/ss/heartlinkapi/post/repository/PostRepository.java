@@ -45,5 +45,5 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	void deleteByUserId(UserEntity user);
 
 	// 좋아요 많은 순으로 모든 게시글 조회
-	List<PostEntity> findAllOrderByLikeCount();
+	List<PostEntity> findAllByOrderByLikeCountDesc();
 }

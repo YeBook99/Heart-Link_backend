@@ -172,26 +172,35 @@ public class SearchService {
     // 검색창 옆에 띄울 게시글 목록 가져오기
     // 좋아요 많은 순+검색기록 관련 순으로 섞고 나서 연관없는 게시글 최근순으로 가져오기
     public List<Map<String, Object>> getPost(CustomUserDetails user) {
-        List<PostEntity> manyLikePostList = postRepository.findAllOrderByLikeCount(); // 좋아요 많은 순으로 게시글 목록 조회
+        System.out.println("1");
+        List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
+        System.out.println("2");
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
+        System.out.println("3");
         List<PostEntity> searchPostList = new ArrayList<>(); // 검색기록 키워드가 포함된 피드 목록 생성
         for(SearchHistoryEntity searchHistory : searchHistoryList) { // 검색기록 리스트 순회
             if(searchHistory.getType().equals("content")) { // 만약 검색기록의 타입이 content일 때
+                System.out.println("4");
                 // 해당 키워드로 게시글 리스트 모두 조회
                 List<PostEntity> keywordFindPostList = postRepository.findAllByContentIgnoreCaseContaining(searchHistory.getKeyword());
                 for(PostEntity post : keywordFindPostList) { // 게시글을 검색기록 키워드가 포함된 목록에 저장
+                    System.out.println("5");
                     searchPostList.add(post);
                 }
             }
         }
 
         List<PostEntity> mixPostList = mixPostList(manyLikePostList, searchPostList);
+        System.out.println("6");
 
         List<Map<String, Object>> postMap = new ArrayList<>();
+        System.out.println("7");
 
         for(PostEntity post : mixPostList) {
+            System.out.println("8");
             Map<String, Object> map = new HashMap<>();
             PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
+            System.out.println("9");
             map.put("postId",post.getPostId());
             map.put("postImgUrl",file.getFileUrl());
             map.put("likeCount",post.getLikeCount());
@@ -199,6 +208,7 @@ public class SearchService {
             postMap.add(map);
         }
 
+        System.out.println("10");
         return postMap;
 
     }

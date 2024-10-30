@@ -96,17 +96,24 @@ public class SearchController {
     }
 
     // 검색창과 함께 띄울 게시글 조회
-    @GetMapping("/getPost")
-    public ResponseEntity<?> getPost(@AuthenticationPrincipal CustomUserDetails user) {
+    // 서버때문에 테스트 필요.
+    @GetMapping("/getSearchPost")
+    public ResponseEntity<?> getPostList() {
+//    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user) {
+        System.out.println("0");
+//        System.out.println("0"+user.getUserId());
         try {
-
-            if(user == null) {
-                return ResponseEntity.badRequest().body(null);
-            }
-
-            List<Map<String, Object>> postList = searchService.getPost(user);
-
-            return ResponseEntity.ok(postList);
+//            System.out.println("1"+user.getUserId());
+//            if(user == null) {
+//                return ResponseEntity.badRequest().body(null);
+//            }
+//
+//            System.out.println("2"+user.getUserId());
+//            List<Map<String, Object>> postList = searchService.getPost(user);
+//
+//            System.out.println("3"+user.getUserId());
+//            return ResponseEntity.ok(postList);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
