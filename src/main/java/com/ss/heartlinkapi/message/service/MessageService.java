@@ -40,7 +40,7 @@ public class MessageService {
             Long senderId = entity.getSenderId();
             String content = entity.getContent();
             String emoji = entity.getEmoji();
-            String imgUrl = "hello.jpg";
+            String imgUrl = entity.getImgUrl();
             boolean isRead = entity.isRead();
 
             ChatMsgListDTO chatMsgListDTO = ChatMsgListDTO.builder()
@@ -69,7 +69,6 @@ public class MessageService {
         messageEntity.setImgUrl(chatMsgListDTO.getImageUrl());
         messageEntity.setRead(chatMsgListDTO.isRead());
         messageEntity.setCreatedAt(chatMsgListDTO.getLastMessageTime());
-
         messageRepository.save(messageEntity);
     }
 
