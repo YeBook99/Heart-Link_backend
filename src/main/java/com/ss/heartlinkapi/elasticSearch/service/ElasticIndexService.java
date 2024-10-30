@@ -21,7 +21,10 @@ public class ElasticIndexService {
     private final ElasticsearchClient elasticsearchClient;
     private static final String INDEX_NAME = "search_history";
     private static final String MAPPING_FILE_PATH = "src/main/resources/elasticSearch/search_history_mapping.json";
+    private static final String USER_INDEX_NAME = "user_info";
+    private static final String USER_MAPPING_PATH = "src/main/resources/elasticSearch/user_info_mapping.json";
 
+    // 검색기록 인덱스 생성
     @PostConstruct
     public void initializeIndex(){
         try{
@@ -33,11 +36,22 @@ public class ElasticIndexService {
                 // 인덱스가 이미 존재할 경우
                 System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+INDEX_NAME);
             }
+
+            if(!indexExists(USER_INDEX_NAME)){
+                // 인덱스가 존재하지 않을 경우
+                createIndex(USER_INDEX_NAME, USER_MAPPING_PATH);
+                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+USER_INDEX_NAME);
+            } else {
+                // 인덱스가 이미 존재할 경우
+                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+USER_INDEX_NAME);
+            }
         } catch (Exception e){
             e.printStackTrace();
             System.out.println("엘라스틱서치 인덱스 생성 실패");
         }
     }
+
+
 
     // 엘라스틱 서치에서 이미 해당 인덱스가 존재하는지 체크
     private boolean indexExists(String indexName) throws Exception{
@@ -77,9 +91,10 @@ public class ElasticIndexService {
         for (Map.Entry<String, Object> entry : properties.entrySet()) {
             String propertyName = entry.getKey();
             Map<String, Object> propertyDetails = (Map<String, Object>) entry.getValue();
-            propertyMap.put(propertyName, createProperty(propertyDetails));
+            if(createProperty(propertyDetails) != null){
+                propertyMap.put(propertyName, createProperty(propertyDetails));
+            }
         }
-
         return propertyMap;
     }
 
@@ -92,10 +107,8 @@ public class ElasticIndexService {
             return Property.of(p->p.text(t->t));
         } else if (type.equals("date")){
             return Property.of(p->p.date(d->d));
-        } else {
-            throw new IllegalArgumentException("해당하는 필드 타입 없음"+type);
         }
-
+        return null;
     }
 
 }
