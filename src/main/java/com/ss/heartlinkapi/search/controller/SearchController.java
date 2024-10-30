@@ -95,6 +95,24 @@ public class SearchController {
         }
     }
 
+    // 검색창과 함께 띄울 게시글 조회
+    @GetMapping("/getPost")
+    public ResponseEntity<?> getPost(@AuthenticationPrincipal CustomUserDetails user) {
+        try {
+
+            if(user == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            List<Map<String, Object>> postList = searchService.getPost(user);
+
+            return ResponseEntity.ok(postList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 
 
 
