@@ -67,6 +67,7 @@ public class MessageRoomService {
 
 //            msg_room_id 가져오기
             Long messageRoomId = entity.getId();
+            chat.put("msgRoomId", messageRoomId);
 
 //            마지막 메시지 구하기
             String lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
