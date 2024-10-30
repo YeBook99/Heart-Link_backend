@@ -25,17 +25,21 @@ public class FollowService {
 	}
 
 	/********** 유저가 팔로우하고 있는 타 유저 목록 **********/
-	public List<FollowingDTO> getFollowingByUserId(Long userId) {
+	public List<FollowingDTO> getFollowingByUserId(Long userId,Long loginUserId) {
 		List<FollowEntity> followings = followRepository.findByFollowerUserId(userId);
 		
-        return followings.stream().map(follow -> {       	
+        return followings.stream().map(follow -> {
+        	
             UserEntity followingUser = follow.getFollowing();
             ProfileEntity followingprofile = profileRepository.findByUserEntity(followingUser);
             
             FollowingDTO following  = new FollowingDTO();
+            
+            following.setUserId(loginUserId);
             following.setFollowingUserId(followingUser.getUserId());
             following.setFollowingLoginId(followingUser.getLoginId());
             following.setFollowingImg(followingprofile.getProfile_img());
+            following.setStatus(follow.isStatus());
             
             return following;
             
@@ -43,7 +47,7 @@ public class FollowService {
 	
 	}
 	/********** 유저를 팔로우하고 있는 타 유저 목록 **********/
-	public List<FollowerDTO> getFollowersByUserId(Long userId) {
+	public List<FollowerDTO> getFollowersByUserId(Long userId,Long loginUserId) {
 	    List<FollowEntity> followers = followRepository.findByFollowingUserId(userId);
 
 	    return followers.stream().map(follow -> {
@@ -51,13 +55,21 @@ public class FollowService {
 	        ProfileEntity followerProfile = profileRepository.findByUserEntity(followerUser);
 
 	        FollowerDTO follower = new FollowerDTO();
+	        follower.setUserId(loginUserId);
 	        follower.setFollowerUserId(followerUser.getUserId());
 	        follower.setFollowerLoginId(followerUser.getLoginId());
 	        follower.setFollowerImg(followerProfile.getProfile_img());
-
+	        follower.setStatus(follow.isStatus());
+            
 	        return follower;
 	    }).collect(Collectors.toList());
 	}
 	
+	public void unfollow(Long followerId, Long followingId) {
+		
+		//FollowEntity followEntity = followRepository.findByFollowerIdAndFollowingId(followerId,followingId);
+		
+		
+	}
 
 }

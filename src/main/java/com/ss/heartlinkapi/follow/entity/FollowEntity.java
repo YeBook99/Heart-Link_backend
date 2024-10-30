@@ -40,6 +40,8 @@ public class FollowEntity {
 	@JoinColumn(name = "following_id")
 	private UserEntity following;		// 팔로우되는 회원 아이디
 	
+	private boolean status;				// 팔로우 상태(false -> 대기중)
+	
 	@CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt; 	// 생성일시
