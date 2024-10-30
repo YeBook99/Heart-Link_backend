@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.login.service;
 
+import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,12 +19,14 @@ public class LoginService {
 	private final UserRepository userRepository;
 	private final ProfileRepository profileRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
+	private final ElasticService elasticService;
 
 	public LoginService(UserRepository userRepository, ProfileRepository profileRepository,
-			BCryptPasswordEncoder passwordEncoder) {
+						BCryptPasswordEncoder passwordEncoder, ElasticService elasticService) {
 		this.userRepository = userRepository;
 		this.profileRepository = profileRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.elasticService = elasticService;
 	}
 	
 	/************ 로그인 아이디 중복 확인 ************/
@@ -51,6 +54,7 @@ public class LoginService {
 	    try {
 	        // save user
 	        userRepository.save(user);
+			elasticService.addUser(user); // elastic save user
 	        ProfileEntity profile = new ProfileEntity();
 	        profile.setUserEntity(user);
 	        profile.setNickname(joinDTO.getNickname());

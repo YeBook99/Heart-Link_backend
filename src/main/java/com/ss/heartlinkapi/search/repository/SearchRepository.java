@@ -12,9 +12,10 @@ public interface SearchRepository extends JpaRepository<SearchHistoryEntity, Lon
     // 검색어, 타입, 아이디로 검색내역 조회
     SearchHistoryEntity findByKeywordAndTypeAndUserId(String keyword, String type, UserEntity userId);
 
-    // 검색기록 조회
+    // 최근 순으로 검색기록 조회
     @Query("SELECT s FROM SearchHistoryEntity s " +
             "WHERE s.userId = :userId " +
             "ORDER BY COALESCE(s.updatedAt, s.createdAt) DESC")
     List<SearchHistoryEntity> findByUserId(UserEntity userId);
+
 }
