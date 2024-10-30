@@ -48,21 +48,8 @@ public class PostController {
 		this.bookmarkService = bookmarkService;
 	}
 	
-	// 게시글 작성 
-//	@PostMapping("/write")
-//	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
-//		
-//		try {
-//			postService.savePost(postDTO, user);
-//			return ResponseEntity.status(HttpStatus.CREATED).build();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//		}
-//		
-//	}
 	
-	// 사용자ID 안받고 하는 임시 게시글 작성 코드
+	// 게시글 작성
 	@PostMapping("/write")
 	public ResponseEntity<?> writePost(
 	        @RequestParam("post") String postJson, // JSON 문자열로 받음
