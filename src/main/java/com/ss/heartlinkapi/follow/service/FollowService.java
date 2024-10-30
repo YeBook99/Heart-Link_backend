@@ -28,14 +28,14 @@ public class FollowService {
 	public List<FollowingDTO> getFollowingByUserId(Long userId) {
 		List<FollowEntity> followings = followRepository.findByFollowerUserId(userId);
 		
-        return followings.stream().map(follow -> {       	
+        return followings.stream().map(follow -> {
             UserEntity followingUser = follow.getFollowing();
             ProfileEntity followingprofile = profileRepository.findByUserEntity(followingUser);
-            
             FollowingDTO following  = new FollowingDTO();
             following.setFollowingUserId(followingUser.getUserId());
             following.setFollowingLoginId(followingUser.getLoginId());
             following.setFollowingImg(followingprofile.getProfile_img());
+            following.setStatus(follow.isStatus());
             
             return following;
             
@@ -54,7 +54,8 @@ public class FollowService {
 	        follower.setFollowerUserId(followerUser.getUserId());
 	        follower.setFollowerLoginId(followerUser.getLoginId());
 	        follower.setFollowerImg(followerProfile.getProfile_img());
-
+	        follower.setStatus(follow.isStatus());
+            
 	        return follower;
 	    }).collect(Collectors.toList());
 	}
