@@ -70,8 +70,8 @@ public class MessageService {
         messageEntity.setEmoji(chatMsgListDTO.getEmoji());
         messageEntity.setImgUrl(chatMsgListDTO.getImageUrl());
         messageEntity.setRead(chatMsgListDTO.isRead());
-        messageEntity.setCreatedAt(chatMsgListDTO.getLastMessageTime());
         messageRepository.save(messageEntity);
+
     }
 
 
