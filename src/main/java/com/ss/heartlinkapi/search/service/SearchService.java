@@ -199,10 +199,11 @@ public class SearchService {
         for(PostEntity post : mixPostList) {
             System.out.println("8");
             Map<String, Object> map = new HashMap<>();
-            PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
+            System.out.println(postFileRepository.findByPostId(post.getPostId()));
+//            PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
             System.out.println("9");
             map.put("postId",post.getPostId());
-            map.put("postImgUrl",file.getFileUrl());
+//            map.put("postImgUrl",file.getFileUrl());
             map.put("likeCount",post.getLikeCount());
             map.put("commentCount",post.getCommentCount());
             postMap.add(map);
