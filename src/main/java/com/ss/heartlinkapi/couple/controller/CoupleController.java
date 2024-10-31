@@ -68,9 +68,7 @@ public class CoupleController {
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
-
             return ResponseEntity.ok().body(couple.getAnniversaryDate());
-
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
@@ -85,12 +83,7 @@ public class CoupleController {
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
-
-            LocalDate anniversaryDate = couple.getAnniversaryDate();
-            LocalDate today = LocalDate.now();
-            Long dday = ChronoUnit.DAYS.between(anniversaryDate, today);
-            return ResponseEntity.ok().body(dday+1);
-
+            return ResponseEntity.ok(coupleService.getDday(couple));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

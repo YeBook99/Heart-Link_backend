@@ -14,6 +14,7 @@ import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -24,6 +25,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -180,6 +182,14 @@ public class CoupleService {
     		}
     	}
     	return null;
+    }
+
+    // 디데이 일수 조회
+    public int getDday(CoupleEntity couple) {
+        LocalDate anniversaryDate = couple.getAnniversaryDate();
+        LocalDate today = LocalDate.now();
+        int dday = (int) ChronoUnit.DAYS.between(anniversaryDate, today);
+        return dday;
     }
 
 }

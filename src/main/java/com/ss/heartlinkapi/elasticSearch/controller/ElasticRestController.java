@@ -50,9 +50,9 @@ public class ElasticRestController {
 
     // 아이디 자동완성 기능
     @GetMapping("/idAuto")
-    public ResponseEntity<?> idAutoComplete(@RequestParam String prefix){
+    public ResponseEntity<?> idAutoComplete(@RequestParam String searchId){
         try {
-            return ResponseEntity.ok(elasticService.idAutoComplete(prefix));
+            return ResponseEntity.ok(elasticService.idAutoComplete(searchId));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.ok(List.of()); // 빈 리스트 반환
