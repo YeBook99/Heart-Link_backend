@@ -2,6 +2,8 @@ package com.ss.heartlinkapi.profile.service;
 
 import org.springframework.stereotype.Service;
 
+import com.ss.heartlinkapi.couple.entity.CoupleEntity;
+import com.ss.heartlinkapi.couple.repository.CoupleRepository;
 import com.ss.heartlinkapi.follow.repository.FollowRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
@@ -14,12 +16,14 @@ public class ProfileService {
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
 	private final FollowRepository followRepository;
+	private final CoupleRepository coupleRepository;
 	
 	public ProfileService(ProfileRepository profileRepository, UserRepository userRepository,
-			FollowRepository followRepository) {
+			FollowRepository followRepository, CoupleRepository coupleRepository) {
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
 		this.followRepository = followRepository;
+		this.coupleRepository = coupleRepository;
 	}
 
 	/******* 유저 아이디로 유저 엔티티 가져오는 메서드 *******/
@@ -47,6 +51,18 @@ public class ProfileService {
 	/******* 프로필 저장 메서드 *******/
 	public void save(ProfileEntity profileEntity) {
 		profileRepository.save(profileEntity);	
+	}
+	
+	/******* 커플 비공개 설정 *******/
+	public void updateIsPrivate(CoupleEntity coupleEntity) {	
+		coupleEntity.setIsPrivate(true);
+		coupleRepository.save(coupleEntity);	
+	}
+	
+	/******* 전체 공개 설정 *******/
+	public void updatePublic(CoupleEntity coupleEntity) {	
+		coupleEntity.setIsPrivate(false);
+		coupleRepository.save(coupleEntity);	
 	}
 	
 
