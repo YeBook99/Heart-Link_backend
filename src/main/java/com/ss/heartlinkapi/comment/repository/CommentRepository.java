@@ -15,4 +15,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long>{
     @Query("SELECT c FROM CommentEntity c " +
            "WHERE c.postId = :postId AND c NOT IN (SELECT r.commentId FROM ReportEntity r WHERE r.userId.id = :userId)")
     List<CommentEntity> findByPostIdAndNotReported(@Param("postId") PostEntity postId, @Param("userId") Long userId);
+
+    // 댓글 삭제
+	CommentEntity findByCommentIdAndUserId_UserId(Long commentId, Long userId);
 }

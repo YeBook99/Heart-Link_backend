@@ -20,6 +20,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.ss.heartlinkapi.like.entity.LikeEntity;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
@@ -65,7 +68,20 @@ public class CommentEntity {
 	
 	// Cascade 처리
 	@OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"commentId"})
 	private List<ReportEntity> reports;
+	
+	@OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"commentId"})
+    private List<LikeEntity> likes;
+	
+	@OneToMany(mappedBy = "parentId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"parentId"})
+	private List<CommentEntity> children;
+
 
 
 }

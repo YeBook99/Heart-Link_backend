@@ -41,7 +41,6 @@ public class CommentService {
 		comment.setPostId(post);
 		comment.setUserId(user);
 		comment.setContent(commentDTO.getContent());
-		comment.setUpdatedAt(null);
 		
 		// 댓글이 대댓글일 경우
 		if(commentDTO.getParentId() != null) {
@@ -59,7 +58,27 @@ public class CommentService {
 		post.setCommentCount(post.getCommentCount() + 1);
 		postRepository.save(post);
 				
-		
 	}
 	
+	// 댓글 삭제
+	public void deleteComment(Long commentId, Long userId) {
+	    
+	    System.out.println("Deleting comment with ID: " + commentId + " for user ID: " + userId);
+	    CommentEntity comment = commentRepository.findByCommentIdAndUserId_UserId(commentId, userId);
+	    
+	    if (comment == null) {
+	        throw new IllegalArgumentException("댓글이 존재하지 않거나 접근 권한이 없습니다.");
+	    }
+
+	    commentRepository.delete(comment);
+	    
+	    // 댓글 수 감소
+	    PostEntity post = comment.getPostId();
+	    
+	    if (post != null) {
+	        post.setCommentCount(post.getCommentCount() - 1);
+	        postRepository.save(post);
+	    }
+	}
+
 }

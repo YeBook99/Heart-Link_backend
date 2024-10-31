@@ -96,7 +96,6 @@ public class PostService {
 	    post.setUserId(user);
 	    post.setContent(postDTO.getContent());
 	    post.setVisibility(postDTO.getVisibility());
-//	    post.setCreatedAt(LocalDateTime.now());
 	    post.setLikeCount(0);
 	    post.setCommentCount(0);
 
