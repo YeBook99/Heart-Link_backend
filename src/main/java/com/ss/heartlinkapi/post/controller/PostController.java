@@ -48,41 +48,30 @@ public class PostController {
 		this.bookmarkService = bookmarkService;
 	}
 	
-	// 게시글 작성 
-//	@PostMapping("/write")
-//	public ResponseEntity<?> writePost(@RequestBody PostDTO postDTO, @AuthenticationPrincipal UserEntity user){
-//		
-//		try {
-//			postService.savePost(postDTO, user);
-//			return ResponseEntity.status(HttpStatus.CREATED).build();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//		}
-//		
-//	}
 	
-	// 사용자ID 안받고 하는 임시 게시글 작성 코드
+	// 게시글 작성
 	@PostMapping("/write")
 	public ResponseEntity<?> writePost(
 	        @RequestParam("post") String postJson, // JSON 문자열로 받음
 	        @RequestParam("files") List<MultipartFile> files,
-	        @AuthenticationPrincipal CustomUserDetails user) throws JsonMappingException, JsonProcessingException {
+	        @AuthenticationPrincipal CustomUserDetails userDetails) throws JsonMappingException, JsonProcessingException {
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    PostDTO postDTO = objectMapper.readValue(postJson, PostDTO.class);
 
-	    Long userId = user.getUserId();
+//	    Long userId = user.getUserId();
+//	    
+//	    UserEntity myId = new UserEntity();
+//	    myId.setUserId(userId);
 	    
-	    UserEntity myId = new UserEntity();
-	    myId.setUserId(userId);
-
+	    UserEntity user = userDetails.getUserEntity();
+	    
 	    // 첨부파일이 없을 때 예외
 	    if (files == null || files.isEmpty()) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("첨부파일이 최소 1개 이상 포함되어야 합니다.");
 	    }
 
 	    try {
-	        postService.savePost(postDTO, files, myId);
+	        postService.savePost(postDTO, files, user);
 	        return ResponseEntity.status(HttpStatus.CREATED).build();
 	    } catch (Exception e) {
 	        e.printStackTrace();

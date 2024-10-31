@@ -25,6 +25,8 @@ import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
 import com.ss.heartlinkapi.comment.service.CommentService;
+import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
+import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
@@ -53,8 +55,9 @@ public class PostService {
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
 	private final PostFileService postFileService;
+	private final ContentLinktagRepository contentLinktagRepository;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -62,6 +65,7 @@ public class PostService {
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
 		this.postFileService = postFileService;
+		this.contentLinktagRepository = contentLinktagRepository;
 	}
 
 	// 게시글 작성
@@ -92,12 +96,21 @@ public class PostService {
 	    post.setUserId(user);
 	    post.setContent(postDTO.getContent());
 	    post.setVisibility(postDTO.getVisibility());
-	    post.setCreatedAt(LocalDateTime.now());
+//	    post.setCreatedAt(LocalDateTime.now());
 	    post.setLikeCount(0);
 	    post.setCommentCount(0);
 
 	    // PostEntity 저장
 	    postRepository.save(post);
+	    
+	    // ContentLinktagEntity 생성
+//	    ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
+//	    contentLinktag.setBoardId(post);
+//	    contentLinktag.setCommentId(null);
+//	    contentLinktag.setLinktagId(null);	// 여길 어떻게 해야되지?
+//	    
+//	    contentLinktagRepository.save(contentLinktag);
+	    
 
 	    // 파일 저장 경로 지정
 	    String uploadDir = Paths.get("").toAbsolutePath().toString();
