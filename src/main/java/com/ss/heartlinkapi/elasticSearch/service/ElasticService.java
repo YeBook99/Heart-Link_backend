@@ -1,5 +1,9 @@
 package com.ss.heartlinkapi.elasticSearch.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.ss.heartlinkapi.elasticSearch.document.ElasticTagDocument;
 import com.ss.heartlinkapi.elasticSearch.document.ElasticUserDocument;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
@@ -11,7 +15,10 @@ import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,11 +27,14 @@ public class ElasticService {
     private final ElasticHistoryRepository elasticHistoryRepository;
     private final ElasticUserInfoRepository userInfoRepository;
     private final ElasticTagInfoRepository tagInfoRepository;
+    private final ElasticsearchClient elasticsearchClient;
 
-    public ElasticService(ElasticHistoryRepository elasticHistoryRepository, ElasticUserInfoRepository userInfoRepository, ElasticTagInfoRepository tagInfoRepository) {
+
+    public ElasticService(ElasticHistoryRepository elasticHistoryRepository, ElasticUserInfoRepository userInfoRepository, ElasticTagInfoRepository tagInfoRepository, ElasticsearchClient elasticsearchClient) {
         this.elasticHistoryRepository = elasticHistoryRepository;
         this.userInfoRepository = userInfoRepository;
         this.tagInfoRepository = tagInfoRepository;
+        this.elasticsearchClient = elasticsearchClient;
     }
 
     // 검색기록 추가
@@ -74,4 +84,55 @@ public class ElasticService {
         elasticTagDocument.setTagId(tagEntity.getId());
         return tagInfoRepository.save(elasticTagDocument);
     }
+
+    // 아이디 자동완성
+    public List<Map<String, Object>> idAutoComplete(String prefix) throws Exception {
+        // Prefix를 사용한 쿼리 생성
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index("user_info")  // 검색할 인덱스 이름 지정
+                .query(q -> q
+                        .bool(b -> b
+                                .must(m -> m
+                                        .prefix(p -> p
+                                                .field("loginId") // 검색할 필드 지정
+                                                .value(prefix) // 입력된 접두사
+                                        )
+                                )
+                        )
+                )
+        );
+
+        // 검색 요청 수행
+        SearchResponse<ElasticUserDocument> response;
+
+        try {
+            response = elasticsearchClient.search(searchRequest, ElasticUserDocument.class);
+        } catch (Exception e) {
+            // 예외 처리: 로깅이나 사용자에게 알림
+            System.err.println("Elasticsearch search failed: " + e.getMessage());
+            return List.of();  // 빈 리스트 반환
+        }
+
+        // 검색 결과에서 loginId 추출
+        List<Hit<ElasticUserDocument>> hits = response.hits().hits();
+
+        // loginId 필드 추출하여 반환
+        List<ElasticUserDocument> userList = hits.stream()
+                .map(hit -> hit.source())  // loginId 필드 추출
+                .collect(Collectors.toList());
+
+        System.out.println(userList);
+
+        List<Map<String, Object>> userMapList = new ArrayList<>();
+        for(ElasticUserDocument userDoc : userList) {
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("loginId", userDoc.getLoginId());
+            userMap.put("name", userDoc.getName());
+            userMap.put("userId", userDoc.getUserId());
+            userMapList.add(userMap);
+        }
+
+        return userMapList;
+    }
+
 }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.login.service.LoginService;
@@ -39,27 +41,26 @@ public class ProfileController {
 		this.coupleService = coupleService;
 		this.loginService = loginService;
 	}
-	
+
 	/***************** 로그인한 유저 아이디 반환 ******************/
 	@GetMapping("")
 	public ResponseEntity<?> selectProfile(@AuthenticationPrincipal CustomUserDetails loginUser) {
-		
+
 		if (loginUser == null) {
-		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유저 정보 없음");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유저 정보 없음");
 		}
-		
+
 		try {
-		    Long loginUserId = loginUser.getUserId();
-		    return ResponseEntity.ok(loginUserId);
+			Long loginUserId = loginUser.getUserId();
+			return ResponseEntity.ok(loginUserId);
 		} catch (Exception e) {
-		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버오류 : "+e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버오류 : " + e);
 		}
 	}
-	
+
 	/***************** 프로필 조회 ******************/
 	@GetMapping("/{userId}")
-	public ResponseEntity<?> selectProfile(@PathVariable Long userId,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
+	public ResponseEntity<?> selectProfile(@PathVariable Long userId) {
 
 		UserEntity userEntity = profileService.findByUserId(userId);
 		if (userEntity == null) {
@@ -83,11 +84,10 @@ public class ProfileController {
 				coupleUserId);
 		return ResponseEntity.ok(profileDTO);
 	}
-	
 
 	/***************** 내 프로필에서 비밀번호 변경 ******************/
 
-	@PostMapping("/{userId}/update/password")
+	@PatchMapping("/{userId}/update/password")
 	public ResponseEntity<?> updatePassword(@PathVariable Long userId, @RequestBody UpdatePasswordDTO updatePasswordDTO,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
 
@@ -118,7 +118,7 @@ public class ProfileController {
 	}
 
 	/***************** 애칭 수정 ******************/
-	@PostMapping("/{userId}/update/nickname")
+	@PatchMapping("/{userId}/update/nickname")
 	public ResponseEntity<?> updateNickname(@PathVariable Long userId, @RequestBody Map<String, String> request,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
 
@@ -146,7 +146,7 @@ public class ProfileController {
 	}
 
 	/***************** 상태메시지 수정 ******************/
-	@PostMapping("/{userId}/update/bio")
+	@PatchMapping("/{userId}/update/bio")
 	public ResponseEntity<?> updateProfileBio(@PathVariable Long userId, @RequestBody Map<String, String> request,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
 
@@ -172,7 +172,7 @@ public class ProfileController {
 	}
 
 	/***************** 프로필 이미지 수정 ******************/
-	@PostMapping("/{userId}/update/img")
+	@PatchMapping("/{userId}/update/img")
 	public ResponseEntity<?> updateProfileImage(@PathVariable Long userId, @RequestParam("img") MultipartFile img,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
 
@@ -223,4 +223,65 @@ public class ProfileController {
 		return ResponseEntity.ok("프로필 이미지가 성공적으로 업데이트되었습니다.");
 	}
 
+	/***************** 팔로워만 공개 설정 ******************/
+
+	@PatchMapping("/{userId}/update/private")
+	public ResponseEntity<?> updatePrivate(@PathVariable Long userId,
+			@AuthenticationPrincipal CustomUserDetails loginUser) {
+
+		UserEntity userEntity = profileService.findByUserId(userId);
+		if (userEntity == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
+		}
+
+		if (!userId.equals(loginUser.getUserId())) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
+		}
+
+		CoupleEntity coupleEntity = coupleService.findCoupleEntity(userEntity);
+
+		if (coupleEntity == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("커플 정보를 찾을 수 없습니다.");
+		}
+
+		if (coupleEntity.getIsPrivate()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 비공개 설정이 되어 있습니다.");
+		}
+
+		profileService.updateIsPrivate(coupleEntity);
+
+		return ResponseEntity.ok("커플 비공개 설정이 완료되었습니다.");
+
+	}
+	
+	/***************** 전체 공개 설정 ******************/
+	@PatchMapping("/{userId}/update/public")
+	public ResponseEntity<?> updatePublic(@PathVariable Long userId,
+	        @AuthenticationPrincipal CustomUserDetails loginUser) {
+
+	    UserEntity userEntity = profileService.findByUserId(userId);
+	    if (userEntity == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
+	    }
+
+	    if (!userId.equals(loginUser.getUserId())) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
+	    }
+
+	    CoupleEntity coupleEntity = coupleService.findCoupleEntity(userEntity);
+
+	    if (coupleEntity == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("커플 정보를 찾을 수 없습니다.");
+	    }
+
+	    if (!coupleEntity.getIsPrivate()) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 전체 공개 설정이 되어 있습니다.");
+	    }
+	    
+	    profileService.updatePublic(coupleEntity);
+	    
+	    return ResponseEntity.ok("커플 전체 공개 설정이 완료되었습니다.");
+	}
+	
+	
 }

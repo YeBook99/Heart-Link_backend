@@ -20,6 +20,9 @@ public interface FollowRepository extends JpaRepository<FollowEntity, Long>{
 	/******* 팔로워유저와 팔로잉유저로 팔로우 객체 반환 ******/
     FollowEntity findByFollowerAndFollowing(UserEntity follower, UserEntity following);
     
+	/******* 팔로워유저와 팔로잉유저로 팔로우 관계가 있는지 확인 ******/
+    boolean existsByFollowerAndFollowing(UserEntity follower, UserEntity following);
+    
 	// 특정 사용자의 팔로잉 회원 수
 	@Query("SELECT COUNT(f) FROM FollowEntity f WHERE f.follower.id = :userId")
 	int countFollowingByFollowerId(@Param("userId") Long userId);

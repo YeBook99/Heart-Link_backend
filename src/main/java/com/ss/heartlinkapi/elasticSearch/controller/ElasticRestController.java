@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.elasticSearch.controller;
 import com.ss.heartlinkapi.elasticSearch.document.ElasticTagDocument;
 import com.ss.heartlinkapi.elasticSearch.document.ElasticUserDocument;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
+import com.ss.heartlinkapi.elasticSearch.service.ElasticIndexService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.service.LinkTagService;
@@ -45,5 +46,16 @@ public class ElasticRestController {
     public ResponseEntity<?> testAddTag(@RequestParam String tagName){
         LinkTagEntity result = linkTagService.saveTag(tagName);
         return ResponseEntity.ok(result);
+    }
+
+    // 아이디 자동완성 기능
+    @GetMapping("/idAuto")
+    public ResponseEntity<?> idAutoComplete(@RequestParam String prefix){
+        try {
+            return ResponseEntity.ok(elasticService.idAutoComplete(prefix));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of()); // 빈 리스트 반환
+        }
     }
 }

@@ -34,11 +34,11 @@ public class ContentLinktagEntity {
 	private PostEntity boardId;						// 게시글 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id", nullable = false)
+	@JoinColumn(name = "comment_id")
 	private CommentEntity commentId;				// 댓글 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "linktag_id", nullable = false)
+	@JoinColumn(name = "linktag_id")
 	private LinkTagEntity linktagId;				// 링크태그 아이디
 
 }
