@@ -3,6 +3,8 @@ package com.ss.heartlinkapi.comment.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,9 +27,11 @@ public class CommentController {
 	
 	// 댓글 작성
 	@PostMapping("/{postId}/reply")
-	public ResponseEntity<?> writeComment(@RequestBody CommentDTO commentDTO, @AuthenticationPrincipal CustomUserDetails userDetails){
+	public ResponseEntity<?> writeComment(@PathVariable Long postId, @RequestBody CommentDTO commentDTO, @AuthenticationPrincipal CustomUserDetails userDetails){
 		
 		UserEntity user = userDetails.getUserEntity();
+		
+		commentDTO.setPostId(postId);
 		
 		try {
 			commentService.writeComment(commentDTO, user);
@@ -40,6 +44,26 @@ public class CommentController {
 		}
 		
 	}
+	
+	
+	
+	// 댓글 삭제
+	@DeleteMapping("/{commentId}/delete")
+	public ResponseEntity<?> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails user) {
+	    Long userId = user.getUserId();
+
+	    try {
+	        commentService.deleteComment(commentId, userId);
+	        return ResponseEntity.ok("댓글 삭제 완료");
+	    } catch (IllegalArgumentException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 삭제 중 오류가 발생했습니다.");
+	    }
+	}
+
 	
 
 }
