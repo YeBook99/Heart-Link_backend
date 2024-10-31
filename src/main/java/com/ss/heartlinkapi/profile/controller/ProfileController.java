@@ -58,8 +58,7 @@ public class ProfileController {
 	
 	/***************** 프로필 조회 ******************/
 	@GetMapping("/{userId}")
-	public ResponseEntity<?> selectProfile(@PathVariable Long userId,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
+	public ResponseEntity<?> selectProfile(@PathVariable Long userId) {
 
 		UserEntity userEntity = profileService.findByUserId(userId);
 		if (userEntity == null) {
