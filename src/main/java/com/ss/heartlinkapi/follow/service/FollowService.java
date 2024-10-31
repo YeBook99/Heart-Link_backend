@@ -78,7 +78,8 @@ public class FollowService {
 			return follower;
 		}).collect(Collectors.toList());
 	}
-
+	
+	/********** 언팔로우 **********/
 	@Transactional
 	public void unfollow(UserEntity follower, UserEntity following) {
 
@@ -94,7 +95,11 @@ public class FollowService {
 	/********** 비공계 계정이라면 팔로우 요청, 아니라면 팔로우 하는 메서드 **********/
 	@Transactional
 	public void follow(UserEntity follower, UserEntity following) {
-
+		
+	    if (followRepository.existsByFollowerAndFollowing(follower, following)) {
+	        throw new IllegalArgumentException("이미 팔로우 중입니다.");
+	    }
+		
 		CoupleEntity couple = coupleRepository.findCoupleByUserId(following.getUserId());
 		if (couple == null) {
 			throw new EntityNotFoundException();
@@ -131,7 +136,8 @@ public class FollowService {
 		followEntity.setStatus(true);
 		followRepository.save(followEntity);
 	}
-
+	
+	/********** 팔로우 요청을 거절하는 메서드 **********/
 	public void rejectFollow(UserEntity follower, UserEntity following) {
 		FollowEntity followEntity = followRepository.findByFollowerAndFollowing(follower, following);
 
