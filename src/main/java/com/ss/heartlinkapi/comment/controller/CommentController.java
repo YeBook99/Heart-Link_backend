@@ -6,11 +6,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
+import com.ss.heartlinkapi.comment.dto.CommentUpdateDTO;
 import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.user.entity.UserEntity;
@@ -48,7 +50,7 @@ public class CommentController {
 	
 	
 	// 댓글 삭제
-	@DeleteMapping("/{commentId}/delete")
+	@DeleteMapping("/{commentId}/reply/delete")
 	public ResponseEntity<?> deleteComment(@PathVariable Long commentId, @AuthenticationPrincipal CustomUserDetails user) {
 	    Long userId = user.getUserId();
 
@@ -61,6 +63,24 @@ public class CommentController {
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 삭제 중 오류가 발생했습니다.");
+	    }
+	}
+	
+	// 댓글 수정
+	@PutMapping("/{commentId}")
+	public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody CommentUpdateDTO updateDTO, @AuthenticationPrincipal CustomUserDetails user){
+		
+		Long userId = user.getUserId();
+		
+		try {
+			commentService.updateComment(commentId, userId, updateDTO);
+			return ResponseEntity.ok("댓글 수정 완료");
+	    } catch (IllegalArgumentException e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 수정 중 오류가 발생했습니다.");
 	    }
 	}
 

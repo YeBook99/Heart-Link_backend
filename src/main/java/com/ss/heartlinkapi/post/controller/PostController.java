@@ -146,10 +146,8 @@ public class PostController {
 	
 	
 	// 사용자와 사용자의 커플 게시글 목록 조회
-	@GetMapping("/couple")
-	public ResponseEntity<List<PostFileDTO>> getCouplePostFiles(@AuthenticationPrincipal CustomUserDetails user){
-		
-		Long userId =user.getUserId();
+	@GetMapping("/couple/{userId}")
+	public ResponseEntity<List<PostFileDTO>> getCouplePostFiles(@PathVariable Long userId){
 		
 		List<PostFileDTO> postFiles = postService.getPostFilesByUserId(userId);
 		
