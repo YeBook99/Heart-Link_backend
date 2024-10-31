@@ -24,8 +24,8 @@ public class ChatHandler extends TextWebSocketHandler {
 //        payload에 targetid 붙여서 같이 받은다음 파싱해서 비교하면 되지 않을까??
 
         String payload = message.getPayload();
-//        System.out.println("Received message: " + payload);
-        log.info("세션 확인 -> {}", sessions);
+        log.info("넘어온 값: {}", payload);
+//        log.info("세션 확인 -> {}", sessions);
         // 모든 사용자에게 메시지 전송
         for(WebSocketSession s : sessions.values()) {
             if(s.isOpen()&& ! s.equals(session)) {

@@ -6,6 +6,9 @@ import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -27,6 +32,24 @@ public class MessageController {
 
     private final MessageRoomService messageRoomService;
     private final MessageService messageService;
+
+    @GetMapping("/images/{filename:.+}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get("images").resolve(filename); // 'images'는 루트 디렉토리에 있는 폴더
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (MalformedURLException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     //    메세지와 관련된 모든 정보 가져오기
     @GetMapping
@@ -49,7 +72,7 @@ public class MessageController {
                 .msgRoomId(textMessageDTO.getMsgRoomId())
                 .senderId(textMessageDTO.getSenderId())
                 .content(textMessageDTO.getContent())
-                .lastMessageTime(LocalDateTime.now())
+                .messageTime(LocalDateTime.now())
                 .isRead(false)
                 .build();
 
@@ -58,56 +81,61 @@ public class MessageController {
         return ResponseEntity.ok("save message");
     }
 
-//    //    이미지 파일 또는 gif를 메시지 저장
-//    @PostMapping("/messages/img")
-//    public ResponseEntity<String> saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
-//                                                   @RequestParam("msgRoomId") Long msgRoomId,
-//                                                   @RequestParam("senderId") Long senderId) {
-//
-////        이미지가 비었는지 확인
-//        if (multipartFile.isEmpty()) {
-//            return ResponseEntity.badRequest().body("no image");
-//        } else {
-//            try {
-//
-////                파일 확장자가 이미지류인지 확인
-//                String fileExtension = multipartFile.getOriginalFilename() != null
-//                        ? multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf("."))
-//                        : "";
-//
-//                if (!fileExtension.matches("(?i)\\.(jpg|jpeg|png|gif)$")) {
-//                    return ResponseEntity.badRequest().body("not support image");
-//                }
-//
-////            현재 heartlink-api폴더 경로를 가져옴.
-//                String currentPath = Paths.get("").toAbsolutePath().toString();
-//
-////            img파일 위치 경로에 파일 이름을 더해 filePath에 저장
-//                String newFileName = UUID.randomUUID().toString() + fileExtension;
-//                String filePath = currentPath + "/src/main/resources/static/img/" + newFileName;
-//
-//
-//                multipartFile.transferTo(new File(filePath));
-//
-////            이미지를 가져올 경로를 저장하는 과정
-//                String ImportPath = "http://localhost:9090/img/" + newFileName;
-//
-//                ChatMsgListDTO chatMsgListDTO = new ChatMsgListDTO().builder()
-//                        .msgRoomId(msgRoomId)
-//                        .senderId(senderId)
-//                        .emoji(null)
-//                        .imageUrl(ImportPath)
-//                        .isRead(false)
-//                        .build();
-//
-//                messageService.saveChatMessage(chatMsgListDTO);
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return ResponseEntity.ok("save image");
-//        }
-//    }
+    //    이미지 파일 또는 gif를 메시지 저장
+    @PostMapping("/messages/img")
+    public ResponseEntity<String> saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
+                                                       @RequestParam("msgRoomId") Long msgRoomId,
+                                                       @RequestParam("senderId") Long senderId) {
+
+//        이미지가 비었는지 확인
+        if (multipartFile.isEmpty()) {
+            return ResponseEntity.badRequest().body("no file");
+
+        } else {
+            try {
+
+//                파일 확장자가 이미지 계열인지 확인
+                String fileExtension = multipartFile.getOriginalFilename() != null
+                        ? multipartFile.getOriginalFilename().substring(multipartFile.getOriginalFilename().lastIndexOf("."))
+                        : "";
+
+                if (!fileExtension.matches("(?i)\\.(jpg|jpeg|png|gif)$")) {
+                    return ResponseEntity.badRequest().body("not supported");
+                }
+
+//            현재 heartlink-api폴더 경로를 가져옴.
+                String currentPath = Paths.get("").toAbsolutePath().toString();
+
+//            img파일 위치 경로에 파일 이름을 더해 filePath에 저장
+                String newFileName = UUID.randomUUID().toString() + fileExtension;
+                String filePath = currentPath + "/images/" + newFileName;
+
+
+                multipartFile.transferTo(new File(filePath));
+
+//            이미지를 가져올 경로를 저장하는 과정
+                String importPath = "http://localhost:9090/dm/images/" + newFileName;
+
+                SaveMsgDTO saveMsgDTO = new SaveMsgDTO().builder()
+                        .msgRoomId(msgRoomId)
+                        .senderId(senderId)
+                        .emoji(null)
+                        .imageUrl(importPath)
+                        .messageTime(LocalDateTime.now())
+                        .isRead(false)
+                        .build();
+
+                messageService.saveChatMessage(saveMsgDTO);
+
+                return ResponseEntity.ok(importPath);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return ResponseEntity.ok("save good");
+    }
 
     //    비공개 사용자에게 메시지 요청보내기
     @PostMapping("/message/apply")
