@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
+import com.ss.heartlinkapi.comment.dto.CommentUpdateDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
 import com.ss.heartlinkapi.post.entity.PostEntity;
@@ -79,6 +80,23 @@ public class CommentService {
 	        post.setCommentCount(post.getCommentCount() - 1);
 	        postRepository.save(post);
 	    }
+	}
+	
+	// 댓글 수정
+	@Transactional
+	public void updateComment(Long commentId, Long userId, CommentUpdateDTO updateDTO) {
+		
+		CommentEntity comment = commentRepository.findById(commentId)
+				.orElseThrow(() -> new IllegalArgumentException("해당 댓글이 없습니다. id=" + commentId));
+		
+		if (!comment.getUserId().getUserId().equals(userId)) {
+			throw new IllegalArgumentException("권한이 없습니다. 댓글 작성자와 동일한 사용자가 아닙니다.");
+		}
+		
+		comment.setContent(updateDTO.getContent());
+		
+		commentRepository.save(comment);
+		
 	}
 
 }
