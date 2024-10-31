@@ -96,7 +96,7 @@ public class PostService {
 	    post.setUserId(user);
 	    post.setContent(postDTO.getContent());
 	    post.setVisibility(postDTO.getVisibility());
-	    post.setCreatedAt(LocalDateTime.now());
+//	    post.setCreatedAt(LocalDateTime.now());
 	    post.setLikeCount(0);
 	    post.setCommentCount(0);
 
@@ -104,12 +104,12 @@ public class PostService {
 	    postRepository.save(post);
 	    
 	    // ContentLinktagEntity 생성
-	    ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
-	    contentLinktag.setBoardId(post);
-	    contentLinktag.setCommentId(null);
-	    contentLinktag.setLinktagId(null);	// 여길 어떻게 해야되지?
-	    
-	    contentLinktagRepository.save(contentLinktag);
+//	    ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
+//	    contentLinktag.setBoardId(post);
+//	    contentLinktag.setCommentId(null);
+//	    contentLinktag.setLinktagId(null);	// 여길 어떻게 해야되지?
+//	    
+//	    contentLinktagRepository.save(contentLinktag);
 	    
 
 	    // 파일 저장 경로 지정
