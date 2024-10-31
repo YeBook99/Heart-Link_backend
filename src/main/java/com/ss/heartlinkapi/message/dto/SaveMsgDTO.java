@@ -17,7 +17,7 @@ public class SaveMsgDTO {
     private String content;
     private String emoji;
     private String imageUrl;
-    private LocalDateTime lastMessageTime;
+    private LocalDateTime messageTime;
     private boolean isRead;
 
 }
