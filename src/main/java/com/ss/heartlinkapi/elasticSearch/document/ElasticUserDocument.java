@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.elasticSearch.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,13 +15,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ElasticUserDocument {
     @Id
     @Field(type = FieldType.Keyword)
     private String documentId;
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Long)
     private Long userId;
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String loginId;
     @Field(type = FieldType.Text)
     private String name;

@@ -2,12 +2,16 @@ package com.ss.heartlinkapi.elasticSearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.mapping.Property;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import javax.annotation.PostConstruct;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,7 +26,6 @@ public class ElasticIndexService {
     private static final String INDEX_NAME = "search_history";
     private static final String MAPPING_FILE_PATH = "src/main/resources/elasticSearch/search_history_mapping.json";
     private static final String USER_INDEX_NAME = "user_info";
-    private static final String USER_MAPPING_PATH = "src/main/resources/elasticSearch/user_info_mapping.json";
     private static final String TAG_INDEX_NAME = "tag_info";
     private static final String TAG_MAPPING_PATH = "src/main/resources/elasticSearch/tag_info_mapping.json";
 
@@ -42,10 +45,12 @@ public class ElasticIndexService {
 
             if(!indexExists(USER_INDEX_NAME)){
                 // 인덱스가 존재하지 않을 경우
-                createIndex(USER_INDEX_NAME, USER_MAPPING_PATH);
+                createIdIndex();
                 System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+USER_INDEX_NAME);
             } else {
                 // 인덱스가 이미 존재할 경우
+//                deleteIndex(USER_INDEX_NAME);
+//                createIdIndex(USER_INDEX_NAME, USER_MAPPING_PATH);
                 System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+USER_INDEX_NAME);
             }
 
@@ -63,9 +68,58 @@ public class ElasticIndexService {
         }
     }
 
+    // 유저 인덱스 생성
+    public void createIdIndex() throws Exception{
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:9200/user_info";
+        String requestBody = "{\n" +
+                "  \"settings\": {\n" +
+                "    \"analysis\": {\n" +
+                "      \"normalizer\": {\n" +
+                "        \"my_normalizer\": {\n" +
+                "          \"type\": \"custom\",\n" +
+                "          \"filter\": [\"lowercase\"]\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  },\n" +
+                "  \"mappings\": {\n" +
+                "    \"properties\": {\n" +
+                "      \"userId\": {\n" +
+                "        \"type\": \"long\"\n" +
+                "      },\n" +
+                "      \"loginId\": {\n" +
+                "        \"type\": \"keyword\",\n" +
+                "        \"normalizer\": \"my_normalizer\"\n" +
+                "      },\n" +
+                "      \"name\": {\n" +
+                "        \"type\": \"text\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            restTemplate.put(url, requestEntity);
+        } catch (HttpClientErrorException e) {
+            e.printStackTrace(); // 에러 로그 출력
+        }
+    }
+
     // 엘라스틱 서치에서 이미 해당 인덱스가 존재하는지 체크
     private boolean indexExists(String indexName) throws Exception{
         return elasticsearchClient.indices().exists(ExistsRequest.of(e->e.index(indexName))).value();
+    }
+
+    // 인덱스 삭제
+    private void deleteIndex(String indexName) throws Exception {
+        elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index(indexName)));
+        System.out.println("엘라스틱 서치 인덱스 삭제 완료. 인덱스 이름: " + indexName);
     }
 
     // 인덱스 생성
@@ -110,14 +164,24 @@ public class ElasticIndexService {
     // Property 생성
     private Property createProperty(Map<String, Object> propertyDetails) {
         String type = propertyDetails.get("type").toString();
-        if(type.equals("keyword")){
-            return Property.of(p->p.keyword(k->k));
-        } else if (type.equals("text")){
-            return Property.of(p->p.text(t->t));
-        } else if (type.equals("date")){
-            return Property.of(p->p.date(d->d));
+        switch (type) {
+            case "keyword":
+                return Property.of(p -> p.keyword(k -> k));
+            case "text":
+                return Property.of(p -> p.text(t -> t));
+            case "date":
+                return Property.of(p -> p.date(d -> d));
+            case "integer":
+                return Property.of(p -> p.integer(i -> i));
+            case "float":
+                return Property.of(p -> p.float_(f -> f));
+            case "long":
+                return Property.of(p -> p.long_(l -> l));
+            case "boolean":
+                return Property.of(p -> p.boolean_(b -> b));
+            default:
+                throw new IllegalArgumentException("Unsupported property type: " + type);
         }
-        return null;
     }
 
 }

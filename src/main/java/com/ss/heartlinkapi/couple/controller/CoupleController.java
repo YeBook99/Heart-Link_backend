@@ -63,11 +63,8 @@ public class CoupleController {
     // 기념일 날짜 조회
     @GetMapping("/ddayDate")
     public ResponseEntity<?> getAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user) {
-        System.out.println("dday????????????");
-        System.out.println(user.getUserId());
         try {
             CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(user.getUserId());
-            System.out.println(couple+"dday????????????");
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
