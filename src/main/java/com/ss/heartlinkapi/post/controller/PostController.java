@@ -1,7 +1,13 @@
 package com.ss.heartlinkapi.post.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -80,36 +86,37 @@ public class PostController {
 	}
 
 	
-	// 내 게시물 조회
 	@GetMapping("")
-	public ResponseEntity<?> getFollowingPublicPosts(@AuthenticationPrincipal CustomUserDetails user){
-		Long userId = user.getUserId();
-		
-		List<PostDTO> followingPosts = postService.getPublicPostByFollowerId(userId);
-		List<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(userId);
-		
-		return ResponseEntity.ok().body(new PostsResponse(followingPosts, nonFollowedPosts));
-		
+	public ResponseEntity<?> getFollowingPublicPosts(
+	        @AuthenticationPrincipal CustomUserDetails user,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+
+	    Long userId = user.getUserId();
+	    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+	    // 팔로우하는 게시물 조회 (페이징)
+	    Page<PostDTO> followingPosts = postService.getPublicPostByFollowerId(userId, pageable);
+	    // 팔로우하지 않은 게시물 조회 (페이징)
+	    Page<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(userId, pageable);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("followingPosts", followingPosts.getContent()); // 현재 페이지의 팔로우 게시물
+	    response.put("totalFollowingPages", followingPosts.getTotalPages()); // 총 페이지 수
+	    response.put("totalFollowingElements", followingPosts.getTotalElements()); // 총 게시글 수
+	    
+	    response.put("nonFollowedPosts", nonFollowedPosts.getContent()); // 현재 페이지의 비팔로우 게시물
+	    response.put("totalNonFollowedPages", nonFollowedPosts.getTotalPages()); // 총 페이지 수
+	    response.put("totalNonFollowedElements", nonFollowedPosts.getTotalElements()); // 총 게시글 수
+
+	    return ResponseEntity.ok().body(response);
 	}
+
+
+
+
+
 	
-	private static class PostsResponse {
-		private List<PostDTO> followingPosts;
-		private List<PostDTO> nonFollowedPosts;
-		
-		public PostsResponse(List<PostDTO> followingPosts, List<PostDTO> nonFollowedPosts) {
-			this.followingPosts = followingPosts;
-			this.nonFollowedPosts = nonFollowedPosts;
-		}
-		
-		public List<PostDTO> getFollowingPosts(){
-			return followingPosts;
-		}
-		
-		public List<PostDTO> getNonFollowedPosts(){
-			return nonFollowedPosts;
-		}
-		
-	}
 	
 	// 게시글 상세보기
 	@GetMapping("/details/{postId}")

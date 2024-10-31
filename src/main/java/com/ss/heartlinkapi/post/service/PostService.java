@@ -41,6 +41,8 @@ import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import io.jsonwebtoken.io.IOException;
 
@@ -164,10 +166,9 @@ public class PostService {
 	
 	
 	// 내 팔로잉 게시물 조회
-	public List<PostDTO> getPublicPostByFollowerId(Long followerId) {
-	    List<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId);
-	    return posts.stream()
-	                .map(post -> {
+	public Page<PostDTO> getPublicPostByFollowerId(Long followerId, Pageable pageable) {
+	    Page<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId, pageable);
+	    return posts.map(post -> {
 	                    List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
 	                    List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 	                    UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
@@ -193,45 +194,43 @@ public class PostService {
 		                    partner != null ? partner.getLoginId() : "No Partner",
 		             	    partner != null ? partner.getUserId() : null
 		                );
-	                })
-	                .collect(Collectors.toList());
+	                });
 	}
 
 	
-	// 팔로우하지 않은 사용자 게시글 조회
-	public List<PostDTO> getNonFollowedAndNonReportedPosts(Long userId) {
-	    List<PostEntity> posts = postRepository.findNonFollowedAndNonReportedPosts(userId);
+	public Page<PostDTO> getNonFollowedAndNonReportedPosts(Long userId, Pageable pageable) {
+	    Page<PostEntity> posts = postRepository.findNonFollowedAndNonReportedPosts(userId, pageable);
 	 
-	    return posts.stream()
-	    		.map(post -> {
-	    			List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-	    			List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
-	    			UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
-	    			return new PostDTO(
-	    					post.getPostId(),
-	    					post.getUserId().getUserId(),
-                            post.getUserId().getLoginId(),
-                            post.getContent(),
-                            post.getCreatedAt(),
-                            post.getUpdatedAt(),
-                            post.getLikeCount(),
-                            post.getCommentCount(),
-                            post.getVisibility(),
-                            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
-                            postFiles.stream()
-                                .map(file -> new PostFileDTO(
-                                    post.getPostId(),
-                                    file.getFileUrl(),
-                                    file.getFileType(),
-                                    file.getSortOrder()))
-                                .collect(Collectors.toList()),
-                                null,
-	                    partner != null ? partner.getLoginId() : "No Partner",
-	             	    partner != null ? partner.getUserId() : null
-	    					);
-	    		})
-	    		.collect(Collectors.toList());
+	    return posts.map(post -> {
+	        List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+	        List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
+	        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+	        
+	        return new PostDTO(
+	                post.getPostId(),
+	                post.getUserId().getUserId(),
+	                post.getUserId().getLoginId(),
+	                post.getContent(),
+	                post.getCreatedAt(),
+	                post.getUpdatedAt(),
+	                post.getLikeCount(),
+	                post.getCommentCount(),
+	                post.getVisibility(),
+	                profiles != null ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
+	                postFiles.stream()
+	                    .map(file -> new PostFileDTO(
+	                        post.getPostId(),
+	                        file.getFileUrl(),
+	                        file.getFileType(),
+	                        file.getSortOrder()))
+	                    .collect(Collectors.toList()),
+	                null,
+	                partner != null ? partner.getLoginId() : "No Partner",
+	                partner != null ? partner.getUserId() : null
+	        );
+	    });
 	}
+
 	
 	// 게시글 상세보기
 	public PostDTO getPostById(Long postId, Long userId) {
