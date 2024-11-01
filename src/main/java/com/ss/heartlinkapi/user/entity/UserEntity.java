@@ -46,8 +46,8 @@ public class UserEntity {
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<SocialEntity> socialAccounts; // 소셜 엔티티 목록
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<NotificationEntity> notifications;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<NotificationEntity> notifications;
     
     @Column(name = "couple_code", length = 6)
     private String coupleCode;	// 커플 코드

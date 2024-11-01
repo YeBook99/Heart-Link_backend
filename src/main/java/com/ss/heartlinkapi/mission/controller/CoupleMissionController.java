@@ -83,7 +83,7 @@ public class CoupleMissionController {
                 return ResponseEntity.notFound().build();
             }
             missionService.writePostWithTag(tag);
-            return ResponseEntity.ok(missionService.writePostWithTag(tag););
+            return ResponseEntity.ok(missionService.writePostWithTag(tag));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
