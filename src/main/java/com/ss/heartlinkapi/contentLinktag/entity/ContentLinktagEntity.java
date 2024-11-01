@@ -30,7 +30,7 @@ public class ContentLinktagEntity {
 	private Long contentLinktagId;					// 연결 링크 태그 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "board_id")
+	@JoinColumn(name = "post_id")
 	private PostEntity boardId;						// 게시글 아이디
 	
 	@ManyToOne(fetch = FetchType.LAZY)
