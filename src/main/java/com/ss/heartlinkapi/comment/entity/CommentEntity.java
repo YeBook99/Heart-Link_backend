@@ -22,7 +22,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
+import com.ss.heartlinkapi.mention.entity.MentionEntity;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
@@ -82,6 +84,14 @@ public class CommentEntity {
 	@JsonIgnoreProperties({"parentId"})
 	private List<CommentEntity> children;
 
-
+	@OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"commentId"})
+	private List<MentionEntity> mentions;
+	
+	@OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"commentId"})
+	private List<ContentLinktagEntity> commentLinktags;
 
 }
