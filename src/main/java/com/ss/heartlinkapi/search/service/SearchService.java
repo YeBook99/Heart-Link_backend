@@ -14,12 +14,8 @@ import com.ss.heartlinkapi.search.repository.SearchRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Column;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -171,7 +167,7 @@ public class SearchService {
 
     // 검색창 옆에 띄울 게시글 목록 가져오기
     // 좋아요 많은 순+검색기록 관련 순으로 섞고 나서 연관없는 게시글 최근순으로 가져오기
-    public List<Map<String, Object>> getPost(CustomUserDetails user) {
+    public Map<String, Object> getPost(CustomUserDetails user, Integer cursor, int limit) {
         List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
         List<PostEntity> searchPostList = new ArrayList<>(); // 검색기록 키워드가 포함된 피드 목록 생성
@@ -186,18 +182,39 @@ public class SearchService {
         }
 
         List<PostEntity> mixPostList = mixPostList(manyLikePostList, searchPostList);
-        List<Map<String, Object>> postMap = new ArrayList<>();
+        List<Map<String, Object>> postList = new ArrayList<>();
 
-        for(PostEntity post : mixPostList) {
+        if(cursor == null) {
+            cursor = 0;
+        }
+
+        Integer nextCursor = (cursor + limit < mixPostList.size()) ? cursor + limit : null;
+
+        if (cursor >= mixPostList.size()) {
+            cursor = mixPostList.size() - limit;
+            if (cursor < 0) cursor = 0;
+        }
+
+        int endIndex = (nextCursor != null) ? Math.min(nextCursor, mixPostList.size()) : mixPostList.size();
+        List<PostEntity> sliceData = mixPostList.subList(cursor, endIndex);
+
+        for(PostEntity post : sliceData) {
             Map<String, Object> map = new HashMap<>();
             PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
             map.put("postId",post.getPostId());
             map.put("postImgUrl",file.getFileUrl());
             map.put("likeCount",post.getLikeCount());
             map.put("commentCount",post.getCommentCount());
-            postMap.add(map);
+            postList.add(map);
         }
-        return postMap;
+
+        Map<String, Object> postData = new HashMap<>();
+
+        postData.put("nextCursor", nextCursor);
+        postData.put("data", sliceData);
+        postData.put("hasNext", nextCursor != null && nextCursor < mixPostList.size());
+
+        return postData;
     }
 
     // 게시글 섞기 (좋아요 많은 순 + 검색기록에 따른 게시글 리스트)
