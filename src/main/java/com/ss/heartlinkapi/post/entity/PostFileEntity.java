@@ -41,4 +41,16 @@ public class PostFileEntity {
 	@Column(name = "sort_order")
 	private int sortOrder;			// 정렬 순서
 
+	
+	
+	@Override
+	public String toString() {
+	    return "PostFileEntity{" +
+	            "postFileId=" + postFileId +
+	            ", fileUrl='" + fileUrl + '\'' +
+	            '}';
+	}
 }
+
+
+
