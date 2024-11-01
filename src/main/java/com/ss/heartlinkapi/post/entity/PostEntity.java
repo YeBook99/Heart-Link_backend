@@ -44,7 +44,7 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long postId; // 게시글 id
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity userId; // 게시글 작성자 id
 	

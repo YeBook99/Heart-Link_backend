@@ -97,17 +97,12 @@ public class SearchController {
 
     // 검색창과 함께 띄울 게시글 조회
     @GetMapping("/getSearchPost")
-    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "3") int limit) {
         try {
-            System.out.println("1"+user.getUserId());
             if(user == null) {
                 return ResponseEntity.badRequest().body(null);
             }
-
-            System.out.println("2"+user.getUserId());
-            List<Map<String, Object>> postList = searchService.getPost(user);
-
-            System.out.println("3"+user.getUserId());
+            Map<String, Object> postList = searchService.getPost(user, cursor, limit);
             return ResponseEntity.ok(postList);
         } catch (Exception e) {
             e.printStackTrace();
