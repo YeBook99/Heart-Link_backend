@@ -97,11 +97,7 @@ public class SearchController {
 
     // 검색창과 함께 띄울 게시글 조회
     @GetMapping("/getSearchPost")
-<<<<<<< HEAD
-    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "30") int limit) {
-=======
     public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "3") int limit) {
->>>>>>> feature/search
         try {
             if(user == null) {
                 return ResponseEntity.badRequest().body(null);
