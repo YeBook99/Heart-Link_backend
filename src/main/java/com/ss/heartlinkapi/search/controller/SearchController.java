@@ -1,12 +1,14 @@
 package com.ss.heartlinkapi.search.controller;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -87,6 +89,21 @@ public class SearchController {
 
                 return ResponseEntity.ok(postList);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 검색창과 함께 띄울 게시글 조회
+    @GetMapping("/getSearchPost")
+    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "30") int limit) {
+        try {
+            if(user == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            Map<String, Object> postList = searchService.getPost(user, cursor, limit);
+            return ResponseEntity.ok(postList);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
