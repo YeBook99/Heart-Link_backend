@@ -18,6 +18,10 @@ public class ElasticTagDocument {
     private String documentId;
     @Field(type = FieldType.Keyword)
     private Long tagId;
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String tagName;
+    @Field(type = FieldType.Text, name = "eng_TagName")
+    private String engTagName;
+    @Field(type = FieldType.Text, name = "kor_TagName")
+    private String korTagName;
 }

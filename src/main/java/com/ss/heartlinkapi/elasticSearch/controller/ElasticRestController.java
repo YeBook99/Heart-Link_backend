@@ -58,4 +58,15 @@ public class ElasticRestController {
             return ResponseEntity.ok(List.of()); // 빈 리스트 반환
         }
     }
+
+    // 태그 자동완성 기능
+    @GetMapping("/tagAuto")
+    public ResponseEntity<?> tagAutoComplete(@RequestParam String searchTag){
+        try {
+            return ResponseEntity.ok(elasticService.tagAutoComplete(searchTag));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.ok(List.of()); // 빈 리스트 반환
+        }
+    }
 }

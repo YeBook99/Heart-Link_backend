@@ -23,44 +23,42 @@ import java.util.Map;
 public class ElasticIndexService {
 
     private final ElasticsearchClient elasticsearchClient;
-    private static final String INDEX_NAME = "search_history";
-    private static final String MAPPING_FILE_PATH = "src/main/resources/elasticSearch/search_history_mapping.json";
-    private static final String USER_INDEX_NAME = "user_info";
-    private static final String TAG_INDEX_NAME = "tag_info";
-    private static final String TAG_MAPPING_PATH = "src/main/resources/elasticSearch/tag_info_mapping.json";
 
+    RestTemplate restTemplate = new RestTemplate();
 
     // 검색기록 인덱스 생성
     @PostConstruct
     public void initializeIndex(){
         try{
-            if(!indexExists(INDEX_NAME)){
+            if(!indexExists(IndexClass.INDEX_NAME)){
                 // 인덱스가 존재하지 않을 경우
-                createIndex(INDEX_NAME, MAPPING_FILE_PATH);
-                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+INDEX_NAME);
+                createIndex(IndexClass.INDEX_NAME, IndexClass.MAPPING_FILE_PATH);
+                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+IndexClass.INDEX_NAME);
             } else {
                 // 인덱스가 이미 존재할 경우
-                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+INDEX_NAME);
+                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+IndexClass.INDEX_NAME);
             }
 
-            if(!indexExists(USER_INDEX_NAME)){
+            if(!indexExists(IndexClass.USER_INDEX_NAME)){
                 // 인덱스가 존재하지 않을 경우
                 createIdIndex();
-                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+USER_INDEX_NAME);
+                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+IndexClass.USER_INDEX_NAME);
             } else {
                 // 인덱스가 이미 존재할 경우
 //                deleteIndex(USER_INDEX_NAME);
 //                createIdIndex(USER_INDEX_NAME, USER_MAPPING_PATH);
-                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+USER_INDEX_NAME);
+                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+IndexClass.USER_INDEX_NAME);
             }
 
-            if(!indexExists(TAG_INDEX_NAME)){
+            if(!indexExists(IndexClass.TAG_INDEX_NAME)){
                 // 인덱스가 존재하지 않을 경우
-                createIndex(TAG_INDEX_NAME, TAG_MAPPING_PATH);
-                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+TAG_INDEX_NAME);
+                createTagIndex();
+                System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+IndexClass.TAG_INDEX_NAME);
             } else {
                 // 인덱스가 이미 존재할 경우
-                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+TAG_INDEX_NAME);
+                deleteIndex(IndexClass.TAG_INDEX_NAME);
+                createTagIndex();
+                System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+IndexClass.TAG_INDEX_NAME);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -70,34 +68,8 @@ public class ElasticIndexService {
 
     // 유저 인덱스 생성
     public void createIdIndex() throws Exception{
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:9200/user_info";
-        String requestBody = "{\n" +
-                "  \"settings\": {\n" +
-                "    \"analysis\": {\n" +
-                "      \"normalizer\": {\n" +
-                "        \"my_normalizer\": {\n" +
-                "          \"type\": \"custom\",\n" +
-                "          \"filter\": [\"lowercase\"]\n" +
-                "        }\n" +
-                "      }\n" +
-                "    }\n" +
-                "  },\n" +
-                "  \"mappings\": {\n" +
-                "    \"properties\": {\n" +
-                "      \"userId\": {\n" +
-                "        \"type\": \"long\"\n" +
-                "      },\n" +
-                "      \"loginId\": {\n" +
-                "        \"type\": \"keyword\",\n" +
-                "        \"normalizer\": \"my_normalizer\"\n" +
-                "      },\n" +
-                "      \"name\": {\n" +
-                "        \"type\": \"text\"\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}";
+        String indexUrl = IndexClass.URL+IndexClass.USER_INDEX_NAME;
+        String requestBody = IndexClass.USERINDEX;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -105,7 +77,24 @@ public class ElasticIndexService {
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
         try {
-            restTemplate.put(url, requestEntity);
+            restTemplate.put(indexUrl, requestEntity);
+        } catch (HttpClientErrorException e) {
+            e.printStackTrace(); // 에러 로그 출력
+        }
+    }
+
+    // 태그 인덱스 생성
+    private void createTagIndex() throws Exception{
+        String indexUrl = IndexClass.URL+IndexClass.TAG_INDEX_NAME;
+        String requestBody = IndexClass.TAGINDEX;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            restTemplate.put(indexUrl, requestEntity);
         } catch (HttpClientErrorException e) {
             e.printStackTrace(); // 에러 로그 출력
         }
@@ -121,6 +110,10 @@ public class ElasticIndexService {
         elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index(indexName)));
         System.out.println("엘라스틱 서치 인덱스 삭제 완료. 인덱스 이름: " + indexName);
     }
+
+//    private void deleteIndex(String url) throws Exception {
+//        restTemplate.delete(url);
+//    }
 
     // 인덱스 생성
     private void createIndex(String indexName, String mappingFilePath) throws Exception{
