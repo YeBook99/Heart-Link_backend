@@ -79,7 +79,7 @@ public class SecurityConfig {
                         //토큰 role값 검증 확인용
                         //.antMatchers("/user/check").hasRole("USER")
                         // 예능 전용
-                        .antMatchers("/couple/**", "/admin/**", "/search/**", "/es/**", "/ads/**").permitAll()
+                        .antMatchers("/couple/**", "/admin/**", "/search/**", "/es/**", "/ads/**", "/tag/**").permitAll()
                         .antMatchers("/dm/**","/message","/report","/notifications/**").permitAll()
 						.antMatchers("/img/**","/images/**").permitAll()
 						.antMatchers("/v2/api-docs", "/swagger-resources/**","/swagger-ui/**","/webjars/**").permitAll()
