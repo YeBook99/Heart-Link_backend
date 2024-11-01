@@ -35,6 +35,7 @@ import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.mention.entity.MentionEntity;
 import com.ss.heartlinkapi.mention.repository.MentionRepository;
+import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
@@ -67,8 +68,9 @@ public class PostService {
 	private final ContentLinktagRepository contentLinktagRepository;
 	private final LinkTagRepository linkTagRepository;
 	private final MentionRepository mentionRepository;
+	private final CoupleMissionService coupleMissionService;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -79,6 +81,7 @@ public class PostService {
 		this.contentLinktagRepository = contentLinktagRepository;
 		this.linkTagRepository = linkTagRepository;
 		this.mentionRepository = mentionRepository;
+		this.coupleMissionService = coupleMissionService;
 	}
 
 	// 게시글 작성
@@ -166,6 +169,7 @@ public class PostService {
 	    
 	    // 아이디 태그 및 해시태그 처리
 	    processTags(postDTO.getContent(), post);
+	    
 	}
 	
 	// 게시글 작성 태그처리
@@ -221,6 +225,9 @@ public class PostService {
 		}
 		
 		contentLinktagRepository.saveAll(contentLinktags);
+		
+		// 미션 서비스 추가
+		coupleMissionService.checkMissionTag(post.getCreatedAt(), contentLinktags);
 	}
 	
 
