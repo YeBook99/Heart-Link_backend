@@ -95,6 +95,8 @@ public class PostEntity {
 	@JsonIgnoreProperties({"postId"})
 	private List<BookmarkEntity> bookmarks;
     
-    
-    // mention도 추가
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<CommentEntity> mentions;
 }

@@ -44,11 +44,11 @@ public class MentionEntity {
 	UserEntity userId;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", nullable = false)
+	@JoinColumn(name = "post_id")
 	PostEntity postId;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "comment_id", nullable = false)
+	@JoinColumn(name = "comment_id")
 	CommentEntity commentId;
 	
 	@CreatedDate

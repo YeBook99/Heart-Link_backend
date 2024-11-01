@@ -82,6 +82,9 @@ public class CommentEntity {
 	@JsonIgnoreProperties({"parentId"})
 	private List<CommentEntity> children;
 
-
+	@OneToMany(mappedBy = "commentId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"commentId"})
+	private List<CommentEntity> mentions;
 
 }
