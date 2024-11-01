@@ -6,6 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.ss.heartlinkapi.aspect.NotificationAspect;
+import com.ss.heartlinkapi.notification.service.NotificationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
@@ -27,143 +32,153 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 public class LikeService {
-	
-	private final LikeRepository likeRepository;
-	private final ProfileRepository profileRepository;
-	private final PostRepository postRepository;
-	private final CommentRepository commentRepository;
-	private final UserRepository userRepository;
-	
-	public LikeService(LikeRepository likeRepository, ProfileRepository profileRepository, PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
-		this.likeRepository = likeRepository;
-		this.profileRepository = profileRepository;
-		this.postRepository = postRepository;
-		this.commentRepository = commentRepository;
-		this.userRepository = userRepository;
-	}
-	
-	// 게시글 좋아요 목록 조회
-	@Transactional
-	public List<LikeDTO> getLikesByPostId(Long postId) {
-		List<LikeEntity> likes = likeRepository.findByPostId_PostId(postId);
-		
-		
-		return likes.stream()
+
+    private final LikeRepository likeRepository;
+    private final ProfileRepository profileRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
+
+    public LikeService(LikeRepository likeRepository, ProfileRepository profileRepository, PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository, NotificationService notificationService) {
+        this.likeRepository = likeRepository;
+        this.profileRepository = profileRepository;
+        this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+        this.notificationService = notificationService;
+    }
+
+    // 게시글 좋아요 목록 조회
+    @Transactional
+    public List<LikeDTO> getLikesByPostId(Long postId) {
+        List<LikeEntity> likes = likeRepository.findByPostId_PostId(postId);
+
+
+        return likes.stream()
                 .map(like -> {
-                    
+
                     List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(like.getUserId());
 
                     return new LikeDTO(
-                        like.getLikeId(),
-                        like.getUserId().getUserId(),
-                        like.getUserId().getLoginId(),
-                        (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
-                        postId,
-                        null,
-                        like.getCreatedAt()
+                            like.getLikeId(),
+                            like.getUserId().getUserId(),
+                            like.getUserId().getLoginId(),
+                            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
+                            postId,
+                            null,
+                            like.getCreatedAt()
                     );
                 })
                 .collect(Collectors.toList());
     }
 
-	// 댓글 좋아요 목록 조회
-	public List<LikeDTO> getLikesByCommentId(Long commentId) {
+    // 댓글 좋아요 목록 조회
+    public List<LikeDTO> getLikesByCommentId(Long commentId) {
 
-		List<LikeEntity> likes = likeRepository.findByPostId_PostId(commentId);
-			
-			
-		return likes.stream()
-		            .map(like -> {
-		                
-		                List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(like.getUserId());
-		
-		                return new LikeDTO(
-		                    like.getLikeId(),
-		                    like.getUserId().getUserId(),
-		                    like.getUserId().getLoginId(),
-		                    (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
-		                    null,
-		                    commentId,
-		                    like.getCreatedAt()
-		                );
-		            })
-		            .collect(Collectors.toList());
-	}
-	
-	// 내가 누른 좋아요 목록 조회
-	public List<PostFileDTO> getPostFilesByUserId(Long userId){
-		List<PostFileEntity> postFiles = likeRepository.findLikePostFilesByUserId(userId);
-		
-		return postFiles.stream()
-				.map(file -> new PostFileDTO(
-								file.getPostId().getPostId(),
-								file.getFileUrl(),
-								file.getFileType(),
-								file.getSortOrder()
-								))
-				.collect(Collectors.toList());
+        List<LikeEntity> likes = likeRepository.findByPostId_PostId(commentId);
 
-	}
-	
-	// 좋아요 추가, 삭제
-	@Transactional
-	public boolean addOrRemoveLike(Long postId, Long userId, Long commentId) {
-	    UserEntity user = userRepository.findById(userId)
-	            .orElseThrow(() -> new IllegalArgumentException("User not found"));
-	    
-	    // 게시글 또는 댓글 엔티티 가져오기
-	    PostEntity post = null;
-	    CommentEntity comment = null;
-	    if (postId != null) {
-	        post = postRepository.findById(postId)
-	                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-	    } else if (commentId != null) {
-	        comment = commentRepository.findById(commentId)
-	                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-	    } else {
-	        throw new IllegalArgumentException("Either postId or commentId must be provided");
-	    }
 
-	    // 중복 좋아요 여부 확인
-	    Optional<LikeEntity> existingLike;
-	    
-	    // 게시글에 대한 좋아요
-	    if (post != null) {
-	        existingLike = likeRepository.findByUserIdAndPostId(user, post);
-	    // 댓글에 대한 좋아요
-	    } else {
-	        existingLike = likeRepository.findByUserIdAndCommentId(user, comment);
-	    }
+        return likes.stream()
+                .map(like -> {
 
-	    if (existingLike.isPresent()) {
-	        // 좋아요가 이미 있으면 삭제
-	        likeRepository.delete(existingLike.get());
-	        if (post != null) {
-	            post.setLikeCount(post.getLikeCount() - 1);
-	            postRepository.save(post);
-	        } else {
-	            comment.setLikeCount(comment.getLikeCount() - 1);
-	            commentRepository.save(comment);
-	        }
-	    } else {
-	        // 좋아요가 없으면 추가
-	        LikeEntity like = new LikeEntity();
-	        like.setUserId(user);
-	        if (post != null) {
-	            like.setPostId(post);
-	            post.setLikeCount(post.getLikeCount() + 1);
-	            postRepository.save(post);
-	        } else {
-	            like.setCommentId(comment);
-	            comment.setLikeCount(comment.getLikeCount() + 1);
-	            commentRepository.save(comment);
-	        }
-	        likeRepository.save(like);
-	    }
-	    return true;
-	}
+                    List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(like.getUserId());
 
-				
+                    return new LikeDTO(
+                            like.getLikeId(),
+                            like.getUserId().getUserId(),
+                            like.getUserId().getLoginId(),
+                            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
+                            null,
+                            commentId,
+                            like.getCreatedAt()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    // 내가 누른 좋아요 목록 조회
+    public List<PostFileDTO> getPostFilesByUserId(Long userId) {
+        List<PostFileEntity> postFiles = likeRepository.findLikePostFilesByUserId(userId);
+
+        return postFiles.stream()
+                .map(file -> new PostFileDTO(
+                        file.getPostId().getPostId(),
+                        file.getFileUrl(),
+                        file.getFileType(),
+                        file.getSortOrder()
+                ))
+                .collect(Collectors.toList());
+
+    }
+
+    // 좋아요 추가, 삭제
+    @Transactional
+    public boolean addOrRemoveLike(Long postId, Long userId, Long commentId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 게시글 또는 댓글 엔티티 가져오기
+        PostEntity post = null;
+        CommentEntity comment = null;
+        if (postId != null) {
+            post = postRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+
+        } else if (commentId != null) {
+            comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+        } else {
+            throw new IllegalArgumentException("Either postId or commentId must be provided");
+        }
+
+        // 중복 좋아요 여부 확인
+        Optional<LikeEntity> existingLike;
+
+        // 게시글에 대한 좋아요
+        if (post != null) {
+            existingLike = likeRepository.findByUserIdAndPostId(user, post);
+            // 댓글에 대한 좋아요
+        } else {
+            existingLike = likeRepository.findByUserIdAndCommentId(user, comment);
+        }
+
+        if (existingLike.isPresent()) {
+            // 좋아요가 이미 있으면 삭제
+            likeRepository.delete(existingLike.get());
+            if (post != null) {
+                post.setLikeCount(post.getLikeCount() - 1);
+                postRepository.save(post);
+            } else {
+                comment.setLikeCount(comment.getLikeCount() - 1);
+                commentRepository.save(comment);
+            }
+        } else {
+            // 좋아요가 없으면 추가
+            LikeEntity like = new LikeEntity();
+            like.setUserId(user);
+
+            //	사용자의 LoginId 가져오기 위해서
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String myLoginId = authentication.getName();
+
+            if (post != null) {
+                like.setPostId(post);
+                post.setLikeCount(post.getLikeCount() + 1);
+                postRepository.save(post);
+
+                notificationService.notifyLikePost(myLoginId, postId);
+            } else {
+                like.setCommentId(comment);
+                comment.setLikeCount(comment.getLikeCount() + 1);
+                commentRepository.save(comment);
+
+                notificationService.notifyLikeComment(myLoginId, postId);
+            }
+            likeRepository.save(like);
+        }
+        return true;
+    }
 
 
 }

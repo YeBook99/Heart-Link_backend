@@ -9,6 +9,5 @@ import lombok.Setter;
 @Setter
 public class NotificationTagDTO {
     private String url;
-    private String postImgUrl;
     private String message;
 }

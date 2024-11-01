@@ -10,7 +10,5 @@ import lombok.Setter;
 @Setter
 public class NotificationCommentDTO {
     private String url;
-    private String postImgUrl;
-    private Long commentId;
     private String message;
 }
