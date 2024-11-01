@@ -49,4 +49,8 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 
 	// 좋아요 많은 순으로 모든 게시글 조회
 	List<PostEntity> findAllByOrderByLikeCountDesc();
+	
+	/************* 유저로 게시글 수 조회 **************/
+	int countByUserId(UserEntity user);
+	
 }

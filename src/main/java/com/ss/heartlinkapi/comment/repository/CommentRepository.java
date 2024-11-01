@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface CommentRepository extends JpaRepository<CommentEntity, Long>{
 
@@ -18,4 +19,8 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Long>{
 
     // 댓글 삭제
 	CommentEntity findByCommentIdAndUserId_UserId(Long commentId, Long userId);
+	
+	/************* 유저로 댓글 수 조회 **************/
+	int countByUserId(UserEntity user);
+	
 }
