@@ -1,7 +1,6 @@
 package com.ss.heartlinkapi.user.entity;
 
 import java.time.LocalDateTime;
-import java.util.jar.Attributes.Name;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
