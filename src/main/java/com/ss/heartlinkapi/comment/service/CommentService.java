@@ -166,7 +166,16 @@ public class CommentService {
 			throw new IllegalArgumentException("권한이 없습니다. 댓글 작성자와 동일한 사용자가 아닙니다.");
 		}
 		
+		// 멘션 데이터 삭제
+		mentionRepository.deleteByCommentId(comment);
+		
+		// 링크 태그 데이터 삭제
+		contentLinktagRepository.deleteByCommentId(comment);
+		
 		comment.setContent(updateDTO.getContent());
+		
+		// 태그 처리
+		processTags(updateDTO.getContent(), comment);
 		
 		commentRepository.save(comment);
 		
