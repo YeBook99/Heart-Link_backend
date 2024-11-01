@@ -1,9 +1,9 @@
 package com.ss.heartlinkapi.follow.controller;
 
-import java.util.List;
-
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -57,10 +57,10 @@ public class FollowController {
 	/********** 회원이 팔로우한 유저 목록 보기 **********/
 	@GetMapping("/following/{userId}")
 	public ResponseEntity<?> getFollowing(@PathVariable Long userId,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
+			@AuthenticationPrincipal CustomUserDetails loginUser, Pageable pageable) {
 		Long loginUserId = loginUser.getUserId();
 		try {
-			List<FollowingDTO> followingList = followService.getFollowingByUserId(userId, loginUserId);
+			Page<FollowingDTO> followingList = followService.getFollowingByUserId(userId, loginUserId, pageable);
 			return ResponseEntity.ok(followingList);
 		} catch (EntityNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저가 존재하지 않습니다.");
@@ -72,10 +72,10 @@ public class FollowController {
 	/********** 회원을 팔로우한 유저 목록 보기 **********/
 	@GetMapping("/follower/{userId}")
 	public ResponseEntity<?> getFollower(@PathVariable Long userId,
-			@AuthenticationPrincipal CustomUserDetails loginUser) {
+			@AuthenticationPrincipal CustomUserDetails loginUser, Pageable pageable) {
 		Long loginUserId = loginUser.getUserId();
 		try {
-			List<FollowerDTO> followerList = followService.getFollowersByUserId(userId, loginUserId);
+			Page<FollowerDTO> followerList = followService.getFollowersByUserId(userId, loginUserId, pageable);
 			return ResponseEntity.ok(followerList);
 		} catch (EntityNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저가 존재하지 않습니다.");
