@@ -10,6 +10,7 @@ import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
 import com.ss.heartlinkapi.mission.repository.UserLinkMissionRepository;
+import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,5 +119,23 @@ public class CoupleMissionService {
     // 모든 미션 리스트 조회
     public List<LinkMissionEntity> findAllMissions() {
         return missionRepository.findAll();
+    }
+
+    // 미션태그 아이디로 미션 태그 entity 조회
+    public LinkMissionEntity findOneMissionTag(Long missionId) {
+        return missionRepository.findById(missionId).orElse(null);
+    }
+
+    // 미션태그 아이디로 태그 entity 조회
+    public LinkTagEntity findTagByMissionId(Long missionId) {
+        LinkMissionEntity mission = missionRepository.findById(missionId).orElse(null);
+        return linkTagRepository.findById(mission.getLinkTagId().getId()).orElse(null);
+    }
+
+    // 미션태그 아이디를 가지고 글 작성 페이지로 이동 시 태그 넘겨주기
+    public PostDTO writePostWithTag(LinkTagEntity tag){
+        PostDTO post = new PostDTO();
+        post.setContent("&"+tag.getKeyword()+" ");
+        return post;
     }
 }

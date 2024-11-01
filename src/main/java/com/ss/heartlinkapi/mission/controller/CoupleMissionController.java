@@ -1,7 +1,9 @@
 package com.ss.heartlinkapi.mission.controller;
 
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
+import com.ss.heartlinkapi.post.dto.PostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,6 +65,25 @@ public class CoupleMissionController {
 
             return ResponseEntity.ok(tagList);
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // 미션 클릭 시 해당 미션태그 반환
+    @GetMapping("/writeMission")
+    public ResponseEntity<?> writeMission(@RequestParam Long missionId){
+        try {
+            if(missionId == null){
+                return ResponseEntity.badRequest().build();
+            }
+            LinkTagEntity tag = missionService.findTagByMissionId(missionId);
+            if(tag == null){
+                return ResponseEntity.notFound().build();
+            }
+            missionService.writePostWithTag(tag);
+            return ResponseEntity.ok(missionService.writePostWithTag(tag););
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
