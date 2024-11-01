@@ -1,5 +1,9 @@
 package com.ss.heartlinkapi.comment.service;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -10,19 +14,34 @@ import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.dto.CommentUpdateDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
+import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
+import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
+import com.ss.heartlinkapi.mention.entity.MentionEntity;
+import com.ss.heartlinkapi.mention.repository.MentionRepository;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 
 @Service
 public class CommentService {
 	
 	private final CommentRepository commentRepository;
 	private final PostRepository postRepository;
+	private final UserRepository userRepository;
+	private final ContentLinktagRepository contentLinktagRepository;
+	private final LinkTagRepository linkTagRepository;
+	private final MentionRepository mentionRepository;
 	
-	public CommentService(CommentRepository commentRepository, PostRepository postRepository) {
+	public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository) {
 		this.commentRepository = commentRepository;
 		this.postRepository = postRepository;
+		this.userRepository = userRepository;
+		this.contentLinktagRepository = contentLinktagRepository;
+		this.linkTagRepository = linkTagRepository;
+		this.mentionRepository = mentionRepository;
 	}
 	
 	// 댓글 작성
@@ -58,7 +77,61 @@ public class CommentService {
 		// 댓글 수 증가
 		post.setCommentCount(post.getCommentCount() + 1);
 		postRepository.save(post);
+		
+		// 태그 처리
+		processTags(commentDTO.getContent(), comment);
 				
+	}
+	
+	// 댓글 작성 시 태그 처리
+	@Transactional
+	private void processTags(String content, CommentEntity comment) {
+		
+		// 아이디 태그 처리
+		Pattern userPattern = Pattern.compile("@(\\w+)");
+		Matcher userMatcher = userPattern.matcher(content);
+		
+		// 아이디 태그 있을 경우
+		while(userMatcher.find()) {
+			String username = userMatcher.group(1); // @ 생략
+			UserEntity user = userRepository.findByLoginId(username);
+			
+			// 해당 유저 있을 경우
+	        if(user != null) {
+	            // 기타 처리(알림)
+	            System.out.println("아이디 태그 처리: " + username);
+	            
+	            MentionEntity mention = new MentionEntity();
+	            mention.setUserId(user);
+	            mention.setCommentId(comment);
+	         
+	            mentionRepository.save(mention);
+	        } else {
+	            System.out.println("아이디 태그 처리 실패: " + username + "는 존재하지 않는 사용자입니다.");
+	        }
+		}
+		
+		// 링크태그 처리
+		Pattern linktagPattern = Pattern.compile("&([\\w가-힣]+)");
+		Matcher linktagMatcher = linktagPattern.matcher(content);
+		
+		List<ContentLinktagEntity> contentLinktags = new ArrayList<>();
+		
+		// 링크태그 있을 경우
+		while(linktagMatcher.find()) {
+			String keyword = linktagMatcher.group(1); // & 생략
+			LinkTagEntity linkTag = linkTagRepository.findByKeyword(keyword)
+					.orElseGet(() -> new LinkTagEntity(null, keyword));
+			linkTagRepository.save(linkTag);
+			
+			ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
+			contentLinktag.setLinktagId(linkTag);
+			contentLinktag.setCommentId(comment);
+			contentLinktags.add(contentLinktag);
+		}
+		
+		contentLinktagRepository.saveAll(contentLinktags);
+		
 	}
 	
 	// 댓글 삭제
@@ -99,6 +172,6 @@ public class CommentService {
 		
 	}
 	
-	// 댓글 작성 시 태그 처리
+	
 
 }
