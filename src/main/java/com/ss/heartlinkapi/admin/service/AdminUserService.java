@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.heartlinkapi.admin.dto.AdminUserDTO;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
@@ -36,7 +37,8 @@ public class AdminUserService {
 		this.commentRepository = commentRepository;
 		this.socialRepository = socialRepository;
 	}
-
+	
+	@Transactional(readOnly = true)
 	public Page<AdminUserDTO> getAllUsers(Pageable pageable, Long userId, String loginId, LocalDateTime startDate,
 			LocalDateTime endDate, String role) {
 
@@ -88,10 +90,7 @@ public class AdminUserService {
 			dto.setConnectedSocails(connectedSocials);
 
 			return dto;
-		}
-
-		);
-
+		});
 	}
 
 }

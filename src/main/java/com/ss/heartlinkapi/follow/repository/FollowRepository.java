@@ -2,6 +2,8 @@ package com.ss.heartlinkapi.follow.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,11 +13,11 @@ import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface FollowRepository extends JpaRepository<FollowEntity, Long>{
 	
-	/******* 유저가 팔로우하고 있는 팔로우엔티티 리스트 반환 ******/
-	List<FollowEntity> findByFollowerUserId(Long userId);
+	/******* 유저가 팔로우하고 있는 팔로우엔티티 리스트 페이징 처리 후 반환 ******/
+	Page<FollowEntity> findByFollowerUserId(Long userId, Pageable pageable);
 	
-	/******* 유저를 팔로우하고 있는 팔로우엔티티 리스트 반환 ******/
-    List<FollowEntity> findByFollowingUserId(Long userId);
+	/******* 유저를 팔로우하고 있는 팔로우엔티티 리스트 페이징 처리 후 반환 ******/
+	Page<FollowEntity> findByFollowingUserId(Long userId, Pageable pageable);
 	
 	/******* 팔로워유저와 팔로잉유저로 팔로우 객체 반환 ******/
     FollowEntity findByFollowerAndFollowing(UserEntity follower, UserEntity following);

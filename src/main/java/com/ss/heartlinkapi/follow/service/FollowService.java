@@ -1,10 +1,9 @@
 package com.ss.heartlinkapi.follow.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +36,10 @@ public class FollowService {
 
 	/********** 유저가 팔로우하고 있는 타 유저 목록 **********/
 	@Transactional(readOnly = true)
-	public List<FollowingDTO> getFollowingByUserId(Long userId, Long loginUserId) {
-		List<FollowEntity> followings = followRepository.findByFollowerUserId(userId);
+	public Page<FollowingDTO> getFollowingByUserId(Long userId, Long loginUserId, Pageable pageable) {
+		Page<FollowEntity> followings = followRepository.findByFollowerUserId(userId,pageable);
 
-		return followings.stream().map(follow -> {
+		return followings.map(follow -> {
 
 			UserEntity followingUser = follow.getFollowing();
 			ProfileEntity followingprofile = profileRepository.findByUserEntity(followingUser);
@@ -51,20 +50,21 @@ public class FollowService {
 			following.setFollowingUserId(followingUser.getUserId());
 			following.setFollowingLoginId(followingUser.getLoginId());
 			following.setFollowingImg(followingprofile.getProfile_img());
+			following.setFollowingBio(followingprofile.getBio());
 			following.setStatus(follow.isStatus());
 
 			return following;
 
-		}).collect(Collectors.toList());
+		});
 
 	}
 
 	/********** 유저를 팔로우하고 있는 타 유저 목록 **********/
 	@Transactional(readOnly = true)
-	public List<FollowerDTO> getFollowersByUserId(Long userId, Long loginUserId) {
-		List<FollowEntity> followers = followRepository.findByFollowingUserId(userId);
+	public Page<FollowerDTO> getFollowersByUserId(Long userId, Long loginUserId, Pageable pageable) {
+		Page<FollowEntity> followers = followRepository.findByFollowingUserId(userId, pageable);
 
-		return followers.stream().map(follow -> {
+		return followers.map(follow -> {
 			UserEntity followerUser = follow.getFollower();
 			ProfileEntity followerProfile = profileRepository.findByUserEntity(followerUser);
 
@@ -73,10 +73,11 @@ public class FollowService {
 			follower.setFollowerUserId(followerUser.getUserId());
 			follower.setFollowerLoginId(followerUser.getLoginId());
 			follower.setFollowerImg(followerProfile.getProfile_img());
+			follower.setFollowerBio(followerProfile.getBio());
 			follower.setStatus(follow.isStatus());
 
 			return follower;
-		}).collect(Collectors.toList());
+		});
 	}
 	
 	/********** 언팔로우 **********/
