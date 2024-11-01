@@ -28,7 +28,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ss.heartlinkapi.bookmark.entity.BookmarkEntity;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
+import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.like.entity.LikeEntity;
+import com.ss.heartlinkapi.mention.entity.MentionEntity;
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
@@ -98,5 +100,10 @@ public class PostEntity {
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	@JsonIgnoreProperties({"postId"})
-	private List<CommentEntity> mentions;
+	private List<MentionEntity> mentions;
+	
+	@OneToMany(mappedBy = "boardId", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonManagedReference
+	@JsonIgnoreProperties({"postId"})
+	private List<ContentLinktagEntity> contentLinktags;
 }

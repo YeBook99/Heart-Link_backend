@@ -98,5 +98,7 @@ public class CommentService {
 		commentRepository.save(comment);
 		
 	}
+	
+	// 댓글 작성 시 태그 처리
 
 }

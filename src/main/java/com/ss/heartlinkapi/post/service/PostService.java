@@ -33,6 +33,8 @@ import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
+import com.ss.heartlinkapi.mention.entity.MentionEntity;
+import com.ss.heartlinkapi.mention.repository.MentionRepository;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
@@ -64,8 +66,9 @@ public class PostService {
 	private final PostFileService postFileService;
 	private final ContentLinktagRepository contentLinktagRepository;
 	private final LinkTagRepository linkTagRepository;
+	private final MentionRepository mentionRepository;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -75,6 +78,7 @@ public class PostService {
 		this.postFileService = postFileService;
 		this.contentLinktagRepository = contentLinktagRepository;
 		this.linkTagRepository = linkTagRepository;
+		this.mentionRepository = mentionRepository;
 	}
 
 	// 게시글 작성
@@ -178,9 +182,14 @@ public class PostService {
 			
 			// 해당 유저 있을 경우
 	        if(user != null) {
-	            // 기타 처리(알림) ?
+	            // 기타 처리(알림)
 	            System.out.println("아이디 태그 처리: " + username);
+	            
+	            MentionEntity mention = new MentionEntity();
+	            mention.setUserId(user);
+	            mention.setPostId(post);
 	         
+	            mentionRepository.save(mention);
 	        } else {
 	            System.out.println("아이디 태그 처리 실패: " + username + "는 존재하지 않는 사용자입니다.");
 	        }
