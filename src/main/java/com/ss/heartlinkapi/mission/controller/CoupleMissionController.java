@@ -94,8 +94,18 @@ public class CoupleMissionController {
 
     // 커플의 완료된 미션 여부 반환
     @GetMapping("/missionStatus")
-    public ResponseEntity<?> missionStatus(@AuthenticationPrincipal CustomUserDetails user){
-
+    public ResponseEntity<?> missionStatus(@AuthenticationPrincipal CustomUserDetails user
+    ,@RequestParam(value = "year", required = false) Integer year, @RequestParam(value = "month", required = false) Integer month){
+       try {
+           if(user == null){
+               return ResponseEntity.badRequest().build();
+           }
+           List<Map<String, Object>> completeList = missionService.getMissionStatus(user.getUserId(), year, month);
+           return ResponseEntity.ok(completeList);
+       } catch (Exception e) {
+           e.printStackTrace();
+           return ResponseEntity.internalServerError().build();
+       }
 
     }
 

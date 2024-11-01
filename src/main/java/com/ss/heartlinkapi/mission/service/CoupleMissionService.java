@@ -3,18 +3,18 @@ package com.ss.heartlinkapi.mission.service;
 import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
+import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
-import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
 import com.ss.heartlinkapi.mission.repository.UserLinkMissionRepository;
 import com.ss.heartlinkapi.post.dto.PostDTO;
-import com.ss.heartlinkapi.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +35,8 @@ public class CoupleMissionService {
 
     @Autowired
     private CoupleRepository coupleRepository;
+    @Autowired
+    private CoupleService coupleService;
 
     // 매월 미션 태그 리스트 조회
     public List<LinkMissionEntity> findMissionByYearMonth(Integer year, Integer month) {
@@ -137,5 +139,22 @@ public class CoupleMissionService {
         PostDTO post = new PostDTO();
         post.setContent("&"+tag.getKeyword()+" ");
         return post;
+    }
+
+    // 유저 아이디로 완료된 미션태그 조회
+    public List<Map<String, Object>> getMissionStatus(Long userId, Integer year, Integer month) {
+
+        // 넘어온 날짜가 없을 경우 디폴트값 현재
+        if(year == null){
+            year = LocalDate.now().getYear();
+        }
+        if(month == null){
+            month = LocalDate.now().getMonthValue();
+        }
+
+
+
+
+        return null;
     }
 }
