@@ -39,6 +39,7 @@ public class CoupleService {
 
     @Autowired
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
+
     @Autowired
     private CoupleMissionService coupleMissionService;
 
@@ -46,7 +47,7 @@ public class CoupleService {
     @Lazy
     private PostService postService;
 
-    @PersistenceContext  // EntityManager 주입
+    @PersistenceContext
     private EntityManager entityManager;
 
     // 유저아이디로 커플객체 조회
