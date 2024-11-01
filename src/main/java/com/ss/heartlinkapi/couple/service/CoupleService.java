@@ -191,5 +191,17 @@ public class CoupleService {
         int dday = (int) ChronoUnit.DAYS.between(anniversaryDate, today);
         return dday;
     }
+    
+	/******* 커플 비공개 설정 *******/
+	public void updateIsPrivate(CoupleEntity coupleEntity) {	
+		coupleEntity.setIsPrivate(true);
+		coupleRepository.save(coupleEntity);	
+	}
+	
+	/******* 전체 공개 설정 *******/
+	public void updatePublic(CoupleEntity coupleEntity) {	
+		coupleEntity.setIsPrivate(false);
+		coupleRepository.save(coupleEntity);	
+	}
 
 }

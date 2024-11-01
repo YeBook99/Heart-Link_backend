@@ -11,7 +11,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,22 +65,9 @@ public class ProfileController {
 		if (userEntity == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
 		}
-
-		ProfileEntity userProfile = profileService.selectProfile(userEntity);
-		String userimg = userProfile.getProfile_img();
-		String bio = userProfile.getBio();
-		String loginId = userEntity.getLoginId();
-		String nickname = userProfile.getNickname();
-
-		int followingCount = profileService.selectFollowingCount(userId);
-		int followersCount = profileService.selectFollowersCount(userId);
-		UserEntity coupleUserEntity = coupleService.getCouplePartner(userId);
-		Long coupleUserId = coupleUserEntity.getUserId();
-		ProfileEntity coupleProfile = profileService.selectProfile(coupleUserEntity);
-		String pairimg = coupleProfile.getProfile_img();
-
-		ProfileDTO profileDTO = new ProfileDTO(userimg, pairimg, bio, loginId, nickname, followersCount, followingCount,
-				coupleUserId);
+		
+		ProfileDTO profileDTO = profileService.getUserProfile(userEntity);
+		
 		return ResponseEntity.ok(profileDTO);
 	}
 
@@ -248,7 +234,7 @@ public class ProfileController {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 비공개 설정이 되어 있습니다.");
 		}
 
-		profileService.updateIsPrivate(coupleEntity);
+		coupleService.updateIsPrivate(coupleEntity);
 
 		return ResponseEntity.ok("커플 비공개 설정이 완료되었습니다.");
 
@@ -278,7 +264,7 @@ public class ProfileController {
 	        return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 전체 공개 설정이 되어 있습니다.");
 	    }
 	    
-	    profileService.updatePublic(coupleEntity);
+	    coupleService.updatePublic(coupleEntity);
 	    
 	    return ResponseEntity.ok("커플 전체 공개 설정이 완료되었습니다.");
 	}

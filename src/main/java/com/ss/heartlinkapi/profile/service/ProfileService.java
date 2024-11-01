@@ -3,8 +3,9 @@ package com.ss.heartlinkapi.profile.service;
 import org.springframework.stereotype.Service;
 
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
-import com.ss.heartlinkapi.couple.repository.CoupleRepository;
+import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.follow.repository.FollowRepository;
+import com.ss.heartlinkapi.profile.dto.ProfileDTO;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
@@ -16,20 +17,46 @@ public class ProfileService {
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
 	private final FollowRepository followRepository;
-	private final CoupleRepository coupleRepository;
+	private final CoupleService coupleService;
 	
 	public ProfileService(ProfileRepository profileRepository, UserRepository userRepository,
-			FollowRepository followRepository, CoupleRepository coupleRepository) {
+			FollowRepository followRepository, CoupleService coupleService) {
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
 		this.followRepository = followRepository;
-		this.coupleRepository = coupleRepository;
+		this.coupleService = coupleService;
 	}
 
 	/******* 유저 아이디로 유저 엔티티 가져오는 메서드 *******/
 	public UserEntity findByUserId(Long userId) {
 		return userRepository.findById(userId).orElse(null);
 	}
+	
+    /******* 유저 프로필 정보 조회 메서드 *******/
+    public ProfileDTO getUserProfile(UserEntity userEntity) {
+    	
+    	Long userId = userEntity.getUserId();
+        ProfileEntity userProfile = selectProfile(userEntity);
+        int followingCount = selectFollowingCount(userId);
+        int followersCount = selectFollowersCount(userId);
+        
+        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userId);
+        Boolean isPrivate = couple.getIsPrivate();
+        UserEntity coupleUserEntity = coupleService.getCouplePartner(userId);
+        ProfileEntity coupleProfile = selectProfile(coupleUserEntity);
+        
+        return new ProfileDTO(
+            userProfile.getProfile_img(),
+            coupleProfile.getProfile_img(),
+            userProfile.getBio(),
+            userEntity.getLoginId(),
+            userProfile.getNickname(),
+            followersCount,
+            followingCount,
+            coupleUserEntity.getUserId(),
+            isPrivate
+        );
+    }
 	
 	/******* 유저로 프로필 엔티티 가져오는 메서드 *******/
 	public ProfileEntity selectProfile(UserEntity userEntity) {
@@ -53,18 +80,5 @@ public class ProfileService {
 		profileRepository.save(profileEntity);	
 	}
 	
-	/******* 커플 비공개 설정 *******/
-	public void updateIsPrivate(CoupleEntity coupleEntity) {	
-		coupleEntity.setIsPrivate(true);
-		coupleRepository.save(coupleEntity);	
-	}
-	
-	/******* 전체 공개 설정 *******/
-	public void updatePublic(CoupleEntity coupleEntity) {	
-		coupleEntity.setIsPrivate(false);
-		coupleRepository.save(coupleEntity);	
-	}
-	
-
 
 }
