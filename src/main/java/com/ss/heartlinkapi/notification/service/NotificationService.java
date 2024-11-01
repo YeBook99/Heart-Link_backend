@@ -9,6 +9,8 @@ import com.ss.heartlinkapi.notification.entity.NotificationEntity;
 import com.ss.heartlinkapi.notification.entity.Type;
 import com.ss.heartlinkapi.notification.repository.EmitterRepository;
 import com.ss.heartlinkapi.notification.repository.NotificationRepository;
+import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +34,8 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    private final PostRepository postRepository;
+
     //    구독시 연결 해제 방지를 위해 더미데이터를 보내 연결을 유지시킨다.
     public SseEmitter subscribe(Long userId) {
 
@@ -43,24 +45,44 @@ public class NotificationService {
     }
 
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
-    public void notifyLike(String userName, Long postId) {
-        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/like" + postId, "http://localhost:9090/img/고먀미1.jpeg", userName + "님이 회원님의 글을 좋아합니다.");
-        saveNotification("NEW_LIKE", notificationLikeDTO.getMessage(), 4L );
-//        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
+    public void notifyLikePost(String userName, Long postId) {
+        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 글을 좋아합니다.");
+        Optional<PostEntity> post = postRepository.findById(postId);
+        Long postWriterId = post
+                .map(p -> p.getUserId().getUserId())
+                .orElseThrow(() -> new NoSuchElementException("there is no post"));
+        saveNotification("NEW_LIKE", notificationLikeDTO.getMessage(), postWriterId);
 
-        sendToClient(4L, notificationLikeDTO);
+        sendToClient(postWriterId, notificationLikeDTO);
     }
 
-    public void notifyComment(String userName, Long postId, Long commentId) {
-        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:9090/comments/" + postId, "http://localhost:9090/img/고먀미1.jpeg", commentId, userName + "님이 댓글을 남겼습니다.");
-        saveNotification("NEW_COMMENT", notificationCommentDTO.getMessage(), 4L );
+    //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
+    public void notifyLikeComment(String userName, Long postId) {
+//        postId로 userId를 가져오는 메서드
+        Optional<PostEntity> post = postRepository.findById(postId);
+        Long postWriterId = post
+                .map(p -> p.getUserId().getUserId())
+                .orElseThrow(() -> new NoSuchElementException("there is no post"));
+        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 댓글을 좋아합니다.");
+        saveNotification("NEW_LIKE", notificationLikeDTO.getMessage(), postWriterId );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
-        sendToClient(4L, notificationCommentDTO);
+        sendToClient(postWriterId, notificationLikeDTO);
+    }
+
+    public void notifyComment(String userName, Long postId) {
+        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:9090/feed/details/" + postId,userName + "님이 댓글을 남겼습니다.");
+        Optional<PostEntity> post = postRepository.findById(postId);
+        Long postWriterId = post
+                .map(p -> p.getUserId().getUserId())
+                .orElseThrow(() -> new NoSuchElementException("there is no post"));
+        saveNotification("NEW_COMMENT", notificationCommentDTO.getMessage(), postWriterId );
+//        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
+        sendToClient(postWriterId, notificationCommentDTO);
     }
 
     public void notifyFollow(String userName, Long userId) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/follow", userName + "님이 회원님을 팔로우하였습니다.");
-        saveNotification("NEW_FOLLOW", notificationFollowDTO.getMessage(), 4L );
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
+        saveNotification("NEW_FOLLOW", notificationFollowDTO.getMessage(), userId );
         sendToClient(userId, notificationFollowDTO);
     }
 

@@ -10,6 +10,5 @@ import lombok.Setter;
 @Setter
 public class NotificationLikeDTO {
     private String url;
-    private String postImgUrl;
     private String message;
 }
