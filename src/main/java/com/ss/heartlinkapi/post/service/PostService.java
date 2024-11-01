@@ -219,10 +219,8 @@ public class PostService {
 			
 			System.out.println("저장될 ContentLinktag: " + contentLinktag);
 		}
-		System.out.println("해시태그 처리 종료");
 		
 		contentLinktagRepository.saveAll(contentLinktags);
-		System.out.println("모든 ContentLinktag가 저장되었습니다.");
 	}
 	
 
