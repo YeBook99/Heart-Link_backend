@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
@@ -18,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import org.apache.kafka.common.Uuid;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +31,8 @@ import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
+import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
@@ -58,8 +63,9 @@ public class PostService {
 	private final UserRepository userRepository;
 	private final PostFileService postFileService;
 	private final ContentLinktagRepository contentLinktagRepository;
+	private final LinkTagRepository linkTagRepository;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -68,6 +74,7 @@ public class PostService {
 		this.userRepository = userRepository;
 		this.postFileService = postFileService;
 		this.contentLinktagRepository = contentLinktagRepository;
+		this.linkTagRepository = linkTagRepository;
 	}
 
 	// 게시글 작성
@@ -103,14 +110,6 @@ public class PostService {
 
 	    // PostEntity 저장
 	    postRepository.save(post);
-	    
-	    // ContentLinktagEntity 생성
-//	    ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
-//	    contentLinktag.setBoardId(post);
-//	    contentLinktag.setCommentId(null);
-//	    contentLinktag.setLinktagId(null);	// 여길 어떻게 해야되지?
-//	    
-//	    contentLinktagRepository.save(contentLinktag);
 	    
 
 	    // 파일 저장 경로 지정
@@ -160,7 +159,63 @@ public class PostService {
 	            System.err.println("비어 있는 파일: " + file.getOriginalFilename());
 	        }
 	    }
+	    
+	    // 아이디 태그 및 해시태그 처리
+	    processTags(postDTO.getContent(), post);
 	}
+	
+	// 게시글 작성 태그처리
+	@Transactional
+	private void processTags(String content, PostEntity post) {
+		
+		// 아이디 태그 처리
+		Pattern userPattern = Pattern.compile("@(\\w+)");
+		Matcher userMatcher = userPattern.matcher(content);
+		
+		while(userMatcher.find()) {
+			String username = userMatcher.group(1); // @ 생략
+			UserEntity user = userRepository.findByLoginId(username);
+			
+			// 해당 유저 있을 경우
+	        if(user != null) {
+	            // 기타 처리(알림) ?
+	            System.out.println("아이디 태그 처리: " + username);
+	         
+	        } else {
+	            System.out.println("아이디 태그 처리 실패: " + username + "는 존재하지 않는 사용자입니다.");
+	        }
+		}
+		
+		// 해시태그 처리
+		Pattern linktagPattern = Pattern.compile("&([\\w가-힣]+)");
+		Matcher linktagMatcher = linktagPattern.matcher(content);
+		
+		List<ContentLinktagEntity> contentLinktags = new ArrayList<>();
+		
+		while(linktagMatcher.find()) {
+			System.out.println("해시태그 발견: " + linktagMatcher.group(1)); // 추가된 로깅
+			
+			String keyword = linktagMatcher.group(1); // & 생략
+			// linkTag에 내가 작성한 태그가 없으면 데이터 생성
+			LinkTagEntity linkTag = linkTagRepository.findByKeyword(keyword)
+					.orElseGet(() -> new LinkTagEntity(null, keyword));
+			linkTagRepository.save(linkTag);
+			System.out.println("저장된 LinkTag: " + linkTag.getKeyword());
+			
+			
+			ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
+			contentLinktag.setLinktagId(linkTag);
+			contentLinktag.setBoardId(post);
+			contentLinktags.add(contentLinktag);
+			
+			System.out.println("저장될 ContentLinktag: " + contentLinktag);
+		}
+		System.out.println("해시태그 처리 종료");
+		
+		contentLinktagRepository.saveAll(contentLinktags);
+		System.out.println("모든 ContentLinktag가 저장되었습니다.");
+	}
+	
 
 
 	
