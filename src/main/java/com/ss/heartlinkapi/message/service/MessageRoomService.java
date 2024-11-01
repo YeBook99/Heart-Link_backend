@@ -1,7 +1,7 @@
 package com.ss.heartlinkapi.message.service;
 
 import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
-import com.ss.heartlinkapi.message.dto.ChatUserDTO;
+import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.message.repository.MessageRoomRepository;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,53 +28,62 @@ public class MessageRoomService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
+    private final MessageService messageService;
 
-    public List<ChatUserDTO> getAllChatList(Long userId) {
+    public List<Object> getAllChatList(Long userId) {
 
-        List<ChatUserDTO> list = new ArrayList<>();
+        List<Object> chatList = new ArrayList<>();
+
+
 
         List<MessageRoomEntity> messageRoomEntities = messageRoomRepository.findByUser1IdOrUser2Id(userId, userId);
+
         log.info("entities : {}", messageRoomEntities);
         for (MessageRoomEntity entity : messageRoomEntities) {
-            Long chatUserId = 0L;
+
+            HashMap<String, Object> chat = new HashMap<>();
+            List<ChatMsgListDTO> messages = new ArrayList();
+
+            Long MyUserId = 0L;
 
 //            대화 상대 userId를 확인하는 조건문
             if (Objects.equals(entity.getUser1Id(), userId)) {
-                chatUserId = entity.getUser2Id();
+                MyUserId = entity.getUser2Id();
             } else {
-                chatUserId = entity.getUser1Id();
+                MyUserId = entity.getUser1Id();
             }
 
 //            대화 상대 entity 가져오기
-            UserEntity chatUserEntity = userRepository.findById(chatUserId).get();
+            UserEntity chatUserEntity = userRepository.findById(MyUserId).get();
 
 //            대화 상대 유저이름
-            String userName = chatUserEntity.getLoginId();
+            String otherLoginId = chatUserEntity.getLoginId();
+            chat.put("otherLoginId", otherLoginId);
 
 //            대화 상대 유저 이미지
             ProfileEntity profileEntity = profileRepository.findByUserEntity(chatUserEntity);
-            String userImg = profileEntity.getProfile_img();
+            String otherUserImg = profileEntity.getProfile_img();
+            chat.put("otherUserImg", otherUserImg);
 
 //            msg_room_id 가져오기
             Long messageRoomId = entity.getId();
+            chat.put("msgRoomId", messageRoomId);
 
 //            마지막 메시지 구하기
             String lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
+            chat.put("lastMessage", lastMessage);
 
 //            로그인 상태 확인
-            boolean isLogin = true;
+            chat.put("login", true);
 
-            new ChatUserDTO();
+//          메세지 리스트 불러오기
+            messages = messageService.getAllChatMessage(entity.getId());
+            chat.put("messages", messages);
 
-            list.add(ChatUserDTO.builder()
-                    .msgRoomId(messageRoomId)
-                    .userName(userName)
-                    .userImg(userImg)
-                    .lastMessage(lastMessage)
-                    .build());
+            chatList.add(chat);
         }
 
-        return list;
+        return chatList;
     }
 
     public void applyMessage(ApplyMessageDTO applyMessageDTO) {

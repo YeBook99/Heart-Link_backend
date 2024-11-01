@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 public class PostDTO {
 	
 	private Long postId;                // 게시글 ID
-    private String loginId;             // 작성자 ID (또는 이름)
+	private Long userId;				// 사용자 userId
+    private String loginId;             // 작성자 loginID (또는 이름)
     private String content;             // 게시글 내용
     private LocalDateTime createdAt;    // 작성 시간
     private LocalDateTime updatedAt;	// 수정 시간
@@ -27,7 +28,8 @@ public class PostDTO {
     private List<CommentDTO> comments;	// 댓글 리스트
     
     
-    private String partnerId; // 내 커플의 아이디
+    private String partnerId; // 내 커플의 login 아이디
+    private Long partnerUserId;	// 내 커플의 User 아이디
 //    private List<CommentDTO> comments;	// 댓글 리스트
     
 

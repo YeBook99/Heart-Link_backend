@@ -12,6 +12,8 @@ import com.ss.heartlinkapi.login.service.ReissueService;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -24,8 +26,22 @@ public class ReissueController {
 	}
 
 	@PostMapping("/reissue")
-	public void reissue(@RequestHeader("Refresh-Token") String refreshToken, HttpServletResponse response) {
-
+	public void reissue(@RequestHeader(value = "RefreshToken", required = false) String refreshToken, HttpServletRequest request, HttpServletResponse response) {
+		
+		String cookieRefreshToken = null;
+		Cookie[] cookies = request.getCookies();
+		if(cookies != null) {
+			for(Cookie cookie:cookies) {
+				if("RefreshToken".equals(cookie.getName())) {
+					cookieRefreshToken = cookie.getValue();
+					break;
+				}
+			}
+		}
+		if(refreshToken == null) {
+			refreshToken = cookieRefreshToken;
+		}
+		
 		ResponseEntity<Map<String, String>> result = reissueService.reissueToken(refreshToken);
 		response.setStatus(result.getStatusCodeValue());
 		response.setContentType("application/json");
@@ -33,7 +49,7 @@ public class ReissueController {
 		try {
 			if (result.getStatusCode() == HttpStatus.OK) {
 				response.setHeader("Authorization", result.getBody().get("accessToken"));
-				response.setHeader("Refresh-Token", result.getBody().get("refreshToken"));
+				response.setHeader("RefreshToken", result.getBody().get("refreshToken"));
 				response.getWriter().write(new ObjectMapper().writeValueAsString(result.getBody()));
 			} else {
 				response.getWriter().write(new ObjectMapper().writeValueAsString(result.getBody()));

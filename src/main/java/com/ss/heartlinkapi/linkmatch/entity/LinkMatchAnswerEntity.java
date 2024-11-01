@@ -21,12 +21,12 @@ public class LinkMatchAnswerEntity {
     @Column(name = "id", nullable = false)
     private Long LinkMatchAnswerId;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "users_id")
     private UserEntity userId;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "couple_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "couple_id")
     private CoupleEntity coupleId;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

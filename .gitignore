@@ -35,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### add this for apikey secret ###
+application-secret.properties

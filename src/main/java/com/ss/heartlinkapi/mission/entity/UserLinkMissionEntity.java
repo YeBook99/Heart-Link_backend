@@ -21,7 +21,7 @@ public class UserLinkMissionEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     private CoupleEntity coupleId;
     @JoinColumn(name = "link_mission_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private LinkMissionEntity linkMissionId;
     private boolean status = false;
 
