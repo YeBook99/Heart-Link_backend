@@ -36,6 +36,7 @@ import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.service.PostService;
+import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 import lombok.extern.slf4j.Slf4j;
@@ -85,15 +86,21 @@ public class PostController {
 	    }
 	}
 
-	
+	// 피드 조회
 	@GetMapping("")
 	public ResponseEntity<?> getFollowingPublicPosts(
 	        @AuthenticationPrincipal CustomUserDetails user,
 	        @RequestParam(required = false) Integer cursor,
 	        @RequestParam(defaultValue = "6") int limit) {
 
+		// 커플 해지한 사용자는 접근 불가
+		if (user.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals(Role.ROLE_SINGLE.name()))) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	                .body("커플을 해지한 사용자는 접근할 수 없습니다.");
+	    }
+		
 	    Long userId = user.getUserId();
-
+	    
 	    // 팔로우하는 게시물 조회 (커서 페이징)
 	    Map<String, Object> followingPosts = postService.getPublicPostByFollowerId(userId, cursor, limit);
 
