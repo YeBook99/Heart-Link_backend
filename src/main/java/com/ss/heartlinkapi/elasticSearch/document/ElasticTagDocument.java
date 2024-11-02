@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.elasticSearch.document;
 
 import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -12,11 +13,12 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ElasticTagDocument {
     @Id
     @Field(type = FieldType.Keyword)
     private String documentId;
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Long)
     private Long tagId;
     @Field(type = FieldType.Keyword)
     private String tagName;

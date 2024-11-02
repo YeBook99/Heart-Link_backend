@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -242,70 +244,124 @@ public class PostService {
 	
 	
 	// 내 팔로잉 게시물 조회
-	public Page<PostDTO> getPublicPostByFollowerId(Long followerId, Pageable pageable) {
-	    Page<PostEntity> posts = postRepository.findPublicPostsByFollowerId(followerId, pageable);
-	    return posts.map(post -> {
-	                    List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-	                    List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
-	                    UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
-	                    return new PostDTO(
-	                            post.getPostId(),
-	                            post.getUserId().getUserId(),
-	                            post.getUserId().getLoginId(),
-	                            post.getContent(),
-	                            post.getCreatedAt(),
-	                            post.getUpdatedAt(),
-	                            post.getLikeCount(),
-	                            post.getCommentCount(),
-	                            post.getVisibility(),
-	                            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
-	                            postFiles.stream()
-	                                .map(file -> new PostFileDTO(
-	                                    post.getPostId(),
-	                                    file.getFileUrl(),
-	                                    file.getFileType(),
-	                                    file.getSortOrder()))
-	                                .collect(Collectors.toList()),
-	                                null,
-		                    partner != null ? partner.getLoginId() : "No Partner",
-		             	    partner != null ? partner.getUserId() : null
-		                );
-	                });
-	}
+		public Map<String, Object> getPublicPostByFollowerId(Long userId, Integer cursor, int limit) {
+		    // 모든 게시물을 가져옴
+		    List<PostEntity> allPosts = postRepository.findPublicPostsByFollowerId(userId);
 
-	
-	public Page<PostDTO> getNonFollowedAndNonReportedPosts(Long userId, Pageable pageable) {
-	    Page<PostEntity> posts = postRepository.findNonFollowedAndNonReportedPosts(userId, pageable);
-	 
-	    return posts.map(post -> {
-	        List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-	        List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
-	        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
-	        
-	        return new PostDTO(
-	                post.getPostId(),
-	                post.getUserId().getUserId(),
-	                post.getUserId().getLoginId(),
-	                post.getContent(),
-	                post.getCreatedAt(),
-	                post.getUpdatedAt(),
-	                post.getLikeCount(),
-	                post.getCommentCount(),
-	                post.getVisibility(),
-	                profiles != null ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
-	                postFiles.stream()
-	                    .map(file -> new PostFileDTO(
-	                        post.getPostId(),
-	                        file.getFileUrl(),
-	                        file.getFileType(),
-	                        file.getSortOrder()))
-	                    .collect(Collectors.toList()),
-	                null,
-	                partner != null ? partner.getLoginId() : "No Partner",
-	                partner != null ? partner.getUserId() : null
-	        );
-	    });
-	}
+		    // 커서가 없는 경우 (처음 페이지)
+		    if (cursor == null) cursor = Integer.MAX_VALUE;
+		    
+		    final Integer effectiveCursor = cursor;
+
+		    // 요청된 커서 위치부터 limit만큼 자르기
+		    List<PostEntity> sliceData = allPosts.stream()
+		        .filter(post -> post.getPostId() < effectiveCursor)
+		        .limit(limit)
+		        .collect(Collectors.toList());
+
+		    // PostDTO로 변환
+		    List<PostDTO> postDTOs = sliceData.stream()
+		        .map(post -> {
+		            List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+		            List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
+		            UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+
+		            return new PostDTO(
+		                post.getPostId(),
+		                post.getUserId().getUserId(),
+		                post.getUserId().getLoginId(),
+		                post.getContent(),
+		                post.getCreatedAt(),
+		                post.getUpdatedAt(),
+		                post.getLikeCount(),
+		                post.getCommentCount(),
+		                post.getVisibility(),
+		                profiles != null && !profiles.isEmpty() ? profiles.get(0).getProfile_img() : null,
+		                postFiles.stream()
+		                    .map(file -> new PostFileDTO(
+		                        post.getPostId(),
+		                        file.getFileUrl(),
+		                        file.getFileType(),
+		                        file.getSortOrder()))
+		                    .collect(Collectors.toList()),
+		                null,
+		                partner != null ? partner.getLoginId() : "No Partner",
+		                partner != null ? partner.getUserId() : null
+		            );
+		        })
+		        .collect(Collectors.toList());
+
+		    // 다음 커서를 계산
+		    Long nextCursor = sliceData.size() < limit ? null : sliceData.get(sliceData.size() - 1).getPostId();
+
+		    // 응답 데이터 생성
+		    Map<String, Object> response = new HashMap<>();
+		    response.put("data", postDTOs);
+		    response.put("nextCursor", nextCursor);
+		    response.put("hasNext", nextCursor != null);
+
+		    return response;
+		}
+
+		// 비팔로우 및 신고되지 않은 게시물 조회
+		public Map<String, Object> getNonFollowedAndNonReportedPosts(Long userId, Integer cursor, int limit) {
+		    // 모든 게시물을 가져옴
+		    List<PostEntity> allPosts = postRepository.findNonFollowedAndNonReportedPosts(userId);
+
+		    // 커서가 없는 경우 (처음 페이지)
+		    if (cursor == null) cursor = Integer.MAX_VALUE;
+		    
+		    final Integer effectiveCursor = cursor;
+
+		    // 요청된 커서 위치부터 limit만큼 자르기
+		    List<PostEntity> sliceData = allPosts.stream()
+		    	    .filter(post -> post.getPostId() < effectiveCursor)
+		    	    .limit(limit)
+		    	    .collect(Collectors.toList());
+
+		    // PostDTO로 변환
+		    List<PostDTO> postDTOs = sliceData.stream()
+		        .map(post -> {
+		            List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+		            List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
+		            UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+
+		            return new PostDTO(
+		                post.getPostId(),
+		                post.getUserId().getUserId(),
+		                post.getUserId().getLoginId(),
+		                post.getContent(),
+		                post.getCreatedAt(),
+		                post.getUpdatedAt(),
+		                post.getLikeCount(),
+		                post.getCommentCount(),
+		                post.getVisibility(),
+		                profiles != null && !profiles.isEmpty() ? profiles.get(0).getProfile_img() : null,
+		                postFiles.stream()
+		                    .map(file -> new PostFileDTO(
+		                        post.getPostId(),
+		                        file.getFileUrl(),
+		                        file.getFileType(),
+		                        file.getSortOrder()))
+		                    .collect(Collectors.toList()),
+		                null,
+		                partner != null ? partner.getLoginId() : "No Partner",
+		                partner != null ? partner.getUserId() : null
+		            );
+		        })
+		        .collect(Collectors.toList());
+
+		    // 다음 커서를 계산
+		    Long nextCursor = sliceData.size() < limit ? null : sliceData.get(sliceData.size() - 1).getPostId();
+
+		    // 응답 데이터 생성
+		    Map<String, Object> response = new HashMap<>();
+		    response.put("data", postDTOs);
+		    response.put("nextCursor", nextCursor);
+		    response.put("hasNext", nextCursor != null);
+
+		    return response;
+		}
 
 	
 	// 게시글 상세보기
@@ -368,30 +424,49 @@ public class PostService {
 	}
 	
 	// 사용자와 사용자의 커플 게시글 목록 가져오기
-	public List<PostFileDTO> getPostFilesByUserId(Long userId){
-		UserEntity partner = coupleService.getCouplePartner(userId);
-		List<PostFileEntity> myPostFiles = postFileRepository.findPostFilesByUserId(userId);
-		
-		List<PostFileEntity> partnerPostFiles = new ArrayList<>();
+	public Map<String, Object> getPostFilesByUserId(Long userId, Integer cursor, int limit) {
+	    UserEntity partner = coupleService.getCouplePartner(userId);
+	    
+	    List<PostFileEntity> myPostFiles = postFileRepository.findPostFilesByUserId(userId);
+	    List<PostFileEntity> partnerPostFiles = new ArrayList<>();
+	    
 	    if (partner != null) {
 	        partnerPostFiles = postFileRepository.findPostFilesByUserId(partner.getUserId());
 	    }
-		
-		List<PostFileEntity> allPostFiles = new ArrayList<>();
-		allPostFiles.addAll(myPostFiles);
-		allPostFiles.addAll(partnerPostFiles);
-		
-		
-		return allPostFiles.stream()
-				.map(file -> new PostFileDTO(
-								file.getPostId().getPostId(),
-								file.getFileUrl(),
-								file.getFileType(),
-								file.getSortOrder()
-								))
-				.collect(Collectors.toList());
-		
+	    
+	    List<PostFileEntity> allPostFiles = new ArrayList<>();
+	    allPostFiles.addAll(myPostFiles);
+	    allPostFiles.addAll(partnerPostFiles);
+
+	    // 커서가 없는 경우 (처음 페이지)
+	    if (cursor == null) cursor = 0;
+
+	    // 요청된 커서 위치부터 limit만큼 자르기
+	    int endIndex = Math.min(cursor + limit, allPostFiles.size());
+	    List<PostFileEntity> sliceData = allPostFiles.subList(cursor, endIndex);
+
+	    // PostFileDTO로 변환
+	    List<PostFileDTO> postFileDTOs = sliceData.stream()
+	            .map(file -> new PostFileDTO(
+	                    file.getPostId().getPostId(),
+	                    file.getFileUrl(),
+	                    file.getFileType(),
+	                    file.getSortOrder()
+	            ))
+	            .collect(Collectors.toList());
+
+	    // 다음 커서를 계산
+	    Integer nextCursor = (endIndex < allPostFiles.size()) ? endIndex : null;
+
+	    // 응답 데이터 생성
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("data", postFileDTOs);
+	    response.put("nextCursor", nextCursor);
+	    response.put("hasNext", nextCursor != null);
+
+	    return response;
 	}
+
 	
 	// 게시글 삭제
 	public void deleteMyPost(Long postId, Long userId) {

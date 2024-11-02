@@ -1,6 +1,8 @@
 package com.ss.heartlinkapi.bookmark.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,19 +33,39 @@ public class BookmarkService {
 	}
 	
 	// 내가 누른 북마크 목록 조회
-	public List<PostFileDTO> getBokkmarkPostFilesByUserId(Long userId){
-		List<PostFileEntity> postFiles = bookmarkRepository.findBokkmarkPostFilesByUserId(userId);
-		
-		return postFiles.stream()
-				.map(file -> new PostFileDTO(
-								file.getPostId().getPostId(),
-								file.getFileUrl(),
-								file.getFileType(),
-								file.getSortOrder()
-								))
-				.collect(Collectors.toList());
-		
+	public Map<String, Object> getBookmarkPostFilesByUserId(Long userId, Integer cursor, int limit) {
+	    List<PostFileEntity> allPostFiles = bookmarkRepository.findBookmarkPostFilesByUserId(userId); // 전체 데이터를 가져옴
+
+	    // 커서가 없는 경우 (처음 페이지)
+	    if (cursor == null) cursor = 0;
+
+	    // 요청된 커서 위치부터 limit만큼 자르기
+	    int endIndex = Math.min(cursor + limit, allPostFiles.size());
+	    List<PostFileEntity> sliceData = allPostFiles.subList(cursor, endIndex);
+
+	    // PostFileDTO로 변환
+	    List<PostFileDTO> postFileDTOs = sliceData.stream()
+	            .map(file -> new PostFileDTO(
+	                    file.getPostId().getPostId(),
+	                    file.getFileUrl(),
+	                    file.getFileType(),
+	                    file.getSortOrder()
+	            ))
+	            .collect(Collectors.toList());
+
+	    // 다음 커서를 계산
+	    Integer nextCursor = (endIndex < allPostFiles.size()) ? endIndex : null;
+
+	    // 응답 데이터 생성
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("data", postFileDTOs);
+	    response.put("nextCursor", nextCursor);
+	    response.put("hasNext", nextCursor != null);
+
+	    return response;
 	}
+
+
 	
 	// 북마크 추가, 삭제
 	@Transactional
