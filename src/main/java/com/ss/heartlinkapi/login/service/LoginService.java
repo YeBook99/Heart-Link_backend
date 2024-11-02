@@ -48,6 +48,9 @@ public class LoginService {
 
 		// 이미 있는 회원 400(bad request)
 		if (isUser(joinDTO.getPhone())) {
+			if (isSocialUser(joinDTO.getPhone())) {
+				throw new IllegalArgumentException("소셜 회원으로 가입된 계정입니다. 비밀번호를 입력해주세요.");
+			}
 			throw new IllegalArgumentException("이미 존재하는 회원입니다.");
 		}
 
@@ -76,13 +79,14 @@ public class LoginService {
 		if (!CheckPhone.isPhoneValid(joinDTO.getPhone())) {
 			throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다.");
 		}
-		
-	    // 이메일 형식 확인
-	    if (!isEmailValid(joinDTO.getEmail())) {
-	        throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
-	    }
+
+		// 이메일 형식 확인
+		if (!isEmailValid(joinDTO.getEmail())) {
+			throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+		}
 	}
 
+	/*************** 회원 가입 ****************/
 	@Transactional
 	public boolean saveUser(JoinDTO joinDTO) {
 		UserEntity user = new UserEntity();
@@ -109,6 +113,12 @@ public class LoginService {
 			return false;
 		}
 	}
+	
+	/************ 전화번호로 소셜 사용자인지 확인 ************/
+	@Transactional(readOnly = true)
+	private boolean isSocialUser(String phone) {
+		return userRepository.existsByPhoneAndPasswordIsNull(phone);
+	}
 
 	/************ 로그인 아이디로 유저 찾기 ************/
 	@Transactional(readOnly = true)
@@ -134,10 +144,11 @@ public class LoginService {
 	public boolean checkPassword(UserEntity user, String Password) {
 		return passwordEncoder.matches(Password, user.getPassword());
 	}
+
 	/************ 이메일 형식 검증 ************/
 	private boolean isEmailValid(String email) {
-	    String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
-	    return Pattern.compile(emailRegex).matcher(email).matches();
+		String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+		return Pattern.compile(emailRegex).matcher(email).matches();
 	}
 
 }

@@ -5,11 +5,13 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ss.heartlinkapi.login.dto.AccountLinkingDTO;
 import com.ss.heartlinkapi.login.dto.JoinDTO;
 import com.ss.heartlinkapi.login.dto.UpdatePasswordDTO;
 import com.ss.heartlinkapi.login.service.CheckPassword;
@@ -60,9 +62,39 @@ public class LoginController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러: " + e.getMessage());
 		}
 	}
+	
+	/********** 소셜 계정 연동 시 비밀번호 생성 **********/
+	@PatchMapping("account/linking")
+	public ResponseEntity<?> linkAccount(@RequestBody AccountLinkingDTO dto){
+		
+		String phone = dto.getPhone();
+		String password = dto.getPassword();
+		
+		if (!CheckPassword.isPasswordValid(password)) {
+			return ResponseEntity.badRequest().body("비밀번호는 8~16자 이내이며, 특수문자, 영어, 숫자를 모두 포함해야 합니다.");
+		}
+		// 전화번호 확인
+		if (!CheckPhone.isPhoneValid(phone)) {
+			return ResponseEntity.badRequest().body("전화번호 형식이 올바르지 않습니다.");
+		}
+		// 전화번호로 유저 찾기
+		UserEntity user = loginService.findByPhone(phone);
+		if (user == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저가 존재하지 않습니다.");
+		}
+		
+		boolean isUpdated = loginService.updatePassword(user, password);
+		if (isUpdated) {
+			return ResponseEntity.ok("비밀번호가 성공적으로 설정되었습니다.");
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("비밀번호 설정 실패");
+		}
+		
+	}
+	
 
 	/********** 로그인 창에서의 전화번호 변경 **********/
-	@PostMapping("/update/password")
+	@PatchMapping("/update/password")
 	public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
 
 		String phone = updatePasswordDTO.getPhone();
@@ -99,7 +131,7 @@ public class LoginController {
 	}
 
 	/********** 로그인 창에서의 아이디 찾기 **********/
-	@PostMapping("/find/loginId")
+	@GetMapping("/find/loginId")
 	public ResponseEntity<?> findId(@RequestBody Map<String, String> request) {
 
 		String phone = request.get("phone");
