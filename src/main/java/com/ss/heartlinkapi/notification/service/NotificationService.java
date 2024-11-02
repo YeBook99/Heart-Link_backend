@@ -51,7 +51,7 @@ public class NotificationService {
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
-        saveNotification("NEW_LIKE", notificationLikeDTO.getMessage(), postWriterId);
+        saveNotification("MESSAGE_LIKE", notificationLikeDTO.getMessage(), postWriterId);
 
         sendToClient(postWriterId, notificationLikeDTO);
     }
@@ -64,7 +64,7 @@ public class NotificationService {
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
         NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 댓글을 좋아합니다.");
-        saveNotification("NEW_LIKE", notificationLikeDTO.getMessage(), postWriterId );
+        saveNotification("COMMENT_LIKE", notificationLikeDTO.getMessage(), postWriterId );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationLikeDTO);
     }
@@ -75,18 +75,23 @@ public class NotificationService {
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
-        saveNotification("NEW_COMMENT", notificationCommentDTO.getMessage(), postWriterId );
+        saveNotification("COMMENT", notificationCommentDTO.getMessage(), postWriterId );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationCommentDTO);
     }
-
+    //      팔로우 요청 시 알람
     public void notifyFollow(String userName, Long userId) {
         NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
-        saveNotification("NEW_FOLLOW", notificationFollowDTO.getMessage(), userId );
+        saveNotification("FOLLOW", notificationFollowDTO.getMessage(), userId );
         sendToClient(userId, notificationFollowDTO);
     }
-
-    //  실질적으로 client에게 메세지를 전달해주는 메서드
+    //      비공개 유저 팔로우 요청
+    public void notifyFollowPrivate(String userName, Long userId) {
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
+        saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId );
+        sendToClient(userId, notificationFollowDTO);
+    }
+    //      실질적으로 client에게 메세지를 전달해주는 메서드
     private void sendToClient(Long userId, Object data) {
 
         SseEmitter emitter = emitterRepository.get(userId);
@@ -112,7 +117,7 @@ public class NotificationService {
 
         return emitter;
     }
-
+    //      알람 저장
     private void saveNotification(String type, String message, Long userId){
         UserEntity user = new UserEntity();
         user.setUserId(userId);
@@ -125,7 +130,7 @@ public class NotificationService {
 
         notificationRepository.save(notificationEntity);
     }
-
+    //      내 알람 리스트 불러오기
     public List<NotificationDTO> getNotifications(CustomUserDetails user) {
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(user.getUserId());
