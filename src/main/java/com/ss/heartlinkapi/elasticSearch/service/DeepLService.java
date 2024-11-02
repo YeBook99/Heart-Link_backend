@@ -27,8 +27,8 @@ public class DeepLService {
 
         Map<String, Object> body = new HashMap<>();
         body.put("text", new String[]{text});
-        body.put("target_lang", from);
-        body.put("source_lang", to);
+        body.put("source_lang", from);
+        body.put("target_lang", to);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 

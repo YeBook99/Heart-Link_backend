@@ -110,4 +110,21 @@ public class SearchController {
         }
     }
 
+    // 언급 시 보여줄 아이디 리스트 (팔로우 우선+모든 아이디)
+    @GetMapping("/mentionId")
+    public ResponseEntity<?> mentionId(@AuthenticationPrincipal CustomUserDetails user) {
+        try{
+            if(user == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+        List<Map<String, Object>> userList = searchService.mentionIdList(user.getUserEntity());
+        return ResponseEntity.ok(userList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }

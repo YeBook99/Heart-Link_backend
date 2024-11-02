@@ -56,8 +56,8 @@ public class ElasticIndexService {
                 System.out.println("엘라스틱 서치 인덱스 생성 완료. 인덱스 이름 : "+IndexClass.TAG_INDEX_NAME);
             } else {
                 // 인덱스가 이미 존재할 경우
-                deleteIndex(IndexClass.TAG_INDEX_NAME);
-                createTagIndex();
+//                deleteIndex(IndexClass.TAG_INDEX_NAME);
+//                createTagIndex();
                 System.out.println("엘라스틱 서치 인덱스가 이미 존재함. 인덱스 이름 : "+IndexClass.TAG_INDEX_NAME);
             }
         } catch (Exception e){
@@ -110,10 +110,6 @@ public class ElasticIndexService {
         elasticsearchClient.indices().delete(DeleteIndexRequest.of(d -> d.index(indexName)));
         System.out.println("엘라스틱 서치 인덱스 삭제 완료. 인덱스 이름: " + indexName);
     }
-
-//    private void deleteIndex(String url) throws Exception {
-//        restTemplate.delete(url);
-//    }
 
     // 인덱스 생성
     private void createIndex(String indexName, String mappingFilePath) throws Exception{
