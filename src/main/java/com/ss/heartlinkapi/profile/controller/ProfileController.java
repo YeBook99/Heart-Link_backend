@@ -25,6 +25,7 @@ import com.ss.heartlinkapi.profile.dto.ProfileDTO;
 import com.ss.heartlinkapi.profile.dto.UpdatePasswordDTO;
 import com.ss.heartlinkapi.profile.service.ProfileService;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
+import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 @RestController
@@ -67,7 +68,9 @@ public class ProfileController {
 		}
 		
 		UserEntity loginUserEntity = loginUser.getUserEntity();
-		
+		if (loginUserEntity.getRole() == Role.ROLE_SINGLE && !loginUserEntity.getUserId().equals(userId)) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다.");
+	    }
 		ProfileDTO profileDTO = profileService.getUserProfile(userEntity, loginUserEntity);
 		
 		return ResponseEntity.ok(profileDTO);
