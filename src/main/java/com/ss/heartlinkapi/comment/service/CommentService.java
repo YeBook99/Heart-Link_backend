@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import org.springframework.stereotype.Service;
 
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
@@ -34,14 +35,16 @@ public class CommentService {
 	private final ContentLinktagRepository contentLinktagRepository;
 	private final LinkTagRepository linkTagRepository;
 	private final MentionRepository mentionRepository;
-	
-	public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository) {
+	private final ElasticService elasticService;
+
+	public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, ElasticService elasticService) {
 		this.commentRepository = commentRepository;
 		this.postRepository = postRepository;
 		this.userRepository = userRepository;
 		this.contentLinktagRepository = contentLinktagRepository;
 		this.linkTagRepository = linkTagRepository;
 		this.mentionRepository = mentionRepository;
+		this.elasticService = elasticService;
 	}
 	
 	// 댓글 작성
@@ -122,7 +125,11 @@ public class CommentService {
 			String keyword = linktagMatcher.group(1); // & 생략
 			LinkTagEntity linkTag = linkTagRepository.findByKeyword(keyword)
 					.orElseGet(() -> new LinkTagEntity(null, keyword));
-			linkTagRepository.save(linkTag);
+			LinkTagEntity result = linkTagRepository.save(linkTag);
+			// 엘라스틱에 새 태그 추가
+			if(elasticService.addTag(result)==null) {
+				System.out.println("엘라스틱 태그 저장 실패");
+			}
 			
 			ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
 			contentLinktag.setLinktagId(linkTag);
