@@ -10,4 +10,5 @@ public class BlockListDTO {
 	private Long blockedUserId;
 	private String blockedLoginId;
 	private String blockedImg;
+	private String blockedBio;
 }
