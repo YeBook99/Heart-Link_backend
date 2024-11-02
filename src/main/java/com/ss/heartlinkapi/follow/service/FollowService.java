@@ -2,6 +2,8 @@ package com.ss.heartlinkapi.follow.service;
 
 import javax.persistence.EntityNotFoundException;
 
+import com.ss.heartlinkapi.notification.service.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,14 +27,16 @@ public class FollowService {
 	private final ProfileRepository profileRepository;
 	private final UserRepository userRepository;
 	private final CoupleRepository coupleRepository;
+	private final NotificationService notificationService;
 
 	public FollowService(FollowRepository followRepository, ProfileRepository profileRepository,
-			UserRepository userRepository, CoupleRepository coupleRepository) {
+                         UserRepository userRepository, CoupleRepository coupleRepository, NotificationService notificationService) {
 		this.followRepository = followRepository;
 		this.profileRepository = profileRepository;
 		this.userRepository = userRepository;
 		this.coupleRepository = coupleRepository;
-	}
+        this.notificationService = notificationService;
+    }
 
 	/********** 유저가 팔로우하고 있는 타 유저 목록 **********/
 	@Transactional(readOnly = true)
@@ -112,6 +116,7 @@ public class FollowService {
 		followEntity.setFollowing(following);
 		if (couple.getIsPrivate()) {
 			followEntity.setStatus(false);
+			notificationService.notifyFollowPrivate(follower.getLoginId(), following.getUserId(), follower.getUserId());
 		}
 		followRepository.save(followEntity);
 	}

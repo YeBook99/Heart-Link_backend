@@ -167,13 +167,13 @@ public class LikeService {
                 post.setLikeCount(post.getLikeCount() + 1);
                 postRepository.save(post);
 
-                notificationService.notifyLikePost(myLoginId, postId);
+                notificationService.notifyLikePost(myLoginId, postId, userId);
             } else {
                 like.setCommentId(comment);
                 comment.setLikeCount(comment.getLikeCount() + 1);
                 commentRepository.save(comment);
 
-                notificationService.notifyLikeComment(myLoginId, postId);
+                notificationService.notifyLikeComment(myLoginId, postId, userId);
             }
             likeRepository.save(like);
         }

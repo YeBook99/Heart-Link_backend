@@ -180,12 +180,14 @@ public class ProfileController {
 		try {
 			String currentPath = Paths.get("").toAbsolutePath().toString();
 			String originalFilename = img.getOriginalFilename();
+			if (originalFilename == null || !originalFilename.contains(".")) {
+			    return ResponseEntity.badRequest().body("지원하지 않는 파일 형식입니다.");
+			}
+
 			// 확장자 확인
-			String fileExtension = originalFilename != null
-					? originalFilename.substring(originalFilename.lastIndexOf("."))
-					: "";
-			if (!fileExtension.matches("(?i)\\.(jpg|jpeg|png)$")) {
-				return ResponseEntity.badRequest().body("지원하지 않는 파일 형식입니다.");
+			String fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+			if (!fileExtension.matches("\\.(jpg|jpeg|png)$")) {
+			    return ResponseEntity.badRequest().body("지원하지 않는 파일 형식입니다.");
 			}
 
 			// UUID로 파일 이름 변경
