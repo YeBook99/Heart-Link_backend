@@ -89,25 +89,26 @@ public class PostController {
 	@GetMapping("")
 	public ResponseEntity<?> getFollowingPublicPosts(
 	        @AuthenticationPrincipal CustomUserDetails user,
-	        @RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "10") int size) {
+	        @RequestParam(required = false) Integer cursor,
+	        @RequestParam(defaultValue = "6") int limit) {
 
 	    Long userId = user.getUserId();
-	    Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-	    // 팔로우하는 게시물 조회 (페이징)
-	    Page<PostDTO> followingPosts = postService.getPublicPostByFollowerId(userId, pageable);
-	    // 팔로우하지 않은 게시물 조회 (페이징)
-	    Page<PostDTO> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(userId, pageable);
+	    // 팔로우하는 게시물 조회 (커서 페이징)
+	    Map<String, Object> followingPosts = postService.getPublicPostByFollowerId(userId, cursor, limit);
 
+	    // 비팔로우 및 신고되지 않은 게시물 조회 (커서 페이징)
+	    Map<String, Object> nonFollowedPosts = postService.getNonFollowedAndNonReportedPosts(userId, cursor, limit);
+
+	    // 응답 데이터 생성
 	    Map<String, Object> response = new HashMap<>();
-	    response.put("followingPosts", followingPosts.getContent()); // 현재 페이지의 팔로우 게시물
-	    response.put("totalFollowingPages", followingPosts.getTotalPages()); // 총 페이지 수
-	    response.put("totalFollowingElements", followingPosts.getTotalElements()); // 총 게시글 수
-	    
-	    response.put("nonFollowedPosts", nonFollowedPosts.getContent()); // 현재 페이지의 비팔로우 게시물
-	    response.put("totalNonFollowedPages", nonFollowedPosts.getTotalPages()); // 총 페이지 수
-	    response.put("totalNonFollowedElements", nonFollowedPosts.getTotalElements()); // 총 게시글 수
+	    response.put("followingPosts", followingPosts.get("data")); // 현재 페이지의 팔로우 게시물
+	    response.put("nextFollowingCursor", followingPosts.get("nextCursor")); // 다음 커서
+	    response.put("hasNextFollowing", followingPosts.get("hasNext")); // 다음 페이지 여부
+
+	    response.put("nonFollowedPosts", nonFollowedPosts.get("data")); // 현재 페이지의 비팔로우 게시물
+	    response.put("nextNonFollowedCursor", nonFollowedPosts.get("nextCursor")); // 다음 커서
+	    response.put("hasNextNonFollowed", nonFollowedPosts.get("hasNext")); // 다음 페이지 여부
 
 	    return ResponseEntity.ok().body(response);
 	}
@@ -157,12 +158,16 @@ public class PostController {
 	
 	// 사용자와 사용자의 커플 게시글 목록 조회
 	@GetMapping("/couple/{userId}")
-	public ResponseEntity<List<PostFileDTO>> getCouplePostFiles(@PathVariable Long userId){
-		
-		List<PostFileDTO> postFiles = postService.getPostFilesByUserId(userId);
-		
-		return ResponseEntity.ok(postFiles);
+	public ResponseEntity<?> getCouplePostFiles(
+	        @PathVariable Long userId,
+	        @RequestParam(required = false) Integer cursor,
+	        @RequestParam(defaultValue = "6") int limit) {
+
+	    Map<String, Object> postFiles = postService.getPostFilesByUserId(userId, cursor, limit);
+	    
+	    return ResponseEntity.ok(postFiles);
 	}
+
 	
 	// 내 게시글 삭제
 	@DeleteMapping("/{postId}/delete")
