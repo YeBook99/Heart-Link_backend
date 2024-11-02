@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.notification.entity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 
 public class NotificationEntity {
     @Id
@@ -26,6 +28,9 @@ public class NotificationEntity {
 
     @Enumerated(EnumType.STRING)
     private Type type;
+
+    @Column(name = "user_img")
+    private String userImg;
 
     @Column(name = "message")
     private String message;

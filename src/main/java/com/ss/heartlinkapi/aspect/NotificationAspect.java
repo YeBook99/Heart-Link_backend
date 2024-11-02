@@ -14,6 +14,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.hibernate.mapping.Join;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -29,13 +30,13 @@ public class NotificationAspect {
     @AfterReturning(value = "execution(* com.ss.heartlinkapi.comment.service.CommentService.writeComment(..)) && args(commentDTO, user)", argNames = "joinPoint,commentDTO,user")
     public void notifyComment(final JoinPoint joinPoint, final CommentDTO commentDTO, final UserEntity user){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        notificationService.notifyComment(authentication.getName(),commentDTO.getPostId());
+        notificationService.notifyComment(authentication.getName(),commentDTO.getPostId(), user.getUserId());
     }
 
     @AfterReturning("execution(* com.ss.heartlinkapi.follow.repository.FollowRepository.save(..)) && args(followEntity)" )
     public void notifyFollow(final JoinPoint joinPoint, final FollowEntity followEntity){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        notificationService.notifyFollow(authentication.getName(), followEntity.getFollowing().getUserId());
+        notificationService.notifyFollow(authentication.getName(), followEntity.getFollowing().getUserId(), followEntity.getFollower().getUserId());
     }
 
 }
