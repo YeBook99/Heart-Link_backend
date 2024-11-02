@@ -132,7 +132,7 @@ public class LoginService {
 		return userRepository.findByPhone(phone);
 	}
 
-	/************ 전화번호 업데이트 ************/
+	/************ 비밀번호 업데이트 ************/
 	public boolean updatePassword(UserEntity user, String password) {
 		String encodedPassword = passwordEncoder.encode(password);
 		user.setPassword(encodedPassword);
