@@ -80,6 +80,27 @@ public class ProfileService {
 	public ProfileEntity findByUserEntity(UserEntity user) {
 		return profileRepository.findByUserEntity(user);
 	}
+	
+	/******* 애칭 수정하기 *******/
+    public void updateNickname(Long userId, String nickName) {
+        UserEntity userEntity = findByUserId(userId);
+        if (userEntity == null) {
+            throw new IllegalArgumentException("유저를 찾을 수 없습니다.");
+        }
+
+        ProfileEntity profileEntity = findByUserEntity(userEntity);
+        if (profileEntity == null) {
+            throw new IllegalArgumentException("프로필이 존재하지 않습니다.");
+        }
+
+        if (nickName.length() < 1 || nickName.length() > 10) {
+            throw new IllegalArgumentException("닉네임은 1자 이상 10자 이내여야 합니다.");
+        }
+
+        profileEntity.setNickname(nickName);
+        save(profileEntity);
+    }
+    
 	/******* 프로필 저장 메서드 *******/
 	public void save(ProfileEntity profileEntity) {
 		profileRepository.save(profileEntity);	
