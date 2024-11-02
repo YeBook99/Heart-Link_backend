@@ -2,7 +2,7 @@ package com.ss.heartlinkapi.login.service;
 
 public final class CheckPassword {
     
-    private static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*\\d)(?=.*(_|[^\\w])).{7,16}$";
+	private static final String PASSWORD_REGEX = "^(?!.*[가-힣])(?=.*[a-zA-Z])(?=.*\\d)(?=.*(_|[^\\w])).{8,16}$";
 
     private CheckPassword() {
     }

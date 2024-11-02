@@ -3,6 +3,8 @@ package com.ss.heartlinkapi.login.service;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.regex.Pattern;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +76,11 @@ public class LoginService {
 		if (!CheckPhone.isPhoneValid(joinDTO.getPhone())) {
 			throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다.");
 		}
+		
+	    // 이메일 형식 확인
+	    if (!isEmailValid(joinDTO.getEmail())) {
+	        throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
+	    }
 	}
 
 	@Transactional
@@ -126,6 +133,11 @@ public class LoginService {
 	@Transactional(readOnly = true)
 	public boolean checkPassword(UserEntity user, String Password) {
 		return passwordEncoder.matches(Password, user.getPassword());
+	}
+	/************ 이메일 형식 검증 ************/
+	private boolean isEmailValid(String email) {
+	    String emailRegex = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+	    return Pattern.compile(emailRegex).matcher(email).matches();
 	}
 
 }
