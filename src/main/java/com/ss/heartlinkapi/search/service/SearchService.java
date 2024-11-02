@@ -3,6 +3,8 @@ package com.ss.heartlinkapi.search.service;
 import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import com.ss.heartlinkapi.elasticSearch.service.Language;
+import com.ss.heartlinkapi.follow.entity.FollowEntity;
+import com.ss.heartlinkapi.follow.repository.FollowRepository;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
@@ -12,6 +14,7 @@ import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.search.repository.SearchRepository;
+import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,9 @@ public class SearchService {
 
     @Autowired
     private PostFileRepository postFileRepository;
+
+    @Autowired
+    private FollowRepository followRepository;
 
     // 유저 아이디 검색
     @Transactional
@@ -231,5 +237,40 @@ public class SearchService {
         }
 
         return new ArrayList<>(mergedSet);
+    }
+
+    // 언급 시 아이디 리스트 조회(팔로우 우선 순)
+    public List<Map<String, Object>> mentionIdList(UserEntity user) {
+        // 유저가 팔로우한 회원 리스트
+        List<FollowEntity> followList = followRepository.findByFollowerUserIdAndStatusIsTrue(user);
+        // 롤이 싱글이거나 커플인 모든 유저 리스트
+        List<UserEntity> userList = userRepository.findByRoleIn(Arrays.asList(Role.ROLE_COUPLE, Role.ROLE_SINGLE));
+        // 팔로우 우선, 나머지는 뒤에 위치한 모든 유저 리스트
+        List<UserEntity> followFirstList = new ArrayList<>();
+
+        // 팔로우 우선 리스트에 팔로우한 회원들 우선 추가
+        for(FollowEntity follow : followList) {
+            followFirstList.add(follow.getFollowing());
+        }
+
+        // 팔로우 우선 리스트에 팔로우 안한 회원들 나중에 추가
+        for(UserEntity userEntity : userList) {
+            for(UserEntity followUser : followFirstList) {
+                if(followUser.getUserId() != userEntity.getUserId() &&
+                user.getUserId() != userEntity.getUserId()) {
+                    followFirstList.add(userEntity);
+                }
+            }
+        }
+
+        // 리스트<맵> 형태로 변환
+        List<Map<String, Object>> followMapList = new ArrayList<>();
+        for(UserEntity followUser : followFirstList) {
+            Map<String, Object> followMap = new HashMap<>();
+            followMap.put("userId", followUser.getUserId());
+            followMap.put("loginId", followUser.getLoginId());
+            followMapList.add(followMap);
+        }
+        return followMapList;
     }
 }

@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.user.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,5 +41,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>{
 
 	/*********** 유저 롤 검색 페이징 처리 ***********/
 	Page<UserEntity> findByRole(Role role, Pageable pageable);
-	
+
+	// role이 single, couple 둘 중 해당되는 유저 리스트 반환
+	List<UserEntity> findByRoleIn(List<Role> roles);
 }
