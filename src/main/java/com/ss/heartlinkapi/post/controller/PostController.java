@@ -115,7 +115,6 @@ public class PostController {
 
 
 
-
 	
 	
 	// 게시글 상세보기
@@ -131,21 +130,25 @@ public class PostController {
 	
 	// 내가 누른 좋아요 목록 조회
 	@GetMapping("/like")
-	public ResponseEntity<List<PostFileDTO>> getLikePostFilesByUserId(@AuthenticationPrincipal CustomUserDetails user) {
+	public ResponseEntity<?> getLikePostFilesByUserId(@AuthenticationPrincipal CustomUserDetails user,
+																	@RequestParam(required = false) Integer cursor,
+																	@RequestParam(defaultValue = "6") int limit) {
 		
 		Long userId = user.getUserId();
-	    List<PostFileDTO> postFiles = likeService.getPostFilesByUserId(userId); 				   
+		Map<String, Object> postFiles = likeService.getPostFilesByUserId(userId, cursor, limit); 				   
 	    
 	    return ResponseEntity.ok(postFiles);
 	}
 	
 	// 내가 누른 북마크 목록 조회
 	@GetMapping("/bookmark")
-	public ResponseEntity<List<PostFileDTO>> getBokkmarkPostFilesByUserId(@AuthenticationPrincipal CustomUserDetails user){
+	public ResponseEntity<?> getBokkmarkPostFilesByUserId(@AuthenticationPrincipal CustomUserDetails user,
+																	@RequestParam(required = false) Integer cursor,
+																	@RequestParam(defaultValue = "6") int limit) {
 		
 		Long userId = user.getUserId();
 		
-		List<PostFileDTO> postFiles = bookmarkService.getBokkmarkPostFilesByUserId(userId);
+		Map<String, Object> postFiles = bookmarkService.getBookmarkPostFilesByUserId(userId, cursor, limit);
 		
 		return ResponseEntity.ok(postFiles);
 		

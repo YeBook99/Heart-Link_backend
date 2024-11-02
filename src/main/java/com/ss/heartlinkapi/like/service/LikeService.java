@@ -1,6 +1,8 @@
 package com.ss.heartlinkapi.like.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -98,10 +100,17 @@ public class LikeService {
     }
 
     // 내가 누른 좋아요 목록 조회
-    public List<PostFileDTO> getPostFilesByUserId(Long userId) {
-        List<PostFileEntity> postFiles = likeRepository.findLikePostFilesByUserId(userId);
-
-        return postFiles.stream()
+    public Map<String, Object> getPostFilesByUserId(Long userId, Integer cursor, int limit) {
+        List<PostFileEntity> allPostFiles = likeRepository.findLikePostFilesByUserId(userId); // 전체 데이터를 가져옴
+        
+        // 커서가 없는 경우 (처음 페이지)
+        if (cursor == null) cursor = 0;
+        
+        // 요청된 커서 위치부터 limit만큼 자르기
+        int endIndex = Math.min(cursor + limit, allPostFiles.size());
+        List<PostFileEntity> sliceData = allPostFiles.subList(cursor, endIndex);
+        
+        List<PostFileDTO> postFileDTOs = sliceData.stream()
                 .map(file -> new PostFileDTO(
                         file.getPostId().getPostId(),
                         file.getFileUrl(),
@@ -109,7 +118,17 @@ public class LikeService {
                         file.getSortOrder()
                 ))
                 .collect(Collectors.toList());
+        
+        // 다음 커서를 계산
+        Integer nextCursor = (endIndex < allPostFiles.size()) ? endIndex : null;
+        
+        // 응답 데이터 생성
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", postFileDTOs);
+        response.put("nextCursor", nextCursor);
+        response.put("hasNext", nextCursor != null);
 
+        return response;
     }
 
     // 좋아요 추가, 삭제
