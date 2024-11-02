@@ -1,23 +1,18 @@
 package com.ss.heartlinkapi.couple.controller;
 
-import com.ss.heartlinkapi.couple.dto.CoupleCode;
-import com.ss.heartlinkapi.couple.dto.Dday;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
-import com.ss.heartlinkapi.couple.repository.CoupleRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
-import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/couple")
@@ -31,7 +26,7 @@ public class CoupleController {
 
     // 디데이 설정
     @PostMapping("/dday")
-    public ResponseEntity<?> setAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date) {
+    public ResponseEntity<?> setAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate date) {
         // 오류 500 검사
         try{
             // 오류 400 검사
@@ -92,7 +87,7 @@ public class CoupleController {
 
     // 디데이 수정
     @PutMapping("/dday/update")
-    public ResponseEntity<?> updateAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user, @RequestParam LocalDate date) {
+    public ResponseEntity<?> updateAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate date) {
         // 오류 500 검사
         try{
             // 오류 400 검사

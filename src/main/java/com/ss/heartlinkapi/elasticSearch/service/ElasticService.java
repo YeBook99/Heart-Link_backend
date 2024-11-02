@@ -111,15 +111,12 @@ public class ElasticService {
         try {
             response = elasticsearchClient.search(searchRequest, ElasticUserDocument.class);
         } catch (Exception e) {
-            // 예외 처리: 로깅이나 사용자에게 알림
             System.err.println("엘라스틱 자동완성 검색 실패 : " + e.getMessage());
             return List.of();  // 빈 리스트 반환
         }
 
-        // 검색 결과에서 loginId 추출
         List<Hit<ElasticUserDocument>> hits = response.hits().hits();
 
-        // loginId 필드 추출하여 반환
         List<ElasticUserDocument> userList = hits.stream()
                 .map(hit -> hit.source())  // loginId 필드 추출
                 .collect(Collectors.toList());
@@ -139,21 +136,56 @@ public class ElasticService {
     }
 
     // 태그 자동완성
-    public List<Map<String, Object>> tagAutoComplete(String prefix) throws Exception {
-        SearchRequest searchRequest = SearchRequest.of(s -> s
-                .index(IndexClass.TAG_INDEX_NAME)  // 검색할 인덱스 이름 지정
-                .query(q -> q
-                        .bool(b -> b
-                                .must(m -> m
-                                        .match(mq -> mq
-                                                .field("tagName") // 검색할 필드 지정
-                                                .query(prefix) // 입력된 유사한 검색어
-                                                .fuzziness("AUTO") // 유사성 설정
-                                        )
-                                )
-                        )
-                )
-        );
+    public List<Map<String, Object>> tagAutoComplete(String searchTag) throws Exception {
+        String fieldToSearch;
+        SearchRequest searchRequest;
+        boolean isKorean;
+        if (searchTag != null && !searchTag.isEmpty()) {
+            char firstChar = searchTag.charAt(0);
+            if (Character.UnicodeScript.of(firstChar) == Character.UnicodeScript.HANGUL) {
+                fieldToSearch = "kor_TagName"; // 첫 글자가 한글인 경우
+                isKorean = true;
+            } else if (Character.UnicodeScript.of(firstChar) == Character.UnicodeScript.LATIN) {
+                fieldToSearch = "eng_TagName"; // 첫 글자가 영어인 경우
+                isKorean = false;
+            } else {
+                fieldToSearch = "kor_TagName";
+                isKorean = true;
+            }
+        } else {
+            return List.of();
+        }
+
+        if(isKorean) {
+            searchRequest = SearchRequest.of(s -> s
+                    .index(IndexClass.TAG_INDEX_NAME)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m
+                                            .prefix(p -> p
+                                                    .field("kor_TagName")
+                                                    .value(searchTag) // 입력된 한 글자
+                                            )
+                                    )
+                            )
+                    )
+            );
+        } else {
+            searchRequest = SearchRequest.of(s -> s
+                    .index(IndexClass.TAG_INDEX_NAME)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m
+                                            .match(mq -> mq
+                                                    .field(fieldToSearch)
+                                                    .query(searchTag)
+                                                    .fuzziness("AUTO")
+                                            )
+                                    )
+                            )
+                    )
+            );
+        }
 
         // 검색 요청 수행
         SearchResponse<ElasticTagDocument> response;
@@ -161,19 +193,16 @@ public class ElasticService {
         try {
             response = elasticsearchClient.search(searchRequest, ElasticTagDocument.class);
         } catch (Exception e) {
-            // 예외 처리: 로깅이나 사용자에게 알림
             System.err.println("엘라스틱 자동완성 검색 실패 : " + e.getMessage());
             return List.of();  // 빈 리스트 반환
         }
 
-        // 검색 결과에서 loginId 추출
         List<Hit<ElasticTagDocument>> hits = response.hits().hits();
 
         List<ElasticTagDocument> tagList = hits.stream()
                 .map(hit -> hit.source())
                 .collect(Collectors.toList());
 
-        System.out.println(tagList);
 
         List<Map<String, Object>> tagMapList = new ArrayList<>();
         for(ElasticTagDocument tagDoc : tagList) {

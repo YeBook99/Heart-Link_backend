@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.follow.repository;
 
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.follow.entity.FollowEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+
+import java.util.List;
 
 public interface FollowRepository extends JpaRepository<FollowEntity, Long>{
 	
@@ -30,5 +33,8 @@ public interface FollowRepository extends JpaRepository<FollowEntity, Long>{
 	// 특정 사용자가 팔로우하는 회원 수
 	@Query("SELECT COUNT(f) FROM FollowEntity f WHERE f.following.id = :userId")
 	int countFollowersByUserId(@Param("userId") Long userId);
-	
+
+	// 사용자가 팔로잉하는 회원 리스트
+	List<FollowEntity> findByFollowerUserIdAndStatusIsTrue(Long userId);
+
 }
