@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SearchService {
@@ -242,24 +243,27 @@ public class SearchService {
     // 언급 시 아이디 리스트 조회(팔로우 우선 순)
     public List<Map<String, Object>> mentionIdList(UserEntity user) {
         // 유저가 팔로우한 회원 리스트
-        List<FollowEntity> followList = followRepository.findByFollowerUserIdAndStatusIsTrue(user);
-        // 롤이 싱글이거나 커플인 모든 유저 리스트
-        List<UserEntity> userList = userRepository.findByRoleIn(Arrays.asList(Role.ROLE_COUPLE, Role.ROLE_SINGLE));
-        // 팔로우 우선, 나머지는 뒤에 위치한 모든 유저 리스트
-        List<UserEntity> followFirstList = new ArrayList<>();
+        List<FollowEntity> followList = followRepository.findByFollowerUserIdAndStatusIsTrue(user.getUserId());
 
-        // 팔로우 우선 리스트에 팔로우한 회원들 우선 추가
-        for(FollowEntity follow : followList) {
+        // 팔로우한 회원 ID를 Set에 저장하여 중복 확인
+        Set<Long> followedUserIds = followList.stream()
+                .map(f -> f.getFollowing().getUserId())
+                .collect(Collectors.toSet());
+
+        // 팔로우 우선 리스트에 팔로우한 회원들 추가
+        Set<UserEntity> followFirstList = new LinkedHashSet<>(); // 순서를 유지하기 위해 LinkedHashSet 사용
+        for (FollowEntity follow : followList) {
             followFirstList.add(follow.getFollowing());
         }
 
-        // 팔로우 우선 리스트에 팔로우 안한 회원들 나중에 추가
-        for(UserEntity userEntity : userList) {
-            for(UserEntity followUser : followFirstList) {
-                if(followUser.getUserId() != userEntity.getUserId() &&
-                user.getUserId() != userEntity.getUserId()) {
-                    followFirstList.add(userEntity);
-                }
+        // 롤이 싱글이거나 커플인 모든 유저 리스트
+        List<UserEntity> userList = userRepository.findByRoleIn(Arrays.asList(Role.ROLE_COUPLE, Role.ROLE_SINGLE));
+
+        // 팔로우하지 않은 유저들만 추가
+        for (UserEntity userEntity : userList) {
+            if (!followedUserIds.contains(userEntity.getUserId()) &&
+                    !user.getUserId().equals(userEntity.getUserId())) {
+                followFirstList.add(userEntity);
             }
         }
 

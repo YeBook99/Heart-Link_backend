@@ -44,7 +44,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>{
 
 	// role이 single, couple 둘 중 해당되는 유저 리스트 반환
 	List<UserEntity> findByRoleIn(List<Role> roles);
-	
+
 	/*********** 전화번호로 유저가 존재하고 비밀번호가 없는 회원인지 확인 ***********/
 	boolean existsByPhoneAndPasswordIsNull(String phone);
 	
