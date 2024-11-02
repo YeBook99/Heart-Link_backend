@@ -106,4 +106,12 @@ public class PostEntity {
 	@JsonManagedReference
 	@JsonIgnoreProperties({"postId"})
 	private List<ContentLinktagEntity> contentLinktags;
+	
+	@Override
+	public String toString() {
+	    return "PostEntity{" +
+	            "postIdid=" + postId +
+	            ", content='" + content + '\'' +
+	            '}';
+	}
 }

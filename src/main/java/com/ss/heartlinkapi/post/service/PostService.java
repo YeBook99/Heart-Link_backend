@@ -408,39 +408,30 @@ public class PostService {
 		
 	}
 	
-	// 게시글 수정
-	@Transactional
-	public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
-	    // 게시글 조회 및 권한 확인
-	    PostEntity post = postRepository.findById(postId)
-	            .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
+		// 게시글 수정
+		@Transactional
+		public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
+		    // 게시글 조회 및 권한 확인
+		    PostEntity post = postRepository.findById(postId)
+		            .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
 
-	    if (!post.getUserId().getUserId().equals(userId)) {
-	        throw new IllegalArgumentException("권한이 없습니다. 게시글 작성자와 동일한 사용자가 아닙니다.");
-	    }
+		    if (!post.getUserId().getUserId().equals(userId)) {
+		        throw new IllegalArgumentException("권한이 없습니다. 게시글 작성자와 동일한 사용자가 아닙니다.");
+		    }
+		    
+		    // 멘션 데이터 삭제
+		    mentionRepository.deleteByPostId(post);
+		    
+		    // 링크 태그 데이터 삭제
+		    contentLinktagRepository.deleteByBoardId(post);
 
-	    // 게시글 내용 및 가시성 업데이트
-	    post.setContent(updateDTO.getContent());
-	    post.setVisibility(updateDTO.getVisibility());
+		    // 게시글 내용 및 가시성 업데이트
+		    post.setContent(updateDTO.getContent());
 
-	    // 새로운 파일 URL 목록 가져오기
-	    List<String> newFileUrls = Optional.ofNullable(updateDTO.getNewFileUrls()).orElse(Collections.emptyList());
+		    processTags(updateDTO.getContent(), post);
 
-	    // 해당 게시글의 모든 파일 삭제
-	    postFileRepository.deleteByPostId(postId);
-
-	    // 새로운 파일 추가 및 정렬 순서 할당
-	    int sortOrder = 1;
-	    for (String newFileUrl : newFileUrls) {
-	        PostFileEntity newFile = new PostFileEntity();
-	        newFile.setPostId(post);
-	        newFile.setFileUrl(newFileUrl);
-	        newFile.setFileType(postFileService.determineFileType(newFileUrl));
-	        newFile.setSortOrder(sortOrder++);  // sortOrder 증가
-
-	        postFileRepository.save(newFile);
-	    }
-	}
+		    postRepository.save(post);
+		}
 
 
 

@@ -15,6 +15,4 @@ import lombok.NoArgsConstructor;
 public class PostUpdateDTO {
 
 	private String content;						// 수정할 게시글 내용
-	private Visibility visibility;				// 수정할 공개 범위
-	private List<String> newFileUrls;			// 새로 추가할 파일 URL 목록
 }
