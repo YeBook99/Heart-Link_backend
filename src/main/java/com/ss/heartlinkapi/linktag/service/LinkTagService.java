@@ -29,7 +29,8 @@ public class LinkTagService {
                 System.out.println("엘라스틱 태그 저장 실패");
             }
             return result;
+        } else {
+            return isSavedTag;
         }
-        return isSavedTag;
     }
 }

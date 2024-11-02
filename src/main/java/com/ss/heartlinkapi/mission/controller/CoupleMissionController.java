@@ -1,11 +1,13 @@
 package com.ss.heartlinkapi.mission.controller;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
+import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import com.ss.heartlinkapi.post.dto.PostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -90,4 +92,19 @@ public class CoupleMissionController {
         }
     }
 
+    // 커플의 완료된 미션 여부 반환
+    @GetMapping("/missionStatus")
+    public ResponseEntity<?> missionStatus(@AuthenticationPrincipal CustomUserDetails user
+    ,@RequestParam(value = "year", required = false) Integer year, @RequestParam(value = "month", required = false) Integer month){
+       try {
+           if(user == null){
+               return ResponseEntity.badRequest().build();
+           }
+           List<Map<String, Object>> completeList = missionService.getMissionStatus(user.getUserId(), year, month);
+           return ResponseEntity.ok(completeList);
+       } catch (Exception e) {
+           e.printStackTrace();
+           return ResponseEntity.internalServerError().build();
+       }
+    }
 }

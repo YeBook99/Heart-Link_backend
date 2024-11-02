@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.search.service;
 
 import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
+import com.ss.heartlinkapi.elasticSearch.service.Language;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
@@ -119,7 +120,7 @@ public class SearchService {
         if(searchHistory != null) {
             searchHistory.setUpdatedAt(LocalDateTime.now());
             searchRepository.save(searchHistory);
-            deepLResult = deepLService.translate(searchHistory.getKeyword());
+            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.EN, Language.KO);
         } else {
             searchHistory = new SearchHistoryEntity();
             searchHistory.setUserId(user);
@@ -127,7 +128,7 @@ public class SearchService {
             searchHistory.setType("content");
             searchHistory.setCreatedAt(LocalDateTime.now());
             SearchHistoryEntity result = searchRepository.save(searchHistory);
-            deepLResult = deepLService.translate(searchHistory.getKeyword());
+            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.EN, Language.KO);
         }
 
         // Elastic용 entity

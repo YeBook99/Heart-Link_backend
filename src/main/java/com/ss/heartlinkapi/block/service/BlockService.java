@@ -1,12 +1,10 @@
 package com.ss.heartlinkapi.block.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ss.heartlinkapi.block.dto.BlockListDTO;
@@ -58,13 +56,13 @@ public class BlockService {
 		return userRepository.findById(userId).orElse(null);
 	}
 	
-	/************* 블락한 회원 리스트 불러오는 서비스 **************/
+	/************* 차단한 회원 리스트 불러오는 서비스 **************/
 	@Transactional(readOnly = true)
-	public List<BlockListDTO> getBlockedUsers(UserEntity blocker){
+	public Page<BlockListDTO> getBlockedUsers(UserEntity blocker, Pageable pageable){
 		
-		List<BlockEntity> blockEntities = blockRepository.findByBlockerId(blocker);
+		Page<BlockEntity> blockEntities = blockRepository.findByBlockerId(blocker, pageable);
 		
-		return blockEntities.stream().map(block -> {
+		return blockEntities.map(block -> {
 			
 			BlockListDTO dto = new BlockListDTO();
 			dto.setBlockerUserId(blocker.getUserId());
@@ -73,8 +71,10 @@ public class BlockService {
 			
 			ProfileEntity blockedProfile = profileRepository.findByUserEntity(block.getBlockedId());	
 			dto.setBlockedImg(blockedProfile.getProfile_img());
+			dto.setBlockedBio(blockedProfile.getBio());
+			
 			return dto;
-		}).collect(Collectors.toList());
+		});
 	}
 	/************* 차단 해제 **************/
 	@Transactional

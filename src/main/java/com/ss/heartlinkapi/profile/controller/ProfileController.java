@@ -59,14 +59,16 @@ public class ProfileController {
 
 	/***************** 프로필 조회 ******************/
 	@GetMapping("/{userId}")
-	public ResponseEntity<?> selectProfile(@PathVariable Long userId) {
+	public ResponseEntity<?> selectProfile(@PathVariable Long userId, @AuthenticationPrincipal CustomUserDetails loginUser) {
 
 		UserEntity userEntity = profileService.findByUserId(userId);
 		if (userEntity == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
 		}
 		
-		ProfileDTO profileDTO = profileService.getUserProfile(userEntity);
+		UserEntity loginUserEntity = loginUser.getUserEntity();
+		
+		ProfileDTO profileDTO = profileService.getUserProfile(userEntity, loginUserEntity);
 		
 		return ResponseEntity.ok(profileDTO);
 	}

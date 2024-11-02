@@ -1,9 +1,11 @@
 package com.ss.heartlinkapi.profile.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
+import com.ss.heartlinkapi.follow.entity.FollowEntity;
 import com.ss.heartlinkapi.follow.repository.FollowRepository;
 import com.ss.heartlinkapi.profile.dto.ProfileDTO;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
@@ -28,17 +30,24 @@ public class ProfileService {
 	}
 
 	/******* 유저 아이디로 유저 엔티티 가져오는 메서드 *******/
+	@Transactional(readOnly = true)
 	public UserEntity findByUserId(Long userId) {
 		return userRepository.findById(userId).orElse(null);
 	}
 	
     /******* 유저 프로필 정보 조회 메서드 *******/
-    public ProfileDTO getUserProfile(UserEntity userEntity) {
+	@Transactional(readOnly = true)
+    public ProfileDTO getUserProfile(UserEntity userEntity, UserEntity loginUserEntity) {
     	
     	Long userId = userEntity.getUserId();
         ProfileEntity userProfile = selectProfile(userEntity);
-        int followingCount = selectFollowingCount(userId);
-        int followersCount = selectFollowersCount(userId);
+        
+        int followingCount = followRepository.countFollowingByFollowerId(userId);
+        int followersCount = followRepository.countFollowersByUserId(userId);
+        
+        FollowEntity followEntity = followRepository.findByFollowerAndFollowing(loginUserEntity, userEntity);
+        boolean isFollowed = followEntity != null;
+        boolean followStatus = (followEntity != null && !followEntity.isStatus());
         
         CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userId);
         Boolean isPrivate = couple.getIsPrivate();
@@ -53,25 +62,21 @@ public class ProfileService {
             userProfile.getNickname(),
             followersCount,
             followingCount,
+            isFollowed,
+            followStatus,
             coupleUserEntity.getUserId(),
             isPrivate
         );
     }
 	
 	/******* 유저로 프로필 엔티티 가져오는 메서드 *******/
+	@Transactional(readOnly = true)
 	public ProfileEntity selectProfile(UserEntity userEntity) {
 		return profileRepository.findByUserEntity(userEntity);
 	}
-	/******* 팔로잉 수 가져오는 메서드 *******/
-	public int selectFollowingCount(Long userId) {
-		return followRepository.countFollowingByFollowerId(userId);
-	}
-	/******* 팔로워 수 가져오는 메서드 *******/
-	public int selectFollowersCount(Long userId) {
-		return followRepository.countFollowersByUserId(userId);
-	}
 	
 	/******* 유저로 프로필 가져오기 *******/
+	@Transactional(readOnly = true)
 	public ProfileEntity findByUserEntity(UserEntity user) {
 		return profileRepository.findByUserEntity(user);
 	}

@@ -18,7 +18,7 @@ public class DeepLService {
     private static final String AUTH_KEY = "04effbda-ae8c-4ce6-b384-78cc496fd41a:fx";
 
     // 번역 기능
-    public String translate(String text) {
+    public String translate(String text, Language from, Language to) {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -27,8 +27,8 @@ public class DeepLService {
 
         Map<String, Object> body = new HashMap<>();
         body.put("text", new String[]{text});
-        body.put("target_lang", "EN");
-        body.put("source_lang", "KO");
+        body.put("target_lang", from);
+        body.put("source_lang", to);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
