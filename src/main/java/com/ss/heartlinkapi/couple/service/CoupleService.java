@@ -82,6 +82,8 @@ public class CoupleService {
         UserEntity user2 = userRepository.findByCoupleCode(code);
         user1.setRole(Role.ROLE_COUPLE);
         user2.setRole(Role.ROLE_COUPLE);
+        userRepository.save(user1);
+        userRepository.save(user2);
         CoupleEntity newCouple = new CoupleEntity();
         newCouple.setUser1(user1);
         newCouple.setUser2(user2);
@@ -109,6 +111,8 @@ public class CoupleService {
         couple.setBreakupDate(breakDate);
         couple.getUser1().setRole(Role.ROLE_SINGLE);
         couple.getUser2().setRole(Role.ROLE_SINGLE);
+        userRepository.save(couple.getUser1());
+        userRepository.save(couple.getUser2());
         return coupleRepository.save(couple);
     }
 
@@ -117,6 +121,8 @@ public class CoupleService {
         couple.setBreakupDate(null);
         couple.getUser1().setRole(Role.ROLE_COUPLE);
         couple.getUser2().setRole(Role.ROLE_COUPLE);
+        userRepository.save(couple.getUser1());
+        userRepository.save(couple.getUser2());
         return coupleRepository.save(couple);
     }
 
@@ -124,8 +130,6 @@ public class CoupleService {
     @Transactional
     public void batchFinalUnlinkCouple() {
         List<CoupleEntity> breakCouple = coupleRepository.findCoupleEntityByBreakupDateIsNotNull();
-        for(CoupleEntity couple : breakCouple) {
-        }
         if(breakCouple != null && breakCouple.size() > 0) {
             LocalDate today = LocalDate.now();
             for(CoupleEntity couple : breakCouple) {
@@ -143,6 +147,10 @@ public class CoupleService {
                     try {
                         couple.getUser1().setRole(Role.ROLE_USER);
                         couple.getUser2().setRole(Role.ROLE_USER);
+                        couple.getUser1().setCoupleCode(generateRandomCode());
+                        couple.getUser2().setCoupleCode(generateRandomCode());
+                        userRepository.save(couple.getUser1());
+                        userRepository.save(couple.getUser2());
                         coupleRepository.deleteById(couple.getCoupleId());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -168,18 +176,26 @@ public class CoupleService {
 
     // 커플 해지 유예기간 없이 즉시 해지
     public void finalNowUnlinkCouple(CoupleEntity couple) {
-        UserEntity user1 = couple.getUser1();
-        UserEntity user2 = couple.getUser2();
-
-        coupleRepository.delete(couple);
-
-        user1.setCoupleCode(generateRandomCode());
-        user2.setCoupleCode(generateRandomCode());
-        user1.setRole(Role.ROLE_USER);
-        user2.setRole(Role.ROLE_USER);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
+        List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
+        if(answerList != null && answerList.size() > 0) {
+            coupleMatchAnswerRepository.deleteAllByCoupleId(couple);
+        }
+        // 매치 미션 목록 삭제
+        List<UserLinkMissionEntity> userMissionList = coupleMissionService.findUserLinkMissionByCoupleId(couple);
+        if(userMissionList != null && userMissionList.size() > 0) {
+            coupleMissionService.deleteUserMissionByCoupleId(couple.getCoupleId());
+        }
+        try {
+            couple.getUser1().setRole(Role.ROLE_USER);
+            couple.getUser2().setRole(Role.ROLE_USER);
+            couple.getUser1().setCoupleCode(generateRandomCode());
+            couple.getUser2().setCoupleCode(generateRandomCode());
+            userRepository.save(couple.getUser1());
+            userRepository.save(couple.getUser2());
+            coupleRepository.deleteById(couple.getCoupleId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     // 내 커플의 아이디 가져오기

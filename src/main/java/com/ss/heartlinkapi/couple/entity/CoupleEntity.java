@@ -16,7 +16,6 @@ public class CoupleEntity {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long coupleId;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "users1_id", nullable = false)
     private UserEntity user1;
