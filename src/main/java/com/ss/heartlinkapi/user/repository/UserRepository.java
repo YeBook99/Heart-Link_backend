@@ -40,5 +40,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>{
 
 	/*********** 유저 롤 검색 페이징 처리 ***********/
 	Page<UserEntity> findByRole(Role role, Pageable pageable);
+
+	/*********** 전화번호로 유저가 존재하고 비밀번호가 없는 회원인지 확인 ***********/
+	boolean existsByPhoneAndPasswordIsNull(String phone);
 	
 }
