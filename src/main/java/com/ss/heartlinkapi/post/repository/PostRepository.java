@@ -22,7 +22,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	           "AND p.visibility = com.ss.heartlinkapi.post.entity.Visibility.PUBLIC " +
 	           "AND NOT EXISTS (SELECT r FROM ReportEntity r WHERE r.postId.postId = p.postId AND r.userId.id = :userId) " +
 	           "ORDER BY p.createdAt DESC")
-	Page<PostEntity> findPublicPostsByFollowerId(@Param("userId") Long userId, Pageable pageable);
+	List<PostEntity> findPublicPostsByFollowerId(@Param("userId") Long userId);
 
 	@Query("SELECT p FROM PostEntity p " +
 		       "WHERE p.userId.userId NOT IN (SELECT f.following.id FROM FollowEntity f WHERE f.follower.id = :userId) " +
@@ -32,7 +32,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 		       "AND NOT EXISTS (SELECT b FROM BlockEntity b WHERE (b.blockerId.id = :userId AND b.blockedId.id = p.userId.userId) " + 
 		       "OR (b.blockedId.id = :userId AND b.coupleId.id = p.userId.userId)) " +  
 		       "ORDER BY p.createdAt DESC")
-	Page<PostEntity> findNonFollowedAndNonReportedPosts(@Param("userId") Long userId, Pageable pageable);
+	List<PostEntity> findNonFollowedAndNonReportedPosts(@Param("userId") Long userId);
 
 	
 	// 게시글 상세보기

@@ -20,7 +20,7 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Long>{
            "JOIN b.postId p " +
            "JOIN PostFileEntity pf ON pf.postId = p AND pf.sortOrder = 1 " +
            "WHERE b.userId.id = :userId")
-    List<PostFileEntity> findBokkmarkPostFilesByUserId(@Param("userId") Long userId);
+    List<PostFileEntity> findBookmarkPostFilesByUserId(@Param("userId") Long userId);
 
 	Optional<BookmarkEntity> findByUserIdAndPostId(UserEntity user, PostEntity post);
 
