@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.bookmark.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ public class BookmarkController {
 	}
 	
 	@PostMapping("/{postId}")
-	public ResponseEntity<String> toggleBookmark(Long postId, @AuthenticationPrincipal CustomUserDetails user) {
+	public ResponseEntity<String> toggleBookmark(@PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails user) {
 	    Long userId = user.getUserId();
 	    boolean result = bookmarkService.addOrRemoveBookmark(postId, userId);
 
