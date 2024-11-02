@@ -154,4 +154,13 @@ public class FollowService {
 		
 	}
 
+	/********** 이미 팔로우 중인지 확인하는 메서드 **********/
+	public boolean isFollowing(UserEntity follower, UserEntity following) {
+		FollowEntity followEntity = followRepository.findByFollowerAndFollowing(follower, following);
+		if(followEntity == null) {
+			return false;
+		}
+		return followEntity.isStatus();
+	}
+
 }
