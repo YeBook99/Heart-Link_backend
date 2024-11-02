@@ -10,10 +10,10 @@ import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
-import java.util.List;
-
 import javax.persistence.EntityNotFoundException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -89,11 +89,11 @@ public class BlockController {
 	/********** 차단한 유저 목록 가져오기 **********/
 
 	@GetMapping("/list")
-	public ResponseEntity<?> getBlockedUsers(@AuthenticationPrincipal CustomUserDetails loginUser) {
+	public ResponseEntity<?> getBlockedUsers(@AuthenticationPrincipal CustomUserDetails loginUser, Pageable pageable) {
 
 		UserEntity blocker = loginUser.getUserEntity();
 		try {
-			List<BlockListDTO> blockedUsers = blockService.getBlockedUsers(blocker);
+			Page<BlockListDTO> blockedUsers = blockService.getBlockedUsers(blocker, pageable);
 			return ResponseEntity.ok(blockedUsers);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러: " + e);
