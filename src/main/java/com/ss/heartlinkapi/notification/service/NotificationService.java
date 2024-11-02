@@ -12,16 +12,13 @@ import com.ss.heartlinkapi.notification.repository.NotificationRepository;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +33,8 @@ public class NotificationService {
 
     private final PostRepository postRepository;
 
+    private final ProfileRepository profileRepository;
+
     //    구독시 연결 해제 방지를 위해 더미데이터를 보내 연결을 유지시킨다.
     public SseEmitter subscribe(Long userId) {
 
@@ -45,50 +44,66 @@ public class NotificationService {
     }
 
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
-    public void notifyLikePost(String userName, Long postId) {
+    public void notifyLikePost(String userName, Long postId, Long userId) {
         NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 글을 좋아합니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
-        saveNotification("MESSAGE_LIKE", notificationLikeDTO.getMessage(), postWriterId);
+        UserEntity user = new UserEntity();
+        user.setUserId(userId);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
+
+        saveNotification("MESSAGE_LIKE", notificationLikeDTO.getMessage(), postWriterId, otherUserImg);
 
         sendToClient(postWriterId, notificationLikeDTO);
     }
 
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
-    public void notifyLikeComment(String userName, Long postId) {
+    public void notifyLikeComment(String userName, Long postId, Long userId) {
 //        postId로 userId를 가져오는 메서드
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
+        UserEntity user = new UserEntity();
+        user.setUserId(userId);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
         NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 댓글을 좋아합니다.");
-        saveNotification("COMMENT_LIKE", notificationLikeDTO.getMessage(), postWriterId );
+        saveNotification("COMMENT_LIKE", notificationLikeDTO.getMessage(), postWriterId, otherUserImg );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationLikeDTO);
     }
 
-    public void notifyComment(String userName, Long postId) {
+    public void notifyComment(String userName, Long postId, Long userId) {
         NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:9090/feed/details/" + postId,userName + "님이 댓글을 남겼습니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
-        saveNotification("COMMENT", notificationCommentDTO.getMessage(), postWriterId );
+        UserEntity user = new UserEntity();
+        user.setUserId(userId);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
+        saveNotification("COMMENT", notificationCommentDTO.getMessage(), postWriterId, otherUserImg );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationCommentDTO);
     }
     //      팔로우 요청 시 알람
-    public void notifyFollow(String userName, Long userId) {
+    public void notifyFollow(String userName, Long userId, Long id) {
         NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
-        saveNotification("FOLLOW", notificationFollowDTO.getMessage(), userId );
+        UserEntity user = new UserEntity();
+        user.setUserId(id);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
+        saveNotification("FOLLOW", notificationFollowDTO.getMessage(), userId, otherUserImg );
         sendToClient(userId, notificationFollowDTO);
     }
     //      비공개 유저 팔로우 요청
-    public void notifyFollowPrivate(String userName, Long userId) {
+    public void notifyFollowPrivate(String userName, Long userId, Long id) {
         NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
-        saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId );
+        UserEntity user = new UserEntity();
+        user.setUserId(id);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
+        saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId, otherUserImg );
         sendToClient(userId, notificationFollowDTO);
     }
     //      실질적으로 client에게 메세지를 전달해주는 메서드
@@ -118,12 +133,13 @@ public class NotificationService {
         return emitter;
     }
     //      알람 저장
-    private void saveNotification(String type, String message, Long userId){
+    private void saveNotification(String type, String message, Long userId, String otherUserImg){
         UserEntity user = new UserEntity();
         user.setUserId(userId);
         NotificationEntity notificationEntity = new NotificationEntity().builder()
                 .user(user)
                 .message(message)
+                .userImg(otherUserImg)
                 .isRead(true)
                 .type(Type.valueOf(type))
                 .build();
