@@ -120,7 +120,7 @@ public class SearchService {
         if(searchHistory != null) {
             searchHistory.setUpdatedAt(LocalDateTime.now());
             searchRepository.save(searchHistory);
-            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.EN, Language.KO);
+            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.KO, Language.EN);
         } else {
             searchHistory = new SearchHistoryEntity();
             searchHistory.setUserId(user);
@@ -128,7 +128,7 @@ public class SearchService {
             searchHistory.setType("content");
             searchHistory.setCreatedAt(LocalDateTime.now());
             SearchHistoryEntity result = searchRepository.save(searchHistory);
-            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.EN, Language.KO);
+            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.KO, Language.EN);
         }
 
         // Elastic용 entity

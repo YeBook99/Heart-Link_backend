@@ -139,21 +139,71 @@ public class ElasticService {
     }
 
     // 태그 자동완성
-    public List<Map<String, Object>> tagAutoComplete(String prefix) throws Exception {
-        SearchRequest searchRequest = SearchRequest.of(s -> s
-                .index(IndexClass.TAG_INDEX_NAME)  // 검색할 인덱스 이름 지정
-                .query(q -> q
-                        .bool(b -> b
-                                .must(m -> m
-                                        .match(mq -> mq
-                                                .field("tagName") // 검색할 필드 지정
-                                                .query(prefix) // 입력된 유사한 검색어
-                                                .fuzziness("AUTO") // 유사성 설정
-                                        )
-                                )
-                        )
-                )
-        );
+    public List<Map<String, Object>> tagAutoComplete(String searchTag) throws Exception {
+        String fieldToSearch;
+        SearchRequest searchRequest;
+        boolean isKorean;
+        if (searchTag != null && !searchTag.isEmpty()) {
+            char firstChar = searchTag.charAt(0);
+            if (Character.UnicodeScript.of(firstChar) == Character.UnicodeScript.HANGUL) {
+                fieldToSearch = "kor_TagName"; // 첫 글자가 한글인 경우
+                isKorean = true;
+            } else if (Character.UnicodeScript.of(firstChar) == Character.UnicodeScript.LATIN) {
+                fieldToSearch = "eng_TagName"; // 첫 글자가 영어인 경우
+                isKorean = false;
+            } else {
+                fieldToSearch = "kor_TagName";
+                isKorean = true;
+            }
+        } else {
+            return List.of();
+        }
+
+        if(isKorean) {
+            searchRequest = SearchRequest.of(s -> s
+                    .index(IndexClass.TAG_INDEX_NAME)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m
+                                            .prefix(p -> p
+                                                    .field("kor_TagName")
+                                                    .value(searchTag) // 입력된 한 글자
+                                            )
+                                    )
+                            )
+                    )
+            );
+        } else {
+            searchRequest = SearchRequest.of(s -> s
+                    .index(IndexClass.TAG_INDEX_NAME)
+                    .query(q -> q
+                            .bool(b -> b
+                                    .must(m -> m
+                                            .match(mq -> mq
+                                                    .field(fieldToSearch)
+                                                    .query(searchTag)
+                                                    .fuzziness("AUTO")
+                                            )
+                                    )
+                            )
+                    )
+            );
+        }
+
+//        SearchRequest searchRequest = SearchRequest.of(s -> s
+//                .index(IndexClass.TAG_INDEX_NAME)  // 검색할 인덱스 이름 지정
+//                .query(q -> q
+//                        .bool(b -> b
+//                                .must(m -> m
+//                                        .match(mq -> mq
+//                                                .field(fieldToSearch) // 검색할 필드 지정
+//                                                .query(searchTag) // 입력된 유사한 검색어
+//                                                .fuzziness("AUTO") // 유사성 설정
+//                                        )
+//                                )
+//                        )
+//                )
+//        );
 
         // 검색 요청 수행
         SearchResponse<ElasticTagDocument> response;
