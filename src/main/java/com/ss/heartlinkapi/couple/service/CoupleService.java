@@ -9,6 +9,7 @@ import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.service.PostService;
+import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ public class CoupleService {
 
     @Autowired
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
+
     @Autowired
     private CoupleMissionService coupleMissionService;
 
@@ -45,7 +47,7 @@ public class CoupleService {
     @Lazy
     private PostService postService;
 
-    @PersistenceContext  // EntityManager 주입
+    @PersistenceContext
     private EntityManager entityManager;
 
     // 유저아이디로 커플객체 조회
@@ -78,7 +80,8 @@ public class CoupleService {
     public CoupleEntity coupleCodeMatch(UserEntity user1, String code) {
         code = code.toUpperCase().trim();
         UserEntity user2 = userRepository.findByCoupleCode(code);
-
+        user1.setRole(Role.ROLE_COUPLE);
+        user2.setRole(Role.ROLE_COUPLE);
         CoupleEntity newCouple = new CoupleEntity();
         newCouple.setUser1(user1);
         newCouple.setUser2(user2);
@@ -104,12 +107,16 @@ public class CoupleService {
     public CoupleEntity setBreakDate(CoupleEntity couple) {
         LocalDate breakDate = LocalDate.now().plusMonths(3);
         couple.setBreakupDate(breakDate);
+        couple.getUser1().setRole(Role.ROLE_SINGLE);
+        couple.getUser2().setRole(Role.ROLE_SINGLE);
         return coupleRepository.save(couple);
     }
 
     // 커플 해지일 삭제
     public CoupleEntity deleteBreakDate(CoupleEntity couple) {
         couple.setBreakupDate(null);
+        couple.getUser1().setRole(Role.ROLE_COUPLE);
+        couple.getUser2().setRole(Role.ROLE_COUPLE);
         return coupleRepository.save(couple);
     }
 
@@ -134,6 +141,8 @@ public class CoupleService {
                         coupleMissionService.deleteUserMissionByCoupleId(couple.getCoupleId());
                     }
                     try {
+                        couple.getUser1().setRole(Role.ROLE_USER);
+                        couple.getUser2().setRole(Role.ROLE_USER);
                         coupleRepository.deleteById(couple.getCoupleId());
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -166,6 +175,8 @@ public class CoupleService {
 
         user1.setCoupleCode(generateRandomCode());
         user2.setCoupleCode(generateRandomCode());
+        user1.setRole(Role.ROLE_USER);
+        user2.setRole(Role.ROLE_USER);
 
         userRepository.save(user1);
         userRepository.save(user2);

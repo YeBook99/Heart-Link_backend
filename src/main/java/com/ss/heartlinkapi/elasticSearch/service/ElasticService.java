@@ -28,13 +28,14 @@ public class ElasticService {
     private final ElasticUserInfoRepository userInfoRepository;
     private final ElasticTagInfoRepository tagInfoRepository;
     private final ElasticsearchClient elasticsearchClient;
+    private final DeepLService deepLService;
 
-
-    public ElasticService(ElasticHistoryRepository elasticHistoryRepository, ElasticUserInfoRepository userInfoRepository, ElasticTagInfoRepository tagInfoRepository, ElasticsearchClient elasticsearchClient) {
+    public ElasticService(ElasticHistoryRepository elasticHistoryRepository, ElasticUserInfoRepository userInfoRepository, ElasticTagInfoRepository tagInfoRepository, ElasticsearchClient elasticsearchClient, DeepLService deepLService) {
         this.elasticHistoryRepository = elasticHistoryRepository;
         this.userInfoRepository = userInfoRepository;
         this.tagInfoRepository = tagInfoRepository;
         this.elasticsearchClient = elasticsearchClient;
+        this.deepLService = deepLService;
     }
 
     // 검색기록 추가
@@ -80,6 +81,8 @@ public class ElasticService {
     // 태그 추가
     public ElasticTagDocument addTag(LinkTagEntity tagEntity) {
         ElasticTagDocument elasticTagDocument = new ElasticTagDocument();
+        elasticTagDocument.setEngTagName(deepLService.translate(tagEntity.getKeyword(), Language.KO, Language.EN));
+        elasticTagDocument.setKorTagName(deepLService.translate(tagEntity.getKeyword(), Language.EN, Language.KO));
         elasticTagDocument.setTagName(tagEntity.getKeyword());
         elasticTagDocument.setTagId(tagEntity.getId());
         return tagInfoRepository.save(elasticTagDocument);
@@ -89,7 +92,7 @@ public class ElasticService {
     public List<Map<String, Object>> idAutoComplete(String prefix) throws Exception {
         // Prefix를 사용한 쿼리 생성
         SearchRequest searchRequest = SearchRequest.of(s -> s
-                .index("user_info")  // 검색할 인덱스 이름 지정
+                .index(IndexClass.USER_INDEX_NAME)  // 검색할 인덱스 이름 지정
                 .query(q -> q
                         .bool(b -> b
                                 .must(m -> m
@@ -109,7 +112,7 @@ public class ElasticService {
             response = elasticsearchClient.search(searchRequest, ElasticUserDocument.class);
         } catch (Exception e) {
             // 예외 처리: 로깅이나 사용자에게 알림
-            System.err.println("Elasticsearch search failed: " + e.getMessage());
+            System.err.println("엘라스틱 자동완성 검색 실패 : " + e.getMessage());
             return List.of();  // 빈 리스트 반환
         }
 
@@ -133,6 +136,53 @@ public class ElasticService {
         }
 
         return userMapList;
+    }
+
+    // 태그 자동완성
+    public List<Map<String, Object>> tagAutoComplete(String prefix) throws Exception {
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index(IndexClass.TAG_INDEX_NAME)  // 검색할 인덱스 이름 지정
+                .query(q -> q
+                        .bool(b -> b
+                                .must(m -> m
+                                        .match(mq -> mq
+                                                .field("tagName") // 검색할 필드 지정
+                                                .query(prefix) // 입력된 유사한 검색어
+                                                .fuzziness("AUTO") // 유사성 설정
+                                        )
+                                )
+                        )
+                )
+        );
+
+        // 검색 요청 수행
+        SearchResponse<ElasticTagDocument> response;
+
+        try {
+            response = elasticsearchClient.search(searchRequest, ElasticTagDocument.class);
+        } catch (Exception e) {
+            // 예외 처리: 로깅이나 사용자에게 알림
+            System.err.println("엘라스틱 자동완성 검색 실패 : " + e.getMessage());
+            return List.of();  // 빈 리스트 반환
+        }
+
+        // 검색 결과에서 loginId 추출
+        List<Hit<ElasticTagDocument>> hits = response.hits().hits();
+
+        List<ElasticTagDocument> tagList = hits.stream()
+                .map(hit -> hit.source())
+                .collect(Collectors.toList());
+
+        System.out.println(tagList);
+
+        List<Map<String, Object>> tagMapList = new ArrayList<>();
+        for(ElasticTagDocument tagDoc : tagList) {
+            Map<String, Object> tagMap = new HashMap<>();
+            tagMap.put("tagId", tagDoc.getTagId());
+            tagMap.put("tagName", tagDoc.getTagName());
+            tagMapList.add(tagMap);
+        }
+        return tagMapList;
     }
 
 }
