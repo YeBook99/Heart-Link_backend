@@ -112,27 +112,19 @@ public class ProfileController {
 	@PatchMapping("/{userId}/update/nickname")
 	public ResponseEntity<?> updateNickname(@PathVariable Long userId, @RequestBody Map<String, String> request,
 			@AuthenticationPrincipal CustomUserDetails loginUser) {
+		
+	    String nickName = request.get("nickName");
 
-		String nickName = request.get("nickName");
+	    if (!userId.equals(loginUser.getUserId())) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
+	    }
 
-		UserEntity userEntity = profileService.findByUserId(userId);
-		if (userEntity == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
-		}
-
-		if (!userId.equals(loginUser.getUserId())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
-		}
-
-		ProfileEntity profileEntity = profileService.findByUserEntity(userEntity);
-		if (profileEntity == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("프로필이 존재하지 않습니다.");
-		}
-
-		profileEntity.setNickname(nickName);
-		profileService.save(profileEntity);
-
-		return ResponseEntity.ok("애칭이 성공적으로 변경되었습니다.");
+	    try {
+	        profileService.updateNickname(userId, nickName);
+	        return ResponseEntity.ok("애칭이 성공적으로 변경되었습니다.");
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    }
 
 	}
 
