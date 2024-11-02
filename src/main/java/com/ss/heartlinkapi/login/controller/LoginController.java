@@ -93,7 +93,7 @@ public class LoginController {
 	}
 	
 
-	/********** 로그인 창에서의 전화번호 변경 **********/
+	/********** 로그인 창에서의 비밀번호 변경 **********/
 	@PatchMapping("/update/password")
 	public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
 
