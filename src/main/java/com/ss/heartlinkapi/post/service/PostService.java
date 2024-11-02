@@ -19,6 +19,7 @@ import javax.management.RuntimeErrorException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
+import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import org.apache.kafka.common.Uuid;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -69,8 +70,9 @@ public class PostService {
 	private final LinkTagRepository linkTagRepository;
 	private final MentionRepository mentionRepository;
 	private final CoupleMissionService coupleMissionService;
+	private final ElasticService elasticService;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -82,6 +84,7 @@ public class PostService {
 		this.linkTagRepository = linkTagRepository;
 		this.mentionRepository = mentionRepository;
 		this.coupleMissionService = coupleMissionService;
+		this.elasticService = elasticService;
 	}
 
 	// 게시글 작성
@@ -212,7 +215,11 @@ public class PostService {
 			// linkTag에 내가 작성한 태그가 없으면 데이터 생성
 			LinkTagEntity linkTag = linkTagRepository.findByKeyword(keyword)
 					.orElseGet(() -> new LinkTagEntity(null, keyword));
-			linkTagRepository.save(linkTag);
+			LinkTagEntity result = linkTagRepository.save(linkTag);
+			// 엘라스틱 태그 인덱스에 추가
+			if(elasticService.addTag(result)==null) {
+				System.out.println("엘라스틱 태그 저장 실패");
+			}
 			System.out.println("저장된 LinkTag: " + linkTag.getKeyword());
 			
 			
