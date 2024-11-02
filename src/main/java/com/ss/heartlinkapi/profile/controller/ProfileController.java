@@ -135,23 +135,16 @@ public class ProfileController {
 
 		String bio = request.get("bio");
 
-		UserEntity userEntity = profileService.findByUserId(userId);
-		if (userEntity == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
-		}
-
 		if (!userId.equals(loginUser.getUserId())) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
 		}
 
-		ProfileEntity profileEntity = profileService.findByUserEntity(userEntity);
-		if (profileEntity == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("프로필이 존재하지 않습니다.");
-		}
-		profileEntity.setBio(bio);
-		profileService.save(profileEntity);
-
-		return ResponseEntity.ok("상태메시지가 수정되었습니다.");
+	    try {
+	        profileService.updateBio(userId, bio);
+	        return ResponseEntity.ok("상태메시지가 수정되었습니다.");
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    }
 	}
 
 	/***************** 프로필 이미지 수정 ******************/
