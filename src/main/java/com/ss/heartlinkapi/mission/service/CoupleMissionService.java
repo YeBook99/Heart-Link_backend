@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.mission.service;
 
 import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
+import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
@@ -11,15 +12,16 @@ import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
 import com.ss.heartlinkapi.mission.repository.UserLinkMissionRepository;
 import com.ss.heartlinkapi.post.dto.PostDTO;
+import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.repository.PostFileRepository;
+import com.ss.heartlinkapi.post.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CoupleMissionService {
@@ -35,8 +37,15 @@ public class CoupleMissionService {
 
     @Autowired
     private CoupleRepository coupleRepository;
+
     @Autowired
-    private CoupleService coupleService;
+    private PostRepository postRepository;
+
+    @Autowired
+    private ContentLinktagRepository contentLinktagRepository;
+
+    @Autowired
+    private PostFileRepository postFileRepository;
 
     // 매월 미션 태그 리스트 조회
     public List<LinkMissionEntity> findMissionByYearMonth(Integer year, Integer month) {
@@ -152,9 +161,42 @@ public class CoupleMissionService {
             month = LocalDate.now().getMonthValue();
         }
 
+        // 유저아이디로 유저 게시글 작성시간을 기준으로 월로 조회해서 전부 가져오기
+        List<PostEntity> postList = postRepository.findAllByUserIdAndMonth(userId, year, month);
 
+        // 이번달의 태그 아이디들 조회해오기
+        List<LinkMissionEntity> missionList = findMissionByYearMonth(year, month);
 
+        // 유저 게시글들에 연결된 태그들 조회하기
+        Set<Map<String, Object>> tagList = new HashSet<>();
 
-        return null;
+        for(PostEntity postEntity : postList){
+            // 유저가 작성한 게시글들의 아이디로 정보 조회
+            List<ContentLinktagEntity> contentList = contentLinktagRepository.findByBoardId(postEntity);
+            for(ContentLinktagEntity contentLinktagEntity : contentList){
+                // 게시글들의 태그 아이디와 미션태그의 태그 아이디를 비교해서 맞으면 저장
+                for(LinkMissionEntity mission : missionList){
+                    if(contentLinktagEntity.getLinktagId()==mission.getLinkTagId()){
+                        // 이번달의 태그와 이번달 작성한 게시글의 태그가 맞을 때
+                        // 포스트 아이디로 포스트 이미지 조회
+                        List<PostFileEntity> fileList = postFileRepository.findByPostId(contentLinktagEntity.getBoardId().getPostId());
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("tagId", mission.getLinkTagId().getId());
+                        map.put("tagName", mission.getLinkTagId().getKeyword());
+                        map.put("postId", contentLinktagEntity.getBoardId().getPostId());
+                        map.put("postImgUrl", fileList.get(0).getFileUrl());
+                        tagList.add(map);
+                    }
+                }
+            }
+        }
+
+        if (tagList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Map<String, Object>> completeTag = new ArrayList<>(tagList);
+
+        return completeTag;
     }
 }

@@ -52,5 +52,8 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	
 	/************* 유저로 게시글 수 조회 **************/
 	int countByUserId(UserEntity user);
-	
+
+	// 해당 월로 유저 아이디로 유저의 게시글 조회
+	@Query(value = "select * from post where user_id = :userId and year(created_at)=:year and month(created_at)=:month", nativeQuery = true)
+	List<PostEntity> findAllByUserIdAndMonth (@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
 }

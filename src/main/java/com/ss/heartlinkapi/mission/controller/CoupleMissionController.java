@@ -106,7 +106,5 @@ public class CoupleMissionController {
            e.printStackTrace();
            return ResponseEntity.internalServerError().build();
        }
-
     }
-
 }
