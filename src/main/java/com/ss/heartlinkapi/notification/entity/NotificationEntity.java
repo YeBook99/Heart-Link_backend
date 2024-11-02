@@ -29,6 +29,9 @@ public class NotificationEntity {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    @Column(name = "user_img")
+    private String userImg;
+
     @Column(name = "message")
     private String message;
 
