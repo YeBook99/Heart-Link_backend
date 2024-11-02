@@ -43,6 +43,10 @@ public class FollowController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
 		}
 
+		if(followService.isFollowing(follower, following)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 팔로우 중인 유저입니다.");
+		}
+
 		try {
 			followService.follow(follower, following);
 			return ResponseEntity.status(HttpStatus.CREATED).body("팔로우 성공");
