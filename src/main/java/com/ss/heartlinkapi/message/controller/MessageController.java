@@ -70,11 +70,13 @@ public class MessageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{msgRoomId}")
-    public ResponseEntity<?> getMessage(@PathVariable String msgRoomId) {
-//        List<Object> chatList = messageRoomService.getAllChatList(user.getUserId());
 
-        return ResponseEntity.ok(null);
+//    상대방과의 채팅 내역을 가져오는 핸들러 메서드
+    @GetMapping("/{msgRoomId}")
+    public ResponseEntity<List<ChatMsgListDTO>> getMessage(@PathVariable Long msgRoomId) {
+        List<ChatMsgListDTO> messages = messageService.getMessages(msgRoomId);
+
+        return ResponseEntity.ok(messages);
     }
 
 
