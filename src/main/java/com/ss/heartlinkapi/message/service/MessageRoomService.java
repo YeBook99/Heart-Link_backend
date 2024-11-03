@@ -30,11 +30,9 @@ public class MessageRoomService {
     private final ProfileRepository profileRepository;
     private final MessageService messageService;
 
-    public List<Object> getAllChatList(Long userId) {
+    public List<Object> getChatUsers(Long userId) {
 
-        List<Object> chatList = new ArrayList<>();
-
-
+        List<Object> chatUsers = new ArrayList<>();
 
         List<MessageRoomEntity> messageRoomEntities = messageRoomRepository.findByUser1IdOrUser2Id(userId, userId);
 
@@ -44,17 +42,17 @@ public class MessageRoomService {
             HashMap<String, Object> chat = new HashMap<>();
             List<ChatMsgListDTO> messages = new ArrayList();
 
-            Long MyUserId = 0L;
+            Long otherUserId = 0L;
 
 //            대화 상대 userId를 확인하는 조건문
             if (Objects.equals(entity.getUser1Id(), userId)) {
-                MyUserId = entity.getUser2Id();
+                otherUserId = entity.getUser2Id();
             } else {
-                MyUserId = entity.getUser1Id();
+                otherUserId = entity.getUser1Id();
             }
 
 //            대화 상대 entity 가져오기
-            UserEntity chatUserEntity = userRepository.findById(MyUserId).get();
+            UserEntity chatUserEntity = userRepository.findById(otherUserId).get();
 
 //            대화 상대 유저이름
             String otherLoginId = chatUserEntity.getLoginId();
@@ -76,14 +74,11 @@ public class MessageRoomService {
 //            로그인 상태 확인
             chat.put("login", true);
 
-//          메세지 리스트 불러오기
-            messages = messageService.getAllChatMessage(entity.getId());
-            chat.put("messages", messages);
 
-            chatList.add(chat);
+            chatUsers.add(chat);
         }
 
-        return chatList;
+        return chatUsers;
     }
 
     public void applyMessage(ApplyMessageDTO applyMessageDTO) {
