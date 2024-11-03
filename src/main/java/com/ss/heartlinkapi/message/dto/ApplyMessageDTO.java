@@ -14,3 +14,5 @@ public class ApplyMessageDTO {
     private Long applyId;
     private String type;
 }
+
+//  비공개 유저에게 메시지 보낼때 담을 요청이 저장되는 DTO

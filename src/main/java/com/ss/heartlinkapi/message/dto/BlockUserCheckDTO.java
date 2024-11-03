@@ -13,3 +13,5 @@ public class BlockUserCheckDTO {
     private Long userId;
     private Long blockUserId;
 }
+
+//  block유저인지 체크할 때 쓰이는 DTO
