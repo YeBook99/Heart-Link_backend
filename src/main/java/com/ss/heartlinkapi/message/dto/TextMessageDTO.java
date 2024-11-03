@@ -14,3 +14,5 @@ public class TextMessageDTO {
     private Long senderId;
     private String content;
 }
+
+//  텍스트 메시지인 경우 컨트롤러에 받아온 값을 임시 저장할 때 쓰이는 DTO

@@ -21,3 +21,5 @@ public class SaveMsgDTO {
     private boolean isRead;
 
 }
+
+//  메세지 저장에 쓰이는 DTO

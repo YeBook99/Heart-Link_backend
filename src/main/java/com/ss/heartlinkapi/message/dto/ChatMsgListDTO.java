@@ -21,3 +21,5 @@ public class ChatMsgListDTO {
     private boolean isRead;
 
 }
+
+//  messageList에 담길 메세지를 저장할 DTO

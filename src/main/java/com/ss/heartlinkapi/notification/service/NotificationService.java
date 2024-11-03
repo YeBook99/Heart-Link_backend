@@ -137,7 +137,7 @@ public class NotificationService {
         UserEntity user = new UserEntity();
         user.setUserId(userId);
         NotificationEntity notificationEntity = new NotificationEntity().builder()
-                .user(user)
+                .userId(user.getUserId())
                 .message(message)
                 .userImg(otherUserImg)
                 .isRead(true)
@@ -149,14 +149,15 @@ public class NotificationService {
     //      내 알람 리스트 불러오기
     public List<NotificationDTO> getNotifications(CustomUserDetails user) {
         UserEntity userEntity = new UserEntity();
-        userEntity.setUserId(user.getUserId());
 
-        List<NotificationEntity> notifications = notificationRepository.findByUser(userEntity);
+        List<NotificationEntity> notifications = notificationRepository.findByUserId(user.getUserId());
 
         List<NotificationDTO> notificationDTOS = new ArrayList<>();
 
         for(NotificationEntity notificationEntity : notifications) {
             NotificationDTO notificationDTO = new NotificationDTO();
+            notificationDTO.setOtherUserImg(notificationEntity.getUserImg());
+            notificationDTO.setType(String.valueOf(notificationEntity.getType()));
             notificationDTO.setCreatedAt(notificationEntity.getCreatedDate());
             notificationDTO.setMessage(notificationEntity.getMessage());
 

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,7 @@ public class MessageController {
     private final MessageRoomService messageRoomService;
     private final MessageService messageService;
 
+    //      images 파일내의 이미지를 가져오기 위한 endpoint
     @GetMapping("/images/{filename:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         try {
@@ -51,18 +53,32 @@ public class MessageController {
         }
     }
 
-    //    메세지와 관련된 모든 정보 가져오기
+    //        채팅상대방 목록과 나의 정보를 가져오는 핸들러 메서드
     @GetMapping
-    public ResponseEntity<HashMap<String, Object>> getAllChatList(@AuthenticationPrincipal CustomUserDetails user) {
+    public ResponseEntity<HashMap<String, Object>> getChatUsers(@AuthenticationPrincipal CustomUserDetails user) {
 
         HashMap<String, Object> response = new HashMap<>();
-        response.put("MyLoginId", user.getUsername());
-        response.put("MyUserId", user.getUserId());
-        List<Object> chatList = messageRoomService.getAllChatList(user.getUserId());
-        response.put("chatList", chatList);
+
+//        내 정보를 저장
+        response.put("myLoginId", user.getUsername());
+        response.put("myUserId", user.getUserId());
+
+//        채팅상대방 목록과 상대방의 정보를 가져오기
+        List<Object> chatUsers = messageRoomService.getChatUsers(user.getUserId());
+        response.put("chatUsers", chatUsers);
 
         return ResponseEntity.ok(response);
     }
+
+
+//    상대방과의 채팅 내역을 가져오는 핸들러 메서드
+    @GetMapping("/{msgRoomId}")
+    public ResponseEntity<List<ChatMsgListDTO>> getMessage(@PathVariable Long msgRoomId) {
+        List<ChatMsgListDTO> messages = messageService.getMessages(msgRoomId);
+
+        return ResponseEntity.ok(messages);
+    }
+
 
     //    텍스트 메세지를 저장
     @PostMapping("/messages/text")
@@ -84,8 +100,8 @@ public class MessageController {
     //    이미지 파일 또는 gif를 메시지 저장
     @PostMapping("/messages/img")
     public ResponseEntity<String> saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
-                                                       @RequestParam("msgRoomId") Long msgRoomId,
-                                                       @RequestParam("senderId") Long senderId) {
+                                                   @RequestParam("msgRoomId") Long msgRoomId,
+                                                   @RequestParam("senderId") Long senderId) {
 
 //        이미지가 비었는지 확인
         if (multipartFile.isEmpty()) {

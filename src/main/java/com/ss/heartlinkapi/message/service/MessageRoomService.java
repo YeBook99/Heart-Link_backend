@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.message.service;
 
 import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.message.repository.MessageRoomRepository;
@@ -30,11 +31,9 @@ public class MessageRoomService {
     private final ProfileRepository profileRepository;
     private final MessageService messageService;
 
-    public List<Object> getAllChatList(Long userId) {
+    public List<Object> getChatUsers(Long userId) {
 
-        List<Object> chatList = new ArrayList<>();
-
-
+        List<Object> chatUsers = new ArrayList<>();
 
         List<MessageRoomEntity> messageRoomEntities = messageRoomRepository.findByUser1IdOrUser2Id(userId, userId);
 
@@ -44,17 +43,17 @@ public class MessageRoomService {
             HashMap<String, Object> chat = new HashMap<>();
             List<ChatMsgListDTO> messages = new ArrayList();
 
-            Long MyUserId = 0L;
+            Long otherUserId = 0L;
 
 //            대화 상대 userId를 확인하는 조건문
             if (Objects.equals(entity.getUser1Id(), userId)) {
-                MyUserId = entity.getUser2Id();
+                otherUserId = entity.getUser2Id();
             } else {
-                MyUserId = entity.getUser1Id();
+                otherUserId = entity.getUser1Id();
             }
 
 //            대화 상대 entity 가져오기
-            UserEntity chatUserEntity = userRepository.findById(MyUserId).get();
+            UserEntity chatUserEntity = userRepository.findById(otherUserId).get();
 
 //            대화 상대 유저이름
             String otherLoginId = chatUserEntity.getLoginId();
@@ -70,20 +69,26 @@ public class MessageRoomService {
             chat.put("msgRoomId", messageRoomId);
 
 //            마지막 메시지 구하기
-            String lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
-            chat.put("lastMessage", lastMessage);
+            MessageEntity lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
+            if(lastMessage == null) {
+                chat.put("lastMessage", null);
+            }
+            else{
+                if(lastMessage.getContent()!=null)
+                    chat.put("lastMessage", lastMessage.getContent());
+                else if(lastMessage.getImgUrl()!=null)
+                    chat.put("lastMessage", "사진을 보냈습니다.");
+            }
+
 
 //            로그인 상태 확인
             chat.put("login", true);
 
-//          메세지 리스트 불러오기
-            messages = messageService.getAllChatMessage(entity.getId());
-            chat.put("messages", messages);
 
-            chatList.add(chat);
+            chatUsers.add(chat);
         }
 
-        return chatList;
+        return chatUsers;
     }
 
     public void applyMessage(ApplyMessageDTO applyMessageDTO) {
