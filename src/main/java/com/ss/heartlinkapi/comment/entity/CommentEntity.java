@@ -93,5 +93,16 @@ public class CommentEntity {
 	@JsonManagedReference
 	@JsonIgnoreProperties({"commentId"})
 	private List<ContentLinktagEntity> commentLinktags;
+	
+	
+	@Override
+	public String toString() {
+	    return "CommentEntity{" +
+	            "commentId=" + commentId +
+	            ", content='" + content + '\'' +
+	            ", likes=" + (likes != null ? likes.size() : 0) + 
+	            '}';
+	}
+
 
 }
