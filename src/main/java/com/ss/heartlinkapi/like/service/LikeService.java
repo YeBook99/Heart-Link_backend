@@ -187,7 +187,7 @@ public class LikeService {
                 postRepository.save(post);
 
                 notificationService.notifyLikePost(myLoginId, postId, userId);
-            } else {
+            } else if (comment != null) {
                 like.setCommentId(comment);
                 comment.setLikeCount(comment.getLikeCount() + 1);
                 commentRepository.save(comment);
