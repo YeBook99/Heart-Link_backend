@@ -89,5 +89,11 @@ public class MessageService {
         return false;
 
     }
+
+    public boolean blockCheck(Long senderId, Long otherUserId) {
+        if(blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(senderId, otherUserId))
+            return true;
+        return blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(otherUserId, senderId);
+    }
 }
 
