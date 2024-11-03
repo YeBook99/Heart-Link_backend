@@ -53,6 +53,24 @@ public class MessageController {
         }
     }
 
+    //          채팅방을 개설하는 핸들러 메서드
+    @PostMapping("/new/{otherUserId}")
+    public ResponseEntity<String> createChatRoom(@PathVariable Long otherUserId, @AuthenticationPrincipal CustomUserDetails user){
+
+        //        상대방의 존재여부 확인
+        if (!messageRoomService.existOtherUser(otherUserId))
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("존재하지 않거나 탈퇴한 유저입니다.");
+
+        //        이미 만들어진 채팅방인지 확인
+        if (messageRoomService.existChatRoom(user.getUserId(), otherUserId))
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 대화방이 존재하는 유저입니다.");
+
+        //        채팅방 생성
+        messageRoomService.createChatRoom(user.getUserId(), otherUserId);
+        return ResponseEntity.ok("create chatRoom");
+
+    }
+
     //        채팅상대방 목록과 나의 정보를 가져오는 핸들러 메서드
     @GetMapping
     public ResponseEntity<HashMap<String, Object>> getChatUsers(@AuthenticationPrincipal CustomUserDetails user) {
