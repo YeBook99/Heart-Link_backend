@@ -30,7 +30,7 @@ public class LoginController {
 	}
 
 	/********** 아이디 중복 확인 **********/
-	@GetMapping("/idcheck")
+	@PostMapping("/idcheck")
 	public ResponseEntity<?> usercheck(@RequestBody Map<String, String> request) {
 		String loginId = request.get("loginId");
 		boolean isExist = loginService.checkId(loginId);
@@ -131,7 +131,7 @@ public class LoginController {
 	}
 
 	/********** 로그인 창에서의 아이디 찾기 **********/
-	@GetMapping("/find/loginId")
+	@PostMapping("/find/loginId")
 	public ResponseEntity<?> findId(@RequestBody Map<String, String> request) {
 
 		String phone = request.get("phone");
