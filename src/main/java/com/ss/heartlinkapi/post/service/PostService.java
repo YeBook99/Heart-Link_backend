@@ -430,14 +430,16 @@ public class PostService {
 	public Map<String, Object> getPostFilesByUserId(Long currentUserId, Long userId, Integer cursor, int limit) {
 	    UserEntity partner = coupleService.getCouplePartner(userId);
 	    
-	    // 현재 사용자가 차단한 경우 확인
-	    boolean isBlocked = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(userId, currentUserId);
+	    // 로그인한 사용자가 차당당한 경우
+	    boolean isBlocked1 = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(userId, currentUserId);
+	    boolean isBlocked2 = blockRepository.existsByBlockedId_UserIdAndCoupleId_CoupleId(userId, currentUserId);
 
-	    // 현재 사용자가 차단당한 경우 확인
-	    boolean isBlocker = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(currentUserId, userId);
+	    // 로그인한 사용자가 차단한 경우
+	    boolean isBlocker1 = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(currentUserId, userId);
+	    boolean isBlocker2 = blockRepository.existsByBlockedId_UserIdAndCoupleId_CoupleId(currentUserId, userId);
 
 	    
-	    if (isBlocked || isBlocker) {
+	    if ((isBlocked1 || isBlocked2) || (isBlocker1 || isBlocker2)) {
 	        // 차단된 경우 오류 응답 반환
 	        Map<String, Object> response = new HashMap<>();
 	        response.put("error", "게시글을 불러올 수 없습니다");
