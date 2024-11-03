@@ -100,7 +100,11 @@ public class MessageController {
 
     //    텍스트 메세지를 저장
     @PostMapping("/messages/text")
-    public ResponseEntity<String> createTextMessage(@RequestBody TextMessageDTO textMessageDTO) {
+    public ResponseEntity<String> createTextMessage(@RequestBody TextMessageDTO textMessageDTO, @RequestParam Long otherUserId) {
+
+        //      상대방이 차단되거나 차단한 유저인지 확인
+        if(messageService.blockCheck(textMessageDTO.getSenderId(), otherUserId))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("차단 유저에게는 메세지를 보낼 수 없습니다.");
 
         SaveMsgDTO saveMsgDTO = new SaveMsgDTO().builder()
                 .msgRoomId(textMessageDTO.getMsgRoomId())
@@ -119,7 +123,12 @@ public class MessageController {
     @PostMapping("/messages/img")
     public ResponseEntity<String> saveImageMessage(@RequestParam("file") MultipartFile multipartFile,
                                                    @RequestParam("msgRoomId") Long msgRoomId,
-                                                   @RequestParam("senderId") Long senderId) {
+                                                   @RequestParam("senderId") Long senderId
+                                                , @RequestParam("otherUserId") Long otherUserId) {
+
+        //      상대방이 차단되거나 차단한 유저인지 확인
+        if (messageService.blockCheck(senderId, otherUserId))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("차단 유저에게는 메세지를 보낼 수 없습니다.");
 
 //        이미지가 비었는지 확인
         if (multipartFile.isEmpty()) {
