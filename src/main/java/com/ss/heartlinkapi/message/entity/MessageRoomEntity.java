@@ -1,7 +1,9 @@
 package com.ss.heartlinkapi.message.entity;
 
 
+import com.ss.heartlinkapi.notification.entity.Type;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -21,8 +23,9 @@ public class MessageRoomEntity {
     private Long user1Id;
     @Column(name = "user2_id")
     private Long user2Id;
-    @Column(name = "type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private MsgRoomType msgRoomType;
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
