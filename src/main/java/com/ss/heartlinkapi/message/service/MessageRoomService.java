@@ -4,6 +4,7 @@ import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
+import com.ss.heartlinkapi.message.entity.MsgRoomType;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.message.repository.MessageRoomRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
@@ -64,6 +65,9 @@ public class MessageRoomService {
             String otherUserImg = profileEntity.getProfile_img();
             chat.put("otherUserImg", otherUserImg);
 
+//            대화 상대 유저 userId
+            chat.put("otherUserId", otherUserId);
+
 //            msg_room_id 가져오기
             Long messageRoomId = entity.getId();
             chat.put("msgRoomId", messageRoomId);
@@ -98,7 +102,7 @@ public class MessageRoomService {
         messageRoomEntity.setUser2Id(applyMessageDTO.getApplyId());
         messageRoomEntity.setCreatedAt(LocalDateTime.now());
 //        수락전은 N으로해서 팔로우 된 사람들과의 대화랑 구분
-        messageRoomEntity.setType("N");
+        messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PRIVATE"));
         messageRoomRepository.save(messageRoomEntity);
     }
 //    msgRoomId를 기준으로 방을 삭제
@@ -109,7 +113,27 @@ public class MessageRoomService {
 //    msgRoomId를 기준으로 type을 y로 업데이트
     public void applyAccept(Long msgRoomId) {
         MessageRoomEntity messageRoomEntity = messageRoomRepository.findById(msgRoomId).orElseThrow(() -> new RuntimeException("MsgRoomId not found"));
-        messageRoomEntity.setType("Y");
+        messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PUBLIC"));
+        messageRoomRepository.save(messageRoomEntity);
+    }
+//    msgRoom 존재 여부
+    public boolean existChatRoom(Long userId, Long otherUserId) {
+        if(messageRoomRepository.existsByUser1IdAndUser2Id(userId, otherUserId))
+            return true;
+        else return messageRoomRepository.existsByUser1IdAndUser2Id(otherUserId, userId);
+    }
+
+//    상대방 존재 여부
+    public boolean existOtherUser(Long otherUserId) {
+        return userRepository.existsById(otherUserId);
+    }
+
+//    채팅방 생성
+    public void createChatRoom(Long userId, Long otherUserId) {
+        MessageRoomEntity messageRoomEntity = new MessageRoomEntity();
+        messageRoomEntity.setUser1Id(userId);
+        messageRoomEntity.setUser2Id(otherUserId);
+        messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PUBLIC"));
         messageRoomRepository.save(messageRoomEntity);
     }
 }
