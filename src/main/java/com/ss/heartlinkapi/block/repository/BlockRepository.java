@@ -4,6 +4,8 @@ import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.block.entity.BlockEntity;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
@@ -21,5 +23,11 @@ public interface BlockRepository extends JpaRepository<BlockEntity, Long>{
     
     /********* 유저엔티티로 블락엔티티리스트 페이징 처리 후 반환 **********/
     Page<BlockEntity> findByBlockerId(UserEntity blocker, Pageable pageable);
+
+    /********* 차단한 커플글 게시글 접근 제한 **********/
+	boolean existsByBlockedId_UserIdAndBlockerId_UserId(Long userId, Long currentUserId);
+	@Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END " +
+	           "FROM BlockEntity b WHERE b.blockedId.userId = :userId AND b.coupleId.coupleId = :coupleId")
+	boolean existsByBlockedId_UserIdAndCoupleId_CoupleId(@Param("userId") Long userId, @Param("coupleId") Long coupleId);
     
 }
