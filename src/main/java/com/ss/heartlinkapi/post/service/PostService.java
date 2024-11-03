@@ -27,6 +27,7 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
@@ -73,8 +74,9 @@ public class PostService {
 	private final MentionRepository mentionRepository;
 	private final CoupleMissionService coupleMissionService;
 	private final ElasticService elasticService;
+	private final BlockRepository blockRepository;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -87,6 +89,7 @@ public class PostService {
 		this.mentionRepository = mentionRepository;
 		this.coupleMissionService = coupleMissionService;
 		this.elasticService = elasticService;
+		this.blockRepository = blockRepository;
 	}
 
 	// 게시글 작성
@@ -424,8 +427,22 @@ public class PostService {
 	}
 	
 	// 사용자와 사용자의 커플 게시글 목록 가져오기
-	public Map<String, Object> getPostFilesByUserId(Long userId, Integer cursor, int limit) {
+	public Map<String, Object> getPostFilesByUserId(Long currentUserId, Long userId, Integer cursor, int limit) {
 	    UserEntity partner = coupleService.getCouplePartner(userId);
+	    
+	    // 현재 사용자가 차단한 경우 확인
+	    boolean isBlocked = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(userId, currentUserId);
+
+	    // 현재 사용자가 차단당한 경우 확인
+	    boolean isBlocker = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(currentUserId, userId);
+
+	    
+	    if (isBlocked || isBlocker) {
+	        // 차단된 경우 오류 응답 반환
+	        Map<String, Object> response = new HashMap<>();
+	        response.put("error", "게시글을 불러올 수 없습니다");
+	        return response;
+	    }
 	    
 	    List<PostFileEntity> myPostFiles = postFileRepository.findPostFilesByUserId(userId);
 	    List<PostFileEntity> partnerPostFiles = new ArrayList<>();

@@ -21,5 +21,8 @@ public interface BlockRepository extends JpaRepository<BlockEntity, Long>{
     
     /********* 유저엔티티로 블락엔티티리스트 페이징 처리 후 반환 **********/
     Page<BlockEntity> findByBlockerId(UserEntity blocker, Pageable pageable);
+
+
+	boolean existsByBlockedId_UserIdAndBlockerId_UserId(Long userId, Long currentUserId);
     
 }
