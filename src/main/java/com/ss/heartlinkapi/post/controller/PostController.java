@@ -166,11 +166,15 @@ public class PostController {
 	// 사용자와 사용자의 커플 게시글 목록 조회
 	@GetMapping("/couple/{userId}")
 	public ResponseEntity<?> getCouplePostFiles(
+			@AuthenticationPrincipal CustomUserDetails user,
 	        @PathVariable Long userId,
 	        @RequestParam(required = false) Integer cursor,
 	        @RequestParam(defaultValue = "6") int limit) {
 
-	    Map<String, Object> postFiles = postService.getPostFilesByUserId(userId, cursor, limit);
+		// 로그인한 사용자의 userId
+		Long currentUserId = user.getUserId();
+		
+	    Map<String, Object> postFiles = postService.getPostFilesByUserId(currentUserId, userId, cursor, limit);
 	    
 	    return ResponseEntity.ok(postFiles);
 	}
