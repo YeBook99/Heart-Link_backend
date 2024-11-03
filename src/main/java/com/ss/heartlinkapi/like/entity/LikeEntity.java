@@ -48,5 +48,16 @@ public class LikeEntity {
 	@CreatedDate
 	@Column(name = "created_at", nullable= false, updatable = false)
 	private LocalDateTime createdAt;			// 생성일시
+	
+	
+	@Override
+	public String toString() {
+	    return "LikeEntity{" +
+	            "likeId=" + likeId +
+	            ", userId=" + userId +
+	            ", commentId=" + (commentId != null ? commentId.getCommentId() : "null") + // null 체크 추가
+	            '}';
+	}
+
 
 }
