@@ -64,6 +64,9 @@ public class MessageRoomService {
             String otherUserImg = profileEntity.getProfile_img();
             chat.put("otherUserImg", otherUserImg);
 
+//            대화 상대 유저 userId
+            chat.put("otherUserId", otherUserId);
+
 //            msg_room_id 가져오기
             Long messageRoomId = entity.getId();
             chat.put("msgRoomId", messageRoomId);
