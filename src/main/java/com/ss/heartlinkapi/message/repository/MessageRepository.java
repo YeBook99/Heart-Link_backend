@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
 
-    @Query(value = "SELECT m.content FROM message m WHERE m.msg_room_id=:id ORDER BY m.created_at desc LIMIT 1", nativeQuery = true)
-    String findByMsgRoomIdOrderByCreatedAt(@Param("id") Long id);
+    @Query(value = "SELECT * FROM message m WHERE m.msg_room_id=:id ORDER BY m.created_at desc LIMIT 1", nativeQuery = true)
+    MessageEntity findByMsgRoomIdOrderByCreatedAt(@Param("id") Long id);
 
     List<MessageEntity> findByMsgRoomId(Long msgRoomId);
 }
