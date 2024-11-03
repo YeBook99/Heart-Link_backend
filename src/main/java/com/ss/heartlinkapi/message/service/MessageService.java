@@ -28,10 +28,11 @@ public class MessageService {
     * 사용자들의 대화내역은 채팅방 번호 즉 msgRoomId를 기본키로 해서 저장되므로
     * 이를 기준으로 메세지를 list형태에 저장하여 가져온다.
     */
-    public List<ChatMsgListDTO> getAllChatMessage(Long msgRoomId) {
+    public List<ChatMsgListDTO> getMessages(Long msgRoomId) {
 
         List<ChatMsgListDTO> list = new ArrayList<>();
-        
+
+//        msgRoomId를 기준으로 메시지 내역을 가져옴.
         List<MessageEntity> messageEntities = messageRepository.findByMsgRoomId(msgRoomId);
 
         for (MessageEntity entity : messageEntities) {
