@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.message.service;
 
 import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.message.repository.MessageRoomRepository;
@@ -68,8 +69,17 @@ public class MessageRoomService {
             chat.put("msgRoomId", messageRoomId);
 
 //            마지막 메시지 구하기
-            String lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
-            chat.put("lastMessage", lastMessage);
+            MessageEntity lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
+            if(lastMessage == null) {
+                chat.put("lastMessage", null);
+            }
+            else{
+                if(lastMessage.getContent()!=null)
+                    chat.put("lastMessage", lastMessage.getContent());
+                else if(lastMessage.getImgUrl()!=null)
+                    chat.put("lastMessage", "사진을 보냈습니다.");
+            }
+
 
 //            로그인 상태 확인
             chat.put("login", true);
