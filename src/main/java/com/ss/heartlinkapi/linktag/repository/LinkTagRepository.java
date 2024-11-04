@@ -1,7 +1,6 @@
 package com.ss.heartlinkapi.linktag.repository;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
-import com.ss.heartlinkapi.mission.dto.LinkMissionDTO;
 
 import java.util.Optional;
 

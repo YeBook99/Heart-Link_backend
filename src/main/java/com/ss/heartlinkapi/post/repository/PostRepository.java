@@ -10,9 +10,6 @@ import org.springframework.data.repository.query.Param;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 public interface PostRepository extends JpaRepository<PostEntity, Long>{
 
 	// 내 팔로잉 게시물 조회

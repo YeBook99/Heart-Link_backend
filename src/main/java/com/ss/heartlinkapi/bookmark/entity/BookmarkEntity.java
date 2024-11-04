@@ -17,7 +17,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.ss.heartlinkapi.post.entity.PostEntity;
-import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 import lombok.Data;

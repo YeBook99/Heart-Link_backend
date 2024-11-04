@@ -1,11 +1,8 @@
 package com.ss.heartlinkapi.mission.repository;
 
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
-import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
