@@ -6,7 +6,6 @@ import com.ss.heartlinkapi.report.entity.ReportEntity;
 import com.ss.heartlinkapi.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
