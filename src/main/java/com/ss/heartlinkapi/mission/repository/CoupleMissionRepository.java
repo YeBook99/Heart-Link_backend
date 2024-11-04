@@ -16,4 +16,5 @@ public interface CoupleMissionRepository extends JpaRepository<LinkMissionEntity
             "and function('YEAR', m.end_date) = :year " +
             "and function('MONTH', m.end_date) = :month ")
     List<LinkMissionEntity> findMissionByYearMonth(@Param("year") int year, @Param("month") int month);
+
 }
