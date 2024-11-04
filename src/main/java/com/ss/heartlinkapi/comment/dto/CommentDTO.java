@@ -1,12 +1,6 @@
 package com.ss.heartlinkapi.comment.dto;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
-
-import com.ss.heartlinkapi.post.dto.PostDTO;
-import com.ss.heartlinkapi.post.dto.PostFileDTO;
-import com.ss.heartlinkapi.post.entity.Visibility;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
