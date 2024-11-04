@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
 
 @Service
 public class AdminCoupleMissionService {
@@ -23,16 +24,27 @@ public class AdminCoupleMissionService {
 
     // 링크 미션 태그 추가
     public LinkMissionEntity addMissionTag(LinkTagEntity linkTag, LinkMissionDTO linkMissionDTO) {
-        LinkMissionEntity linkMissionEntity = new LinkMissionEntity();
-        linkMissionEntity.setLinkTagId(linkTag);
-        LocalDate startDate = LocalDate.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth(), 1);
-        int lastDay = YearMonth.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth()).atEndOfMonth().getDayOfMonth();
-        LocalDate endDate = LocalDate.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth(), lastDay);
+        List<LinkMissionEntity> thisMissions = missionRepository.findMissionByYearMonth(linkMissionDTO.getYear(), linkMissionDTO.getMonth());
+        boolean checkMission = false;
+        for(LinkMissionEntity linkMissionEntity : thisMissions) {
+            if(linkMissionEntity.getLinkTagId().getId()==linkTag.getId()){
+                checkMission = true;
+            }
+        }
+        if (thisMissions.size()<=8 && !checkMission) {
+            LinkMissionEntity linkMissionEntity = new LinkMissionEntity();
+            linkMissionEntity.setLinkTagId(linkTag);
+            LocalDate startDate = LocalDate.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth(), 1);
+            int lastDay = YearMonth.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth()).atEndOfMonth().getDayOfMonth();
+            LocalDate endDate = LocalDate.of(linkMissionDTO.getYear(), linkMissionDTO.getMonth(), lastDay);
 
-        linkMissionEntity.setStart_date(startDate);
-        linkMissionEntity.setEnd_date(endDate);
-        LinkMissionEntity result = missionRepository.save(linkMissionEntity);
-        return result;
+            linkMissionEntity.setStart_date(startDate);
+            linkMissionEntity.setEnd_date(endDate);
+            LinkMissionEntity result = missionRepository.save(linkMissionEntity);
+            return result;
+        } else {
+            return null;
+        }
     }
 
     // 미션 아이디로 미션 찾기
@@ -49,7 +61,7 @@ public class AdminCoupleMissionService {
         beforeMission.setStart_date(startDate);
         beforeMission.setEnd_date(endDate);
 
-        LinkTagEntity findTag = linkTagRepository.findByKeywordContains(afterMission.getMissionTagName());
+        LinkTagEntity findTag = linkTagRepository.findAllByKeyword(afterMission.getMissionTagName());
 
         if(findTag != null) {
             // 기존 태그가 존재할 때 기존 태그 사용

@@ -38,7 +38,11 @@ public class CoupleController {
 
             // 오류 404 검사
             if(couple == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.badRequest().body("찾을 수 없는 커플입니다.");
+            }
+
+            if(couple.getAnniversaryDate()!=null) {
+                return ResponseEntity.badRequest().body("이미 기념일이 설정되었습니다.");
             }
             couple.setAnniversaryDate(date);
             CoupleEntity setCouple = coupleService.setAnniversary(couple);
@@ -193,13 +197,16 @@ public class CoupleController {
                 return ResponseEntity.notFound().build();
             }
 
+            if(couple.getBreakupDate() != null) {
+                return ResponseEntity.badRequest().body("이미 연결 해지되어 유예 기간입니다. 연결 해지 예정일 : "+couple.getBreakupDate().plusDays(1));
+            }
             CoupleEntity result = coupleService.setBreakDate(couple);
 
             if(result == null) {
                 return ResponseEntity.badRequest().body("연결 해지 실패");
             }
 
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok("연결 해지가 완료되었습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -221,11 +228,15 @@ public class CoupleController {
                 return ResponseEntity.notFound().build();
             }
 
+            if(couple.getBreakupDate()==null) {
+                return ResponseEntity.badRequest().body("이미 연결되어 있는 상태입니다.");
+            }
+
             CoupleEntity result = coupleService.deleteBreakDate(couple);
             if (result == null) {
                 return ResponseEntity.badRequest().body("연결 해지 취소 실패");
             }
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok("연결 해지가 취소되었습니다.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();

@@ -90,7 +90,7 @@ public class SearchService {
     public LinkTagEntity searchByTag(String keyword, Long userId) {
         keyword = keyword.trim().substring(1);
 
-        LinkTagEntity findTag = linkTagRepository.findByKeywordContains(keyword);
+        LinkTagEntity findTag = linkTagRepository.findAllByKeyword(keyword);
         UserEntity user = userRepository.findById(userId).orElse(null);
 
         if(user == null || findTag == null) {

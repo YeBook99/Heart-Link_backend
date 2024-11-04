@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -29,29 +30,29 @@ public class AdminCoupleMissionController {
         try{
 
             if(missionTag == null || missionTag.getMissionTagName().isEmpty()){
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity.badRequest().body("태그를 입력해주세요.");
             }
 
-            LinkTagEntity result = linkTagRepository.findByKeywordContains(missionTag.getMissionTagName());
+            LinkTagEntity result = linkTagRepository.findAllByKeyword(missionTag.getMissionTagName().trim());
 
             if (result != null){
                 // 기존 태그를 가져와서 넣기
                 LinkMissionEntity addResult = adminMissionService.addMissionTag(result, missionTag);
                 if(addResult == null){
-                    return ResponseEntity.badRequest().build();
+                    return ResponseEntity.badRequest().body("이미 11월의 미션이 9개이거나 태그가 미션에 존재하는 태그입니다.");
                 } else {
                     return ResponseEntity.ok(addResult);
                 }
             } else {
                 // 태그 명 새로 만들기
                 LinkTagEntity linkTagEntity = new LinkTagEntity();
-                linkTagEntity.setKeyword(missionTag.getMissionTagName());
+                linkTagEntity.setKeyword(missionTag.getMissionTagName().trim());
                 LinkTagEntity addTagResult = linkTagRepository.save(linkTagEntity);
                 LinkMissionEntity addResult = adminMissionService.addMissionTag(addTagResult, missionTag);
                 if(addResult == null){
-                    return ResponseEntity.badRequest().build();
+                    return ResponseEntity.badRequest().body("이미 11월의 미션이 9개이거나 태그가 미션에 존재하는 태그입니다.");
                 } else {
-                    return ResponseEntity.status(HttpStatus.CREATED).body(addResult);
+                    return ResponseEntity.ok(addResult);
                 }
             }
 
