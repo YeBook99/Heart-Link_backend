@@ -49,7 +49,14 @@ public class SmsController {
 	
 	@PostMapping("/validate")
 	public ResponseEntity<?> validateCode(@RequestBody VerificationDTO verificationDTO){
+		
 		String phone = verificationDTO.getPhone();
+		
+		// 전화번호 유효성 검사
+		if(!CheckPhone.isPhoneValid(phone)) {
+			 return ResponseEntity.badRequest().body("유효하지 않은 전화번호입니다.");
+		}
+		
 		String code = verificationDTO.getCode();
 		
 	    try {	    	

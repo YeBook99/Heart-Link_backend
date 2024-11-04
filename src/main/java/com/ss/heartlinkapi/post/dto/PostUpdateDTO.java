@@ -1,10 +1,5 @@
 package com.ss.heartlinkapi.post.dto;
 
-import java.util.List;
-
-import com.ss.heartlinkapi.post.entity.FileType;
-import com.ss.heartlinkapi.post.entity.Visibility;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -24,7 +24,7 @@ public class PostFileService {
 		if(fileUrl.endsWith(".jpg") || fileUrl.endsWith(".jpeg") || fileUrl.endsWith(".png")) {
 
 			return FileType.IMAGE;
-		}else if(fileUrl.endsWith(".mp4") || fileUrl.endsWith(".avi") || fileUrl.endsWith(".mov")) {
+		}else if(fileUrl.endsWith(".mp4") || fileUrl.endsWith(".avi") || fileUrl.endsWith(".mov") || fileUrl.endsWith(".gif")) {
 			
 			return FileType.VIDEO;
 		}

@@ -140,7 +140,7 @@ public class PostService {
 	                String originalFileName = file.getOriginalFilename();
 	                String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf(".")) : "";
 	                
-	                if (!fileExtension.matches("\\.(jpg|jpeg|png|mp4|avi|mov)$")) {
+	                if (!fileExtension.matches("\\.(jpg|jpeg|png|mp4|avi|mov|gif)$")) {
 	                    throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
 	                }
 	                
@@ -208,7 +208,7 @@ public class PostService {
 		}
 		
 		// 해시태그 처리
-		Pattern linktagPattern = Pattern.compile("&([\\w가-힣]+)");
+		Pattern linktagPattern = Pattern.compile("&([\\w가-힣_]+)");
 		Matcher linktagMatcher = linktagPattern.matcher(content);
 		
 		List<ContentLinktagEntity> contentLinktags = new ArrayList<>();
@@ -437,14 +437,12 @@ public class PostService {
 	    // 로그인한 사용자가 차단한 경우
 	    boolean isBlocker1 = blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(currentUserId, userId);
 	    boolean isBlocker2 = blockRepository.existsByBlockedId_UserIdAndCoupleId_CoupleId(currentUserId, userId);
-
 	    
-	    if ((isBlocked1 || isBlocked2) || (isBlocker1 || isBlocker2)) {
-	        // 차단된 경우 오류 응답 반환
-	        Map<String, Object> response = new HashMap<>();
-	        response.put("error", "게시글을 불러올 수 없습니다");
-	        return response;
-	    }
+	    // 차단당한 경우
+	    boolean isBlocked = isBlocked1 || isBlocked2;
+	    
+	    // 차단한경우
+	    boolean isBlocker = isBlocker1 || isBlocker2;
 	    
 	    List<PostFileEntity> myPostFiles = postFileRepository.findPostFilesByUserId(userId);
 	    List<PostFileEntity> partnerPostFiles = new ArrayList<>();
@@ -482,6 +480,8 @@ public class PostService {
 	    response.put("data", postFileDTOs);
 	    response.put("nextCursor", nextCursor);
 	    response.put("hasNext", nextCursor != null);
+	    response.put("isBlocked", isBlocked);  // 차단당함
+	    response.put("isBlocker", isBlocker);  // 차단함
 
 	    return response;
 	}
