@@ -1,6 +1,5 @@
 package com.ss.heartlinkapi.notification.entity;
 
-import com.ss.heartlinkapi.user.entity.UserEntity;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
