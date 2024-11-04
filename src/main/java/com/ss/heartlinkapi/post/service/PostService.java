@@ -140,7 +140,7 @@ public class PostService {
 	                String originalFileName = file.getOriginalFilename();
 	                String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf(".")) : "";
 	                
-	                if (!fileExtension.matches("\\.(jpg|jpeg|png|mp4|avi|mov)$")) {
+	                if (!fileExtension.matches("\\.(jpg|jpeg|png|mp4|avi|mov|gif)$")) {
 	                    throw new IllegalArgumentException("지원하지 않는 파일 형식입니다.");
 	                }
 	                
