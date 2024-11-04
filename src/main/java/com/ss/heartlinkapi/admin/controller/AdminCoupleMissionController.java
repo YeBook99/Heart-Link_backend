@@ -39,7 +39,7 @@ public class AdminCoupleMissionController {
                 // 기존 태그를 가져와서 넣기
                 LinkMissionEntity addResult = adminMissionService.addMissionTag(result, missionTag);
                 if(addResult == null){
-                    return ResponseEntity.badRequest().body("이미 11월의 미션이 9개이거나 태그가 미션에 존재하는 태그입니다.");
+                    return ResponseEntity.badRequest().body("당월의 미션이 9개거나 이미 미션에 존재하는 태그입니다.");
                 } else {
                     return ResponseEntity.ok(addResult);
                 }
@@ -50,7 +50,7 @@ public class AdminCoupleMissionController {
                 LinkTagEntity addTagResult = linkTagRepository.save(linkTagEntity);
                 LinkMissionEntity addResult = adminMissionService.addMissionTag(addTagResult, missionTag);
                 if(addResult == null){
-                    return ResponseEntity.badRequest().body("이미 11월의 미션이 9개이거나 태그가 미션에 존재하는 태그입니다.");
+                    return ResponseEntity.badRequest().body("당월의 미션이 9개거나 이미 미션에 존재하는 태그입니다.");
                 } else {
                     return ResponseEntity.ok(addResult);
                 }
