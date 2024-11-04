@@ -208,7 +208,7 @@ public class PostService {
 		}
 		
 		// 해시태그 처리
-		Pattern linktagPattern = Pattern.compile("&([\\w가-힣]+)");
+		Pattern linktagPattern = Pattern.compile("&([\\w가-힣_]+)");
 		Matcher linktagMatcher = linktagPattern.matcher(content);
 		
 		List<ContentLinktagEntity> contentLinktags = new ArrayList<>();
