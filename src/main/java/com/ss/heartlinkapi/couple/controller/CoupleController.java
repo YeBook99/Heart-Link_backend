@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.couple.controller;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
+import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -259,6 +260,26 @@ public class CoupleController {
 
             coupleService.finalNowUnlinkCouple(couple);
             return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
+
+    // 유예 상태인지 확인
+    @GetMapping("/checkSoonBreak")
+    public ResponseEntity<?> checkSoonBreak(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try{
+            if(userDetails == null) {
+                return ResponseEntity.badRequest().body("해당되는 유저가 없습니다.");
+            }
+
+            if(userDetails.getUserEntity().getRole().equals(Role.ROLE_SINGLE)){
+                return ResponseEntity.ok("true");
+            } else {
+                return ResponseEntity.ok("false");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
