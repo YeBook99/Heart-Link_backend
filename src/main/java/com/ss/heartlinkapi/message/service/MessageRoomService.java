@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.message.service;
 
 import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.dto.FriendDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.entity.MsgRoomType;
@@ -13,6 +14,7 @@ import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -135,5 +137,29 @@ public class MessageRoomService {
         messageRoomEntity.setUser2Id(otherUserId);
         messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PUBLIC"));
         return messageRoomRepository.save(messageRoomEntity);
+    }
+    //  searchName으로 유저를 검색하는 메서드
+    public List<FriendDTO> searchUsers(Long userId, String searchName) {
+
+        List<FriendDTO> friends = new ArrayList<>();
+        List<UserEntity> users = userRepository.findBySearchName(searchName);
+
+        for (UserEntity user : users) {
+
+            if(Objects.equals(user.getUserId(), userId))
+                continue;
+            if(existChatRoom(userId, user.getUserId()))
+                continue;
+
+            FriendDTO friend = new FriendDTO();
+            String userImg = profileRepository.findByUserEntity(user).getProfile_img();
+            friend.setFriendImg(userImg);
+            friend.setFriendName(user.getLoginId());
+            friend.setFriendId(user.getUserId());
+
+            friends.add(friend);
+        }
+
+        return friends;
     }
 }

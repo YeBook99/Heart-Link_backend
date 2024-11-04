@@ -220,9 +220,12 @@ public class MessageController {
         else
             return ResponseEntity.ok("nonblock user");
     }
-
+    //  검색기반으로 팔로잉목록 가져오는 핸들러 메서드
     @GetMapping("/friends")
-    public ResponseEntity<?> getFriends(@AuthenticationPrincipal CustomUserDetails user, @RequestParam String searchName) {
+    public ResponseEntity<List<FriendDTO>> searchUsers(@AuthenticationPrincipal CustomUserDetails user, @RequestParam String searchName) {
 
+        List<FriendDTO> friends = messageRoomService.searchUsers(user.getUserId(), searchName);
+
+        return ResponseEntity.ok(friends);
     }
 }
