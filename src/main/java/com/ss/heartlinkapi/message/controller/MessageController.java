@@ -191,7 +191,7 @@ public class MessageController {
 
 
     //    비공개 사용자 메세지 요청 거절
-    @GetMapping("/message/rejection/{msgRoomId}")
+    @DeleteMapping("/message/rejection/{msgRoomId}")
     public ResponseEntity<String> applyRejection(@PathVariable("msgRoomId") Long msgRoomId) {
 
         messageRoomService.applyRejection(msgRoomId);
