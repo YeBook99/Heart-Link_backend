@@ -19,7 +19,7 @@ public interface CoupleRepository extends JpaRepository<CoupleEntity, Long> {
     @Transactional
     @Modifying
     @Query("update CoupleEntity c set c.matchCount = c.matchCount + 1 where c.coupleId = :coupleId")
-    public int matchCountUp(Long coupleId);
+    public int matchCountUp(@Param("coupleId") Long coupleId);
 
     // 연결 해지 예정 커플 리스트 반환
     public List<CoupleEntity> findCoupleEntityByBreakupDateIsNotNull();
