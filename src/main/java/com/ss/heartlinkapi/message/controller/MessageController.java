@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.message.controller;
 
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.message.dto.*;
+import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -66,8 +67,8 @@ public class MessageController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 대화방이 존재하는 유저입니다.");
 
         //        채팅방 생성
-        messageRoomService.createChatRoom(user.getUserId(), otherUserId);
-        return ResponseEntity.ok("create chatRoom");
+        MessageRoomEntity messageRoomEntity = messageRoomService.createChatRoom(user.getUserId(), otherUserId);
+        return ResponseEntity.ok(String.valueOf(messageRoomEntity.getId()));
 
     }
 
@@ -218,5 +219,10 @@ public class MessageController {
             return ResponseEntity.ok("block user");
         else
             return ResponseEntity.ok("nonblock user");
+    }
+
+    @GetMapping("/friends")
+    public ResponseEntity<?> getFriends(@AuthenticationPrincipal CustomUserDetails user, @RequestParam String searchName) {
+
     }
 }

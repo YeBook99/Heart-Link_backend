@@ -129,11 +129,11 @@ public class MessageRoomService {
     }
 
 //    채팅방 생성
-    public void createChatRoom(Long userId, Long otherUserId) {
+    public MessageRoomEntity createChatRoom(Long userId, Long otherUserId) {
         MessageRoomEntity messageRoomEntity = new MessageRoomEntity();
         messageRoomEntity.setUser1Id(userId);
         messageRoomEntity.setUser2Id(otherUserId);
         messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PUBLIC"));
-        messageRoomRepository.save(messageRoomEntity);
+        return messageRoomRepository.save(messageRoomEntity);
     }
 }
