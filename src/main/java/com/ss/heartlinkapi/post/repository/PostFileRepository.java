@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
-import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface PostFileRepository extends JpaRepository<PostFileEntity, Long>{
 	

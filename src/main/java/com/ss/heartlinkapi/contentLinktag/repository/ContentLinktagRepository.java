@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
-import com.ss.heartlinkapi.post.entity.PostEntity;
 
 import java.util.List;
 

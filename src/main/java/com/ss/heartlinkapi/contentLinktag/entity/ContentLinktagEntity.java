@@ -1,7 +1,5 @@
 package com.ss.heartlinkapi.contentLinktag.entity;
 
-import java.time.LocalDateTime;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,8 +13,6 @@ import javax.persistence.Table;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.post.entity.PostEntity;
-import com.ss.heartlinkapi.post.entity.Visibility;
-import com.ss.heartlinkapi.user.entity.UserEntity;
 
 import lombok.Data;
 
