@@ -8,14 +8,12 @@ import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchStatisticsService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
-import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
