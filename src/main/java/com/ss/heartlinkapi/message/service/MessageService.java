@@ -3,9 +3,11 @@ package com.ss.heartlinkapi.message.service;
 import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.dto.FriendDTO;
 import com.ss.heartlinkapi.message.dto.SaveMsgDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
+import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -95,5 +98,6 @@ public class MessageService {
             return true;
         return blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(otherUserId, senderId);
     }
+
 }
 

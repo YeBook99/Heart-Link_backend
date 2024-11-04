@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.message.service;
 
-import com.ss.heartlinkapi.message.dto.ApplyMessageDTO;
+import com.ss.heartlinkapi.couple.service.CoupleService;
+import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
 import com.ss.heartlinkapi.message.dto.FriendDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
@@ -8,20 +9,17 @@ import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.entity.MsgRoomType;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
 import com.ss.heartlinkapi.message.repository.MessageRoomRepository;
+import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +31,9 @@ public class MessageRoomService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final MessageService messageService;
+    private final SearchService searchService;
+    private final CoupleService coupleService;
+
 
     public List<Object> getChatUsers(Long userId) {
 
@@ -61,6 +62,18 @@ public class MessageRoomService {
 //            대화 상대 유저이름
             String otherLoginId = chatUserEntity.getLoginId();
             chat.put("otherLoginId", otherLoginId);
+
+//            비공개 채팅방 개설 주체 확인
+            if (entity.getUser1Id().equals(userId)) {
+                chat.put("openUser", true);
+            }
+            else{
+                chat.put("openUser", false);
+            }
+
+//            대화방 타입 설정
+            String msgRoomType = String.valueOf(entity.getMsgRoomType());
+            chat.put("msgRoomType", msgRoomType);
 
 //            대화 상대 유저 이미지
             ProfileEntity profileEntity = profileRepository.findByUserEntity(chatUserEntity);
@@ -97,16 +110,17 @@ public class MessageRoomService {
         return chatUsers;
     }
 
-    public void applyMessage(ApplyMessageDTO applyMessageDTO) {
+    public MessageRoomEntity applyMessage(Long userId, Long otherUserId) {
 
         MessageRoomEntity messageRoomEntity = new MessageRoomEntity();
-        messageRoomEntity.setUser1Id(applyMessageDTO.getUserId());
-        messageRoomEntity.setUser2Id(applyMessageDTO.getApplyId());
+        messageRoomEntity.setUser1Id(userId);
+        messageRoomEntity.setUser2Id(otherUserId);
         messageRoomEntity.setCreatedAt(LocalDateTime.now());
 //        수락전은 N으로해서 팔로우 된 사람들과의 대화랑 구분
         messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PRIVATE"));
-        messageRoomRepository.save(messageRoomEntity);
+        return messageRoomRepository.save(messageRoomEntity);
     }
+
 //    msgRoomId를 기준으로 방을 삭제
     public void applyRejection(Long msgRoomId) {
         messageRoomRepository.deleteById(msgRoomId);
@@ -161,5 +175,34 @@ public class MessageRoomService {
         }
 
         return friends;
+    }
+
+    public List<FriendDTO> initSearch(UserEntity user) {
+
+        List<FriendDTO> friends = new ArrayList<>();
+        List<Map<String, Object>> list = searchService.mentionIdList(user);
+
+        for (Map<String, Object> map : list) {
+            FriendDTO friend = new FriendDTO();
+            friend.setFriendName(String.valueOf(map.get("loginId")));
+            friend.setFriendImg(String.valueOf(map.get("profileUrl")));
+            friend.setFriendId((Long) map.get("userId"));
+
+            BlockUserCheckDTO blockUserCheckDTO = new BlockUserCheckDTO();
+            blockUserCheckDTO.setUserId(user.getUserId());
+            blockUserCheckDTO.setBlockUserId((Long)map.get("userId"));
+
+            if (messageService.blockMessage(blockUserCheckDTO)) {
+                continue;
+            }
+
+            friends.add(friend);
+        }
+
+        return friends;
+    }
+
+    public boolean OtherUserIsPrivate(Long otherUserId) {
+        return coupleService.findByUser1_IdOrUser2_Id(otherUserId).getIsPrivate();
     }
 }
