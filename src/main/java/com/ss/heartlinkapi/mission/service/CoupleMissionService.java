@@ -181,6 +181,7 @@ public class CoupleMissionService {
                         // 포스트 아이디로 포스트 이미지 조회
                         List<PostFileEntity> fileList = postFileRepository.findByPostId(contentLinktagEntity.getBoardId().getPostId());
                         Map<String, Object> map = new HashMap<>();
+                        map.put("missionId", mission.getLinkMissionId());
                         map.put("tagId", mission.getLinkTagId().getId());
                         map.put("tagName", mission.getLinkTagId().getKeyword());
                         map.put("postId", contentLinktagEntity.getBoardId().getPostId());
