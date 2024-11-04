@@ -68,6 +68,11 @@ public class MessageController {
         if (messageRoomService.existChatRoom(user.getUserId(), otherUserId))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 대화방이 존재하는 유저입니다.");
 
+        if (messageRoomService.OtherUserIsPrivate(otherUserId)) {
+            MessageRoomEntity messageRoomEntity = messageRoomService.applyMessage(user.getUserId(), otherUserId);
+            return ResponseEntity.ok(String.valueOf(messageRoomEntity.getId()));
+        }
+
         //        채팅방 생성
         MessageRoomEntity messageRoomEntity = messageRoomService.createChatRoom(user.getUserId(), otherUserId);
         return ResponseEntity.ok(String.valueOf(messageRoomEntity.getId()));
@@ -95,6 +100,7 @@ public class MessageController {
 //    상대방과의 채팅 내역을 가져오는 핸들러 메서드
     @GetMapping("/{msgRoomId}")
     public ResponseEntity<List<ChatMsgListDTO>> getMessage(@PathVariable Long msgRoomId) {
+
         List<ChatMsgListDTO> messages = messageService.getMessages(msgRoomId);
 
         return ResponseEntity.ok(messages);
@@ -183,14 +189,6 @@ public class MessageController {
         return ResponseEntity.ok("save good");
     }
 
-    //    비공개 사용자에게 메시지 요청보내기
-    @PostMapping("/message/apply")
-    public ResponseEntity<String> applyMessage(@RequestBody ApplyMessageDTO applyMessageDTO) {
-
-        messageRoomService.applyMessage(applyMessageDTO);
-
-        return ResponseEntity.ok("apply success");
-    }
 
     //    비공개 사용자 메세지 요청 거절
     @GetMapping("/message/rejection/{msgRoomId}")
@@ -230,7 +228,7 @@ public class MessageController {
         List<FriendDTO> friends = new ArrayList<>();
 
         if (searchName == null) {
-            friends = messageService.initSearch(user.getUserEntity());
+            friends = messageRoomService.initSearch(user.getUserEntity());
         }
         else{
             friends = messageRoomService.searchUsers(user.getUserId(), searchName);
