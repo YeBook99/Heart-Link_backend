@@ -1,6 +1,5 @@
 package com.ss.heartlinkapi.linktag.service;
 
-import com.ss.heartlinkapi.elasticSearch.document.ElasticTagDocument;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;

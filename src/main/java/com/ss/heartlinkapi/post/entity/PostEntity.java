@@ -1,7 +1,5 @@
 package com.ss.heartlinkapi.post.entity;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

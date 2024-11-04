@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.ss.heartlinkapi.report.entity.ReportEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public interface ReportRepository extends JpaRepository<ReportEntity, Long>{
 
