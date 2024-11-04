@@ -3,9 +3,11 @@ package com.ss.heartlinkapi.message.service;
 import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.dto.FriendDTO;
 import com.ss.heartlinkapi.message.dto.SaveMsgDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
+import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
+    private final SearchService searchService;
     /*
     * 사용자들의 대화내역은 채팅방 번호 즉 msgRoomId를 기본키로 해서 저장되므로
     * 이를 기준으로 메세지를 list형태에 저장하여 가져온다.
@@ -94,6 +98,23 @@ public class MessageService {
         if(blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(senderId, otherUserId))
             return true;
         return blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(otherUserId, senderId);
+    }
+
+    public List<FriendDTO> initSearch(UserEntity user) {
+
+        List<FriendDTO> friends = new ArrayList<>();
+        List<Map<String, Object>> list = searchService.mentionIdList(user);
+
+        for (Map<String, Object> map : list) {
+            FriendDTO friend = new FriendDTO();
+            friend.setFriendName(String.valueOf(map.get("loginId")));
+            friend.setFriendImg(String.valueOf(map.get("profileUrl")));
+            friend.setFriendId((Long) map.get("userId"));
+
+            friends.add(friend);
+        }
+
+        return friends;
     }
 }
 
