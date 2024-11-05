@@ -86,4 +86,7 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
 
     // 유저와 날짜에 맞는 객체가 있다면 조회 후 반환
     LinkMatchAnswerEntity findByUserIdAndCreatedAt(UserEntity user, LocalDate createdAt);
+
+    // 유저아이디로 링크매치답변 조회
+    List<LinkMatchAnswerEntity> findAllByUserId(UserEntity user);
 }

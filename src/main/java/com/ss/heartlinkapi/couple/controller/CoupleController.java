@@ -275,7 +275,11 @@ public class CoupleController {
                 return ResponseEntity.badRequest().body("해당되는 유저가 없습니다.");
             }
 
-            if(userDetails.getUserEntity().getRole().equals(Role.ROLE_SINGLE)){
+            UserEntity userEntity = userRepository.findById(userDetails.getUserEntity().getUserId()).orElse(null);
+            if(userEntity.getRole().equals(Role.ROLE_SINGLE)){
+                System.out.println(userDetails.getUserEntity().getUserId());
+                System.out.println(userDetails.getUserEntity().getLoginId());
+                System.out.println(userDetails.getUserEntity().getRole());
                 return ResponseEntity.ok("true");
             } else {
                 return ResponseEntity.ok("false");
