@@ -90,7 +90,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 				}
 			}
 		    // 전화번호 입력 요청
-			throw new OAuth2AuthenticationException(new OAuth2Error("전화번호를 입력받아야 합니다. [error: phone]",providerId, null));		
+		    OAuth2Error error = new OAuth2Error(providerId, "전화번호를 입력받아야 합니다.",null);
+		    throw new OAuth2AuthenticationException(error);
+	
 		}
 
 		UserEntity existData = userRepository.findByPhone(phone);
@@ -101,7 +103,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			try {
 				newUserEntity = registerUser(oAuth2Response, phone, providerId);
 			} catch (Exception e) {
-				throw new OAuth2AuthenticationException(new OAuth2Error("회원가입 오류", e.getMessage(), null));
+				throw new OAuth2AuthenticationException(new OAuth2Error(providerId, e.getMessage(), null));
 			}
 			String loginId = newUserEntity.getLoginId();
 			return login(oAuth2Response, loginId);
@@ -129,7 +131,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	public CustomOAuth2User login(OAuth2Response oAuth2Response, String loginId) {
 		
 		OAuth2LoginDTO userDTO = new OAuth2LoginDTO();
-		userDTO.setLoginId(loginId); // 로그인 아이디로 교체해야함
+		userDTO.setLoginId(loginId);
 		userDTO.setName(oAuth2Response.getName());
 		userDTO.setRole(Role.ROLE_USER);
 		
@@ -166,7 +168,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		
 		// 아이디 입력 요청
 		if(loginId==null) {
-			throw new OAuth2AuthenticationException(new OAuth2Error("아이디를 입력받아야 합니다. [error: loginId]",providerId, null));
+		    OAuth2Error error = new OAuth2Error(providerId, "아이디를 입력받아야 합니다.",null);
+		    throw new OAuth2AuthenticationException(error);
 		}
 		userEntity.setLoginId(loginId);
 
