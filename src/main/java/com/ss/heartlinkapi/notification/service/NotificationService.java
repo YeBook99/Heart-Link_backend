@@ -90,7 +90,7 @@ public class NotificationService {
     }
     //      팔로우 요청 시 알람
     public void notifyFollow(String userName, Long userId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
@@ -99,7 +99,7 @@ public class NotificationService {
     }
     //      비공개 유저 팔로우 요청
     public void notifyFollowPrivate(String userName, Long userId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
