@@ -13,4 +13,6 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
     MessageEntity findByMsgRoomIdOrderByCreatedAt(@Param("id") Long id);
 
     List<MessageEntity> findByMsgRoomId(Long msgRoomId);
+
+    void deleteByMsgRoomId(Long msgRoomId);
 }
