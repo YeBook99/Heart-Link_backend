@@ -119,8 +119,8 @@ public class ProfileService {
             throw new IllegalArgumentException("유저를 찾을 수 없습니다.");
         }
 
-        if (bio.length() > 150) {
-            throw new IllegalArgumentException("상태 메시지는 150자 이하로 입력해야 합니다.");
+        if (bio.length() > 20) {
+            throw new IllegalArgumentException("상태 메시지는 20자 이하로 입력해야 합니다.");
         }
 
         ProfileEntity profileEntity = findByUserEntity(userEntity);
