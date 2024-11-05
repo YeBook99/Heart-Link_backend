@@ -90,7 +90,7 @@ public class NotificationService {
     }
     //      팔로우 요청 시 알람
     public void notifyFollow(String userName, Long userId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
@@ -99,13 +99,27 @@ public class NotificationService {
     }
     //      비공개 유저 팔로우 요청
     public void notifyFollowPrivate(String userName, Long userId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + userId, userName + "님이 회원님을 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
         saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId, otherUserImg );
         sendToClient(userId, notificationFollowDTO);
     }
+    //  유저 태그시 알람
+    public void notifyIdTag(String userName, Long postId, Long id) {
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/feed/details/" + postId , userName + "님이 게시글에 회원님을 태그하였습니다.");
+        Optional<PostEntity> post = postRepository.findById(postId);
+        Long postWriterId = post
+                .map(p -> p.getUserId().getUserId())
+                .orElseThrow(() -> new NoSuchElementException("there is no post"));
+        UserEntity user = new UserEntity();
+        user.setUserId(postWriterId);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
+        saveNotification("COMMENT", notificationFollowDTO.getMessage(), id, otherUserImg );
+        sendToClient(id, notificationFollowDTO);
+    }
+
     //      실질적으로 client에게 메세지를 전달해주는 메서드
     private void sendToClient(Long userId, Object data) {
 
