@@ -176,13 +176,13 @@ public class AdsService {
                 JSONObject listingInfo = (JSONObject)listingInfoWrap.get(0);
                 JSONArray watchCountWrap = (JSONArray)listingInfo.get("watchCount");
                 // 조회 수
-                int viewCount = Integer.parseInt((String)watchCountWrap.get(0));
+//                int viewCount = Integer.parseInt((String)watchCountWrap.get(0));
                 EbayProductDTO productDTO = new EbayProductDTO();
                 productDTO.setTitle(title);
                 productDTO.setImgUrl(imgUrl);
                 productDTO.setSiteUrl(siteUrl);
                 productDTO.setPrice(price);
-                productDTO.setViewCount(viewCount);
+//                productDTO.setViewCount(viewCount);
                 productDTO.setCurrency(currency);
                 productDTO.setSearchTime(searchTime);
                 products.add(productDTO);

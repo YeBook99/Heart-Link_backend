@@ -8,6 +8,7 @@ import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,6 +33,8 @@ public class SearchController {
     @Autowired
     private PostFileRepository postFileRepository;
 
+    @Autowired
+    private UserRepository userRepository;
     // 유저 별 검색기록 확인
     @GetMapping("/history")
     public ResponseEntity<?> searchHistory(@AuthenticationPrincipal CustomUserDetails user){
@@ -58,6 +61,7 @@ public class SearchController {
     @GetMapping("/keyword")
     public ResponseEntity<?> search(@RequestParam String keyword, @AuthenticationPrincipal CustomUserDetails user) {
         try {
+            UserEntity userEntity = userRepository.findById(user.getUserEntity().getUserId()).orElse(null);
 
             if(keyword == null || keyword.isEmpty() || user == null) {
                 return ResponseEntity.badRequest().body(null);
@@ -65,15 +69,15 @@ public class SearchController {
 
             if (keyword.startsWith("@")) {
                 System.out.println(keyword);
-                UserEntity userEntity = searchService.searchByUserId(keyword, user.getUserId());
-                if(userEntity == null) {
+                UserEntity userResult = searchService.searchByUserId(keyword, user.getUserId());
+                if(userResult == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
                 Map<String, Object> map = new HashMap<>();
-                map.put("userId", userEntity.getUserId());
-                map.put("loginId", userEntity.getLoginId());
+                map.put("userId", userResult.getUserId());
+                map.put("loginId", userResult.getLoginId());
                 map.put("type", "id");
-                map.put("img", profileRepository.findByUserEntity(userEntity).getProfile_img());
+                map.put("img", profileRepository.findByUserEntity(userResult).getProfile_img());
                 return ResponseEntity.ok(map);
             } else if (keyword.startsWith("&")) {
                 LinkTagEntity tag = searchService.searchByTag(keyword, user.getUserId());
