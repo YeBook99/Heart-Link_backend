@@ -547,9 +547,10 @@ public class PostService {
 			System.out.println("LinkTag에 없는 keyword : " + keyword);
 			return result;
 		}
+		String Linktag = '&' + keyword;
 		
 		// Post의 content에 해당 keyword가 있는지 조회
-		List<PostEntity> posts = postRepository.findByContentContaining(keyword);
+		List<PostEntity> posts = postRepository.findByContentContaining(Linktag);
 		
 		// Post에 없으면 빈 리스트 반환
 		if(posts.isEmpty()) {

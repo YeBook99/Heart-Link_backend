@@ -55,5 +55,5 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	List<PostEntity> findAllByUserIdAndMonth (@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
 
 	// 입력한 내용이 content에 포함되어 있는지 조회
-	List<PostEntity> findByContentContaining(String keyword);
+	List<PostEntity> findByContentContaining(String Linktag);
 }
