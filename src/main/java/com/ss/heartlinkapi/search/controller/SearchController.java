@@ -3,6 +3,8 @@ package com.ss.heartlinkapi.search.controller;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
@@ -27,6 +29,8 @@ public class SearchController {
     private SearchService searchService;
     @Autowired
     private ProfileRepository profileRepository;
+    @Autowired
+    private PostFileRepository postFileRepository;
 
     // 유저 별 검색기록 확인
     @GetMapping("/history")
@@ -87,10 +91,13 @@ public class SearchController {
                 if(post == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
+
                 List<Map<String, Object>> postList = new ArrayList<>();
                 for(int i=0; i<post.size(); i++) {
                     Map<String, Object> postMap = new HashMap<>();
                     for(int j=0; j<post.size(); j++) {
+                        List<PostFileEntity> file = postFileRepository.findByPostId(post.get(i).getPostId());
+                        postMap.put("img", file.get(0).getFileUrl());
                         postMap.put("id", post.get(i).getPostId());
                         postMap.put("content", post.get(i).getContent());
                         postMap.put("type", "post");
