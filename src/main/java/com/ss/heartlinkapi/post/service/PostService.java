@@ -223,9 +223,9 @@ public class PostService {
 					.orElseGet(() -> new LinkTagEntity(null, keyword));
 			LinkTagEntity result = linkTagRepository.save(linkTag);
 			// 엘라스틱 태그 인덱스에 추가
-//			if(elasticService.addTag(result)==null) {
-//				System.out.println("엘라스틱 태그 저장 실패");
-//			}
+			if(elasticService.addTag(result)==null) {
+				System.out.println("엘라스틱 태그 저장 실패");
+			}
 			System.out.println("저장된 LinkTag: " + linkTag.getKeyword());
 			
 			
@@ -569,7 +569,7 @@ public class PostService {
 			}
 			
 		}
-		
+		System.out.println(result);
 		return result;
 	}
 
