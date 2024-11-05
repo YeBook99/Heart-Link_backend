@@ -181,18 +181,30 @@ public class SearchService {
     // 검색창 옆에 띄울 게시글 목록 가져오기
     // 좋아요 많은 순+검색기록 관련 순으로 섞고 나서 연관없는 게시글 최근순으로 가져오기
     public Map<String, Object> getPost(CustomUserDetails user, Integer cursor, int limit) {
+        System.out.println("11111");
         List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
+        System.out.println("22222");
+
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
+        System.out.println("33333");
+
         List<PostEntity> searchPostList = new ArrayList<>(); // 검색기록 키워드가 포함된 피드 목록 생성
+        System.out.println("44444");
+
         for(SearchHistoryEntity searchHistory : searchHistoryList) { // 검색기록 리스트 순회
+            System.out.println("55555");
+
             if(searchHistory.getType().equals("content")) { // 만약 검색기록의 타입이 content일 때
                 // 해당 키워드로 게시글 리스트 모두 조회
                 List<PostEntity> keywordFindPostList = postRepository.findAllByContentIgnoreCaseContaining(searchHistory.getKeyword());
                 for(PostEntity post : keywordFindPostList) { // 게시글을 검색기록 키워드가 포함된 목록에 저장
+                    System.out.println("66666");
+
                     searchPostList.add(post);
                 }
             }
         }
+        System.out.println("77777");
 
         List<PostEntity> mixPostList = mixPostList(manyLikePostList, searchPostList);
         List<Map<String, Object>> postList = new ArrayList<>();
@@ -200,6 +212,7 @@ public class SearchService {
         if(cursor == null) {
             cursor = 0;
         }
+        System.out.println("88888");
 
         Integer nextCursor = (cursor + limit < mixPostList.size()) ? cursor + limit : null;
 
@@ -207,9 +220,11 @@ public class SearchService {
             cursor = mixPostList.size() - limit;
             if (cursor < 0) cursor = 0;
         }
+        System.out.println("99999");
 
         int endIndex = (nextCursor != null) ? Math.min(nextCursor, mixPostList.size()) : mixPostList.size();
         List<PostEntity> sliceData = mixPostList.subList(cursor, endIndex);
+        System.out.println("989879789");
 
         for(PostEntity post : sliceData) {
             Map<String, Object> map = new HashMap<>();
@@ -220,12 +235,15 @@ public class SearchService {
             map.put("commentCount",post.getCommentCount());
             postList.add(map);
         }
+        System.out.println("45346457457457457");
 
         Map<String, Object> postData = new HashMap<>();
+        System.out.println("12312321341221");
 
         postData.put("nextCursor", nextCursor);
         postData.put("data", sliceData);
         postData.put("hasNext", nextCursor != null && nextCursor < mixPostList.size());
+        System.out.println("123423435235325325235325325235235235325353");
 
         return postData;
     }

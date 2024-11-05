@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,7 +120,7 @@ public class SearchController {
 
     // 검색창과 함께 띄울 게시글 조회
     @GetMapping("/getSearchPost")
-    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "30") int limit) {
+    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "30") int limit, HttpServletResponse response) {
         try {
             if(user == null) {
                 return ResponseEntity.badRequest().body(null);
@@ -128,7 +129,11 @@ public class SearchController {
             return ResponseEntity.ok(postList);
         } catch (Exception e) {
             e.printStackTrace();
+            if (!response.isCommitted()) {
+                return ResponseEntity.internalServerError().build();
+            }
             return ResponseEntity.internalServerError().build();
+
         }
     }
 

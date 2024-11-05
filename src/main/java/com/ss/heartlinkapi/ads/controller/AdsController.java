@@ -25,6 +25,7 @@ public class AdsController {
     @GetMapping("/get")
     public ResponseEntity<?> getAds(@AuthenticationPrincipal CustomUserDetails user){
         List<Map<String, Object>> adsResult = adsService.getAds(user.getUserId());
+        System.out.println(adsResult);
         return ResponseEntity.ok(adsResult);
     }
 

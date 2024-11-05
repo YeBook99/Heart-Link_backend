@@ -79,7 +79,7 @@ public class AdsService {
     private String getAdsList(List<String> keywords){
         final String EBAY_GET_URL = "https://svcs.ebay.com/services/search/FindingService/v1";
         final String APPKEY = "-HeartLin-PRD-7b15e11a8-28f07714";
-        int getItemCount = 30; // 가져올 아이템 갯수
+        int getItemCount = 5; // 가져올 아이템 갯수
 
 
         headers = new HttpHeaders();
