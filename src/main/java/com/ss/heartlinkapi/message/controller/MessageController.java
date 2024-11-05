@@ -237,4 +237,13 @@ public class MessageController {
         return ResponseEntity.ok(friends);
     }
 
+    @DeleteMapping("/{msgRoomId}")
+    public ResponseEntity<String> deleteMsgRoom(@PathVariable Long msgRoomId) {
+
+        messageRoomService.deleteMsgRoom(msgRoomId);
+        messageService.deleteMessages(msgRoomId);
+
+        return ResponseEntity.ok("delete success");
+    }
+
 }

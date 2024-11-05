@@ -13,6 +13,7 @@ import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MessageService {
 
     private final MessageRepository messageRepository;
@@ -99,5 +101,8 @@ public class MessageService {
         return blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(otherUserId, senderId);
     }
 
+    public void deleteMessages(Long msgRoomId) {
+        messageRepository.deleteByMsgRoomId(msgRoomId);
+    }
 }
 
