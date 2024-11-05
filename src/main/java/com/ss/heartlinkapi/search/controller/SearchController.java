@@ -2,9 +2,11 @@ package com.ss.heartlinkapi.search.controller;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
+import com.ss.heartlinkapi.post.dto.PostFileDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
+import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
@@ -33,6 +35,8 @@ public class SearchController {
     private ProfileRepository profileRepository;
     @Autowired
     private PostFileRepository postFileRepository;
+    @Autowired
+    private PostService postService;
 
     @Autowired
     private UserRepository userRepository;
@@ -152,6 +156,12 @@ public class SearchController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+    
+    // 링크태그 검색
+    @GetMapping("/tag")
+    public List<PostFileDTO> searchPost(@RequestParam String keyword){
+    	return postService.searchPostByLinktag(keyword);
     }
 
 }
