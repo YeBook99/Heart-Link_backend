@@ -114,7 +114,7 @@ public class SearchService {
             elasticEntity = new SearchHistoryEntity();
             elasticEntity.setUserId(user);
             elasticEntity.setKeyword(keyword);
-            elasticEntity.setType("content");
+            elasticEntity.setType("tag");
             elasticEntity.setCreatedAt(LocalDateTime.now());
             SearchHistoryEntity result = searchRepository.save(elasticEntity);
         }

@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.linkmatch.service;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linkmatch.dto.MatchAnswer;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
+import com.ss.heartlinkapi.linkmatch.dto.MatchAnswerListDTO;
 import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
 import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchRepository;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
@@ -79,8 +80,7 @@ public class CoupleMatchService {
     }
 
     // 매치 답변 내역 조회
-    // 매치 답변 내역 조회
-    public List<Map<String, Object>> findAnswerListByCoupleId(CoupleEntity couple, Long userId) {
+    public Set<MatchAnswerListDTO> findAnswerListByCoupleId(CoupleEntity couple, Long userId) {
         // 상대방 유저엔티티 구하기
         UserEntity partner;
         UserEntity user;
@@ -93,30 +93,43 @@ public class CoupleMatchService {
         }
 
         List<LinkMatchAnswerEntity> coupleList = answerRepository.findByCoupleId(couple);
-        List<Map<String, Object>> answerList = new ArrayList<>();
+        List<MatchAnswerListDTO> answerList = new ArrayList<>();
         for(LinkMatchAnswerEntity answerEntity : coupleList) {
-            Map<String, Object> totalAnswerMap = new HashMap<>();
+            MatchAnswerListDTO dto = new MatchAnswerListDTO();
             LinkMatchEntity matchQuestion = matchRepository.findById(answerEntity.getMatchId().getLinkMatchId()).orElse(null);
-            totalAnswerMap.put("match1", matchQuestion.getMatch1());
-            totalAnswerMap.put("match2", matchQuestion.getMatch2());
-            totalAnswerMap.put("date", matchQuestion.getDisplayDate());
-            if(answerEntity.getUserId().getUserId().equals(user.getUserId())) {
-                if (matchQuestion.getDisplayDate().equals(answerEntity.getCreatedAt())) {
-                    totalAnswerMap.put("myChoice", answerEntity.getChoice());
-                } else {
-                    totalAnswerMap.put("myChoice", "답변하지 않음");
-                }
-            } else if(answerEntity.getUserId().getUserId().equals(partner.getUserId())){
-                if(matchQuestion.getDisplayDate().equals(answerEntity.getCreatedAt())){
-                    totalAnswerMap.put("partnerChoice", answerEntity.getChoice());
-                } else {
-                    totalAnswerMap.put("partnerChoice", "답변하지 않음");
-                }
+            dto.setMatch1(matchQuestion.getMatch1());
+            System.out.println("서비스의 setMatch1 : "+matchQuestion.getMatch1());
+
+            dto.setMatch2(matchQuestion.getMatch2());
+            System.out.println("서비스의 setMatch2 : "+matchQuestion.getMatch2());
+
+            dto.setDate(matchQuestion.getDisplayDate());
+            System.out.println("서비스의 setDate : "+matchQuestion.getDisplayDate());
+
+            LinkMatchAnswerEntity myAnswer = coupleMatchAnswerRepository.findByUserIdAndCreatedAt(user, matchQuestion.getDisplayDate());
+            System.out.println("서비스의 myAnswer : "+coupleMatchAnswerRepository.findByUserIdAndCreatedAt(user, matchQuestion.getDisplayDate()));
+
+            if(myAnswer != null) {
+                dto.setMyChoice(myAnswer.getChoice());
+            } else {
+                dto.setMyChoice(-1);
             }
-            answerList.add(totalAnswerMap);
+            LinkMatchAnswerEntity partnerAnswer = coupleMatchAnswerRepository.findByUserIdAndCreatedAt(partner, matchQuestion.getDisplayDate());
+            System.out.println("서비스의 partnerAnswer : "+coupleMatchAnswerRepository.findByUserIdAndCreatedAt(partner, matchQuestion.getDisplayDate()));
+
+            if(partnerAnswer != null) {
+                dto.setPartnerChoice(partnerAnswer.getChoice());
+            } else {
+                dto.setPartnerChoice(-1);
+            }
+
+            answerList.add(dto);
         }
+        Set<MatchAnswerListDTO> set = new HashSet<>(answerList);
         // 상대 답, 내 답, 날짜, 매치1, 매치2
-        return answerList;
+        System.out.println("서비스의 answerList : "+answerList);
+
+        return set;
     }
 
 }
