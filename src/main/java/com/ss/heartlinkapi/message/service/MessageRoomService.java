@@ -17,6 +17,7 @@ import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -24,6 +25,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MessageRoomService {
 
     private final MessageRoomRepository messageRoomRepository;
@@ -204,5 +206,9 @@ public class MessageRoomService {
 
     public boolean OtherUserIsPrivate(Long otherUserId) {
         return coupleService.findByUser1_IdOrUser2_Id(otherUserId).getIsPrivate();
+    }
+
+    public void deleteMsgRoom(Long msgRoomId) {
+        messageRoomRepository.deleteById(msgRoomId);
     }
 }
