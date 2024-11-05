@@ -127,9 +127,9 @@ public class CommentService {
 					.orElseGet(() -> new LinkTagEntity(null, keyword));
 			LinkTagEntity result = linkTagRepository.save(linkTag);
 			// 엘라스틱에 새 태그 추가
-			if(elasticService.addTag(result)==null) {
-				System.out.println("엘라스틱 태그 저장 실패");
-			}
+//			if(elasticService.addTag(result)==null) {
+//				System.out.println("엘라스틱 태그 저장 실패");
+//			}
 			
 			ContentLinktagEntity contentLinktag = new ContentLinktagEntity();
 			contentLinktag.setLinktagId(linkTag);
