@@ -22,7 +22,7 @@ public class MessageEntity {
     private Long msgRoomId;
     @Column(name = "sender_id")
     private Long senderId;
-    @Column(name = "content")
+    @Column(name = "content", length = 500)
     private String content;
     @Column(name = "img_url")
     private String imgUrl;

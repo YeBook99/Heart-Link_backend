@@ -1,5 +1,6 @@
 package com.ss.heartlinkapi.admin.controller;
 
+import com.ss.heartlinkapi.admin.dto.AdminMatchDTO;
 import com.ss.heartlinkapi.admin.service.AdminCoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,17 +46,19 @@ public class AdminCoupleMatchController {
 
     // 매치 질문 등록
     @PostMapping("/questions")
-    public ResponseEntity<?> addMatchQuestion(@RequestBody LinkMatchEntity questionText) {
+    public ResponseEntity<?> addMatchQuestion(@RequestBody AdminMatchDTO questionText) {
         // 오류 500 검사
         try {
-            LinkMatchEntity result = adminCoupleMatchService.addMatchQuestion(questionText);
-
             // 오류 400 검사
             if (questionText == null || questionText.getMatch1() == null || questionText.getMatch2() == null
-                    || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
+                    || questionText.getDisplayDate() == null) {
                 return ResponseEntity.badRequest().build();
             }
 
+            LinkMatchEntity result = adminCoupleMatchService.addMatchQuestion(questionText);
+            if (result == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 매치 질문이 존재하는 날짜입니다.");
+            }
             return ResponseEntity.status(HttpStatus.CREATED).body("매치 질문을 등록하였습니다.");
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,23 +67,22 @@ public class AdminCoupleMatchController {
     }
 
     // 매치 질문 수정
-    @PutMapping("/questions/{questionId}/update")
-    public ResponseEntity<?> updateMatchQuestion(@RequestBody LinkMatchEntity questionText) {
+    @PutMapping("/questions/update")
+    public ResponseEntity<?> updateMatchQuestion(@RequestParam(name = "questionId") Long questionId, @RequestBody AdminMatchDTO questionText) {
         // 오류 500 검사
         try{
-            LinkMatchEntity result = adminCoupleMatchService.updateMatchQuestion(questionText.getLinkMatchId(), questionText);
             // 오류 400 검사
-            if(questionText == null || questionText.getMatch1() == null || questionText.getMatch2() == null
-            || questionText.getDisplayDate() == null || questionText.getLinkMatchId() == null) {
+            if(questionId == null || questionText.getMatch1() == null || questionText.getMatch2() == null
+                    || questionText.getDisplayDate() == null) {
                 return ResponseEntity.badRequest().build();
             }
+            LinkMatchEntity result = adminCoupleMatchService.updateMatchQuestion(questionId, questionText);
             // 오류 404 검사
             if (result == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("매치 질문 수정에 실패하였습니다.");
             }
 
             return ResponseEntity.status(HttpStatus.CREATED).body("매치 질문이 수정되었습니다.");
-
 
         } catch (Exception e) {
             e.printStackTrace();

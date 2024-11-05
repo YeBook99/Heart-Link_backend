@@ -148,7 +148,6 @@ public class NotificationService {
     }
     //      내 알람 리스트 불러오기
     public List<NotificationDTO> getNotifications(CustomUserDetails user) {
-        UserEntity userEntity = new UserEntity();
 
         List<NotificationEntity> notifications = notificationRepository.findByUserId(user.getUserId());
 

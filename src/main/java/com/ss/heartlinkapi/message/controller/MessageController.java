@@ -2,8 +2,10 @@ package com.ss.heartlinkapi.message.controller;
 
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.message.dto.*;
+import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
+import com.ss.heartlinkapi.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -21,6 +23,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -65,9 +68,14 @@ public class MessageController {
         if (messageRoomService.existChatRoom(user.getUserId(), otherUserId))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 대화방이 존재하는 유저입니다.");
 
+        if (messageRoomService.OtherUserIsPrivate(otherUserId)) {
+            MessageRoomEntity messageRoomEntity = messageRoomService.applyMessage(user.getUserId(), otherUserId);
+            return ResponseEntity.ok(String.valueOf(messageRoomEntity.getId()));
+        }
+
         //        채팅방 생성
-        messageRoomService.createChatRoom(user.getUserId(), otherUserId);
-        return ResponseEntity.ok("create chatRoom");
+        MessageRoomEntity messageRoomEntity = messageRoomService.createChatRoom(user.getUserId(), otherUserId);
+        return ResponseEntity.ok(String.valueOf(messageRoomEntity.getId()));
 
     }
 
@@ -92,6 +100,7 @@ public class MessageController {
 //    상대방과의 채팅 내역을 가져오는 핸들러 메서드
     @GetMapping("/{msgRoomId}")
     public ResponseEntity<List<ChatMsgListDTO>> getMessage(@PathVariable Long msgRoomId) {
+
         List<ChatMsgListDTO> messages = messageService.getMessages(msgRoomId);
 
         return ResponseEntity.ok(messages);
@@ -180,17 +189,9 @@ public class MessageController {
         return ResponseEntity.ok("save good");
     }
 
-    //    비공개 사용자에게 메시지 요청보내기
-    @PostMapping("/message/apply")
-    public ResponseEntity<String> applyMessage(@RequestBody ApplyMessageDTO applyMessageDTO) {
-
-        messageRoomService.applyMessage(applyMessageDTO);
-
-        return ResponseEntity.ok("apply success");
-    }
 
     //    비공개 사용자 메세지 요청 거절
-    @GetMapping("/message/rejection/{msgRoomId}")
+    @DeleteMapping("/message/rejection/{msgRoomId}")
     public ResponseEntity<String> applyRejection(@PathVariable("msgRoomId") Long msgRoomId) {
 
         messageRoomService.applyRejection(msgRoomId);
@@ -219,4 +220,30 @@ public class MessageController {
         else
             return ResponseEntity.ok("nonblock user");
     }
+
+    //  검색기반으로 팔로잉목록 가져오는 핸들러 메서드
+    @GetMapping("/friends")
+    public ResponseEntity<List<FriendDTO>> searchUsers(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) String searchName) {
+
+        List<FriendDTO> friends = new ArrayList<>();
+
+        if (searchName == null) {
+            friends = messageRoomService.initSearch(user.getUserEntity());
+        }
+        else{
+            friends = messageRoomService.searchUsers(user.getUserId(), searchName);
+        }
+
+        return ResponseEntity.ok(friends);
+    }
+
+    @DeleteMapping("/{msgRoomId}")
+    public ResponseEntity<String> deleteMsgRoom(@PathVariable Long msgRoomId) {
+
+        messageRoomService.deleteMsgRoom(msgRoomId);
+        messageService.deleteMessages(msgRoomId);
+
+        return ResponseEntity.ok("delete success");
+    }
+
 }

@@ -7,12 +7,9 @@ import com.ss.heartlinkapi.ads.dto.EbayProductDTO;
 import com.ss.heartlinkapi.elasticSearch.document.SearchHistoryDocument;
 import com.ss.heartlinkapi.elasticSearch.service.DeepLService;
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
-import lombok.Value;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
-import org.hibernate.type.IntegerType;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -30,7 +27,6 @@ public class AdsService {
     private final ElasticService elasticService;
     private final RestTemplate restTemplate;
     private HttpHeaders headers;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private String token;
 
     public AdsService(ElasticService elasticService, DeepLService deepLService) {
@@ -180,13 +176,13 @@ public class AdsService {
                 JSONObject listingInfo = (JSONObject)listingInfoWrap.get(0);
                 JSONArray watchCountWrap = (JSONArray)listingInfo.get("watchCount");
                 // 조회 수
-                int viewCount = Integer.parseInt((String)watchCountWrap.get(0));
+//                int viewCount = Integer.parseInt((String)watchCountWrap.get(0));
                 EbayProductDTO productDTO = new EbayProductDTO();
                 productDTO.setTitle(title);
                 productDTO.setImgUrl(imgUrl);
                 productDTO.setSiteUrl(siteUrl);
                 productDTO.setPrice(price);
-                productDTO.setViewCount(viewCount);
+//                productDTO.setViewCount(viewCount);
                 productDTO.setCurrency(currency);
                 productDTO.setSearchTime(searchTime);
                 products.add(productDTO);

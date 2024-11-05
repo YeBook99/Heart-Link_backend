@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface CoupleMissionRepository extends JpaRepository<LinkMissionEntity, Long> {
@@ -17,4 +16,5 @@ public interface CoupleMissionRepository extends JpaRepository<LinkMissionEntity
             "and function('YEAR', m.end_date) = :year " +
             "and function('MONTH', m.end_date) = :month ")
     List<LinkMissionEntity> findMissionByYearMonth(@Param("year") int year, @Param("month") int month);
+
 }

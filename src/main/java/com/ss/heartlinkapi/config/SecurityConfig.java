@@ -25,6 +25,7 @@ import com.ss.heartlinkapi.login.service.CustomLogoutService;
 import com.ss.heartlinkapi.login.service.CustomUserDetailsService;
 import com.ss.heartlinkapi.login.service.JWTService;
 import com.ss.heartlinkapi.login.service.RefreshTokenService;
+import com.ss.heartlinkapi.oauth2.jwt.CustomFailureHandler;
 import com.ss.heartlinkapi.oauth2.jwt.CustomSuccessHandler;
 import com.ss.heartlinkapi.oauth2.service.CustomOAuth2UserService;
 
@@ -40,11 +41,13 @@ public class SecurityConfig {
 	private final CustomLogoutService customLogoutService;
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final CustomSuccessHandler customSuccessHandler;
+	private final CustomFailureHandler customFailureHandler;
 
 	public SecurityConfig(AuthenticationConfiguration authenticationConfiguration,
 			CustomUserDetailsService customUserDetailsService, JWTUtil jwtUtil, JWTService jwtService,
 			RefreshTokenService refreshTokenService, CustomLogoutService customLogoutService,
-			CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler) {
+			CustomOAuth2UserService customOAuth2UserService, CustomSuccessHandler customSuccessHandler,
+			CustomFailureHandler customFailureHandler) {
 		this.authenticationConfiguration = authenticationConfiguration;
 		this.customUserDetailsService = customUserDetailsService;
 		this.jwtUtil = jwtUtil;
@@ -53,6 +56,7 @@ public class SecurityConfig {
 		this.customLogoutService = customLogoutService;
 		this.customOAuth2UserService = customOAuth2UserService;
 		this.customSuccessHandler = customSuccessHandler;
+		this.customFailureHandler = customFailureHandler;
 	}
 
 	@Bean
@@ -90,7 +94,7 @@ public class SecurityConfig {
 						.antMatchers("/comment/**").permitAll()
                         .anyRequest().authenticated());
         // oauth2
-        http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler));
+        http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler).failureHandler(customFailureHandler));
         // login
         http.addFilterAt(new LoginFilter(customUserDetailsService, bCryptPasswordEncoder(), authenticationManager(),jwtUtil,refreshTokenService), UsernamePasswordAuthenticationFilter.class);
         // JWTFilter

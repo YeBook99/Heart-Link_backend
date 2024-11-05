@@ -1,12 +1,9 @@
 package com.ss.heartlinkapi.post.service;
 
 import java.io.File;
-import java.lang.System.Logger;
 import java.nio.file.Paths;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,13 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import javax.management.RuntimeErrorException;
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
-import org.apache.kafka.common.Uuid;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +24,6 @@ import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
-import com.ss.heartlinkapi.comment.service.CommentService;
 import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
 import com.ss.heartlinkapi.couple.service.CoupleService;
@@ -46,17 +38,13 @@ import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
 import com.ss.heartlinkapi.post.entity.FileType;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
-import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
-import io.jsonwebtoken.io.IOException;
 
 
 @Service

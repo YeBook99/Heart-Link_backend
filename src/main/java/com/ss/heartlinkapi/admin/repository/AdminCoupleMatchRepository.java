@@ -9,4 +9,5 @@ public interface AdminCoupleMatchRepository extends JpaRepository<LinkMatchEntit
 
     // 매치 질문 조회
     Page<LinkMatchEntity> findAllByOrderByLinkMatchIdDesc(Pageable pageable);
+
 }

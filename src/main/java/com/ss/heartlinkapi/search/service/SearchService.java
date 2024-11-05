@@ -12,8 +12,10 @@ import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
+import com.ss.heartlinkapi.profile.service.ProfileService;
 import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
 import com.ss.heartlinkapi.search.repository.SearchRepository;
+import com.ss.heartlinkapi.user.entity.ProfileEntity;
 import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
@@ -52,6 +54,9 @@ public class SearchService {
     @Autowired
     private FollowRepository followRepository;
 
+    @Autowired
+    private ProfileService profileService;
+
     // 유저 아이디 검색
     @Transactional
     public UserEntity searchByUserId(String keyword, Long userId) {
@@ -85,7 +90,7 @@ public class SearchService {
     public LinkTagEntity searchByTag(String keyword, Long userId) {
         keyword = keyword.trim().substring(1);
 
-        LinkTagEntity findTag = linkTagRepository.findByKeywordContains(keyword);
+        LinkTagEntity findTag = linkTagRepository.findAllByKeyword(keyword);
         UserEntity user = userRepository.findById(userId).orElse(null);
 
         if(user == null || findTag == null) {
@@ -271,8 +276,10 @@ public class SearchService {
         List<Map<String, Object>> followMapList = new ArrayList<>();
         for(UserEntity followUser : followFirstList) {
             Map<String, Object> followMap = new HashMap<>();
+            ProfileEntity profile = profileService.findByUserEntity(followUser);
             followMap.put("userId", followUser.getUserId());
             followMap.put("loginId", followUser.getLoginId());
+            followMap.put("profileUrl", profile.getProfile_img());
             followMapList.add(followMap);
         }
         return followMapList;

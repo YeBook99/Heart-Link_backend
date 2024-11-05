@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long>{
 	
@@ -47,5 +49,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>{
 
 	/*********** 전화번호로 유저가 존재하고 비밀번호가 없는 회원인지 확인 ***********/
 	boolean existsByPhoneAndPasswordIsNull(String phone);
-	
+
+	@Query("SELECT u FROM UserEntity u WHERE u.loginId LIKE CONCAT('%', :searchName, '%') ")
+    List<UserEntity> findBySearchName(@Param("searchName") String searchName);
 }

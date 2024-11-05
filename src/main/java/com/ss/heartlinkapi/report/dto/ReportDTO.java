@@ -1,11 +1,7 @@
 package com.ss.heartlinkapi.report.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import com.ss.heartlinkapi.post.dto.PostDTO;
-import com.ss.heartlinkapi.post.dto.PostFileDTO;
-import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.report.entity.Status;
 
 import lombok.AllArgsConstructor;

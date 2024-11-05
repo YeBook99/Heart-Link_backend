@@ -3,22 +3,27 @@ package com.ss.heartlinkapi.message.service;
 import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.message.dto.BlockUserCheckDTO;
 import com.ss.heartlinkapi.message.dto.ChatMsgListDTO;
+import com.ss.heartlinkapi.message.dto.FriendDTO;
 import com.ss.heartlinkapi.message.dto.SaveMsgDTO;
 import com.ss.heartlinkapi.message.entity.MessageEntity;
 import com.ss.heartlinkapi.message.repository.MessageRepository;
+import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MessageService {
 
     private final MessageRepository messageRepository;
@@ -94,6 +99,10 @@ public class MessageService {
         if(blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(senderId, otherUserId))
             return true;
         return blockRepository.existsByBlockedId_UserIdAndBlockerId_UserId(otherUserId, senderId);
+    }
+
+    public void deleteMessages(Long msgRoomId) {
+        messageRepository.deleteByMsgRoomId(msgRoomId);
     }
 }
 

@@ -3,7 +3,6 @@ package com.ss.heartlinkapi.follow.service;
 import javax.persistence.EntityNotFoundException;
 
 import com.ss.heartlinkapi.notification.service.NotificationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

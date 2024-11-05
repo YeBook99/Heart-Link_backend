@@ -8,9 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import com.ss.heartlinkapi.aspect.NotificationAspect;
 import com.ss.heartlinkapi.notification.service.NotificationService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,8 +27,6 @@ import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 
-import co.elastic.clients.elasticsearch.security.get_token.UserRealm;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 public class LikeService {
@@ -192,7 +188,7 @@ public class LikeService {
                 comment.setLikeCount(comment.getLikeCount() + 1);
                 commentRepository.save(comment);
 
-                notificationService.notifyLikeComment(myLoginId, postId, userId);
+                notificationService.notifyLikeComment(myLoginId, comment.getPostId().getPostId(), userId);
             }
             likeRepository.save(like);
         }

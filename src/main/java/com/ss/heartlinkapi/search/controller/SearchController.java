@@ -3,9 +3,12 @@ package com.ss.heartlinkapi.search.controller;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.post.entity.PostEntity;
-import com.ss.heartlinkapi.search.entity.SearchHistoryEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.ProfileRepository;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,13 @@ public class SearchController {
 
     @Autowired
     private SearchService searchService;
+    @Autowired
+    private ProfileRepository profileRepository;
+    @Autowired
+    private PostFileRepository postFileRepository;
 
+    @Autowired
+    private UserRepository userRepository;
     // 유저 별 검색기록 확인
     @GetMapping("/history")
     public ResponseEntity<?> searchHistory(@AuthenticationPrincipal CustomUserDetails user){
@@ -53,6 +61,7 @@ public class SearchController {
     @GetMapping("/keyword")
     public ResponseEntity<?> search(@RequestParam String keyword, @AuthenticationPrincipal CustomUserDetails user) {
         try {
+            UserEntity userEntity = userRepository.findById(user.getUserEntity().getUserId()).orElse(null);
 
             if(keyword == null || keyword.isEmpty() || user == null) {
                 return ResponseEntity.badRequest().body(null);
@@ -60,29 +69,42 @@ public class SearchController {
 
             if (keyword.startsWith("@")) {
                 System.out.println(keyword);
-                UserEntity userEntity = searchService.searchByUserId(keyword, user.getUserId());
-                if(userEntity == null) {
+                UserEntity userResult = searchService.searchByUserId(keyword, user.getUserId());
+                if(userResult == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
-                return ResponseEntity.ok(userEntity.getUserId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("userId", userResult.getUserId());
+                map.put("loginId", userResult.getLoginId());
+                map.put("type", "id");
+                map.put("img", profileRepository.findByUserEntity(userResult).getProfile_img());
+                return ResponseEntity.ok(map);
             } else if (keyword.startsWith("&")) {
                 LinkTagEntity tag = searchService.searchByTag(keyword, user.getUserId());
                 if(tag == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
-                return ResponseEntity.ok(tag.getId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("tagId", tag.getId());
+                map.put("tagName", tag.getKeyword());
+                map.put("type", "tag");
+                return ResponseEntity.ok(map);
             } else {
                 System.out.println("키워드 : "+keyword);
                 List<PostEntity> post = searchService.searchByPost(keyword, user.getUserId());
                 if(post == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
+
                 List<Map<String, Object>> postList = new ArrayList<>();
                 for(int i=0; i<post.size(); i++) {
                     Map<String, Object> postMap = new HashMap<>();
                     for(int j=0; j<post.size(); j++) {
+                        List<PostFileEntity> file = postFileRepository.findByPostId(post.get(i).getPostId());
+                        postMap.put("img", file.get(0).getFileUrl());
                         postMap.put("id", post.get(i).getPostId());
                         postMap.put("content", post.get(i).getContent());
+                        postMap.put("type", "post");
                     }
                     postList.add(i, postMap);
                 }

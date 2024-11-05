@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -33,5 +32,12 @@ public class NotificationController {
     public ResponseEntity<List<NotificationDTO>> getNotifications(@AuthenticationPrincipal CustomUserDetails user) {
         List<NotificationDTO> notifications = notificationService.getNotifications(user);
         return ResponseEntity.ok(notifications);
+    }
+
+//    userId를 반환하는 핸들러 메서드
+    @GetMapping("/check-userid")
+    public ResponseEntity<Long> checkUserId(@AuthenticationPrincipal CustomUserDetails user) {
+
+        return ResponseEntity.ok(user.getUserId());
     }
 }
