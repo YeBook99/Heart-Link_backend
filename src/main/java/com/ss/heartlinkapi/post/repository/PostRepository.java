@@ -53,4 +53,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	// 해당 월로 유저 아이디로 유저의 게시글 조회
 	@Query(value = "select * from post where user_id = :userId and year(created_at)=:year and month(created_at)=:month", nativeQuery = true)
 	List<PostEntity> findAllByUserIdAndMonth (@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
+
+	// 입력한 내용이 content에 포함되어 있는지 조회
+	List<PostEntity> findByContentContaining(String keyword);
 }
