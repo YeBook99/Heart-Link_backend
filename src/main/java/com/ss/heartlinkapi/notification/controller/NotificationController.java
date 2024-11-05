@@ -33,4 +33,11 @@ public class NotificationController {
         List<NotificationDTO> notifications = notificationService.getNotifications(user);
         return ResponseEntity.ok(notifications);
     }
+
+//    userId를 반환하는 핸들러 메서드
+    @GetMapping("/check-userid")
+    public ResponseEntity<Long> checkUserId(@AuthenticationPrincipal CustomUserDetails user) {
+
+        return ResponseEntity.ok(user.getUserId());
+    }
 }
