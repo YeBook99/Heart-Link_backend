@@ -106,6 +106,20 @@ public class NotificationService {
         saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId, otherUserImg );
         sendToClient(userId, notificationFollowDTO);
     }
+    //  유저 태그시 알람
+    public void notifyIdTag(String userName, Long postId, Long id) {
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/feed/details/" + postId , userName + "님이 게시글에 회원님을 태그하였습니다.");
+        Optional<PostEntity> post = postRepository.findById(postId);
+        Long postWriterId = post
+                .map(p -> p.getUserId().getUserId())
+                .orElseThrow(() -> new NoSuchElementException("there is no post"));
+        UserEntity user = new UserEntity();
+        user.setUserId(postWriterId);
+        String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
+        saveNotification("COMMENT", notificationFollowDTO.getMessage(), id, otherUserImg );
+        sendToClient(id, notificationFollowDTO);
+    }
+
     //      실질적으로 client에게 메세지를 전달해주는 메서드
     private void sendToClient(Long userId, Object data) {
 

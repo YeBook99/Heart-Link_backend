@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
+import com.ss.heartlinkapi.notification.service.NotificationService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,8 +68,10 @@ public class PostService {
 	private final CoupleMissionService coupleMissionService;
 	private final ElasticService elasticService;
 	private final BlockRepository blockRepository;
+	private final NotificationService notificationService;
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository) {
+
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository, NotificationService notificationService) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -78,7 +85,8 @@ public class PostService {
 		this.coupleMissionService = coupleMissionService;
 		this.elasticService = elasticService;
 		this.blockRepository = blockRepository;
-	}
+        this.notificationService = notificationService;
+    }
 
 	// 게시글 작성
 	@Transactional
@@ -188,8 +196,13 @@ public class PostService {
 	            MentionEntity mention = new MentionEntity();
 	            mention.setUserId(user);
 	            mention.setPostId(post);
-	         
+
 	            mentionRepository.save(mention);
+
+				//	알람 연동
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+				notificationService.notifyIdTag(authentication.getName(), post.getPostId(), user.getUserId());
 	        } else {
 	            System.out.println("아이디 태그 처리 실패: " + username + "는 존재하지 않는 사용자입니다.");
 	        }
