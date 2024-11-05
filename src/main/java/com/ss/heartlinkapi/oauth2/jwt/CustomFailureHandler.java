@@ -42,7 +42,7 @@ public class CustomFailureHandler extends SimpleUrlAuthenticationFailureHandler 
 			}
 		}
 		System.out.println(providerId);
-	    String redirectUri = "http://localhost:3000";
+	    String redirectUri = "http://localhost:3000/login";
 		String redirectUrl = redirectUri + "?providerId=" + providerId + "&errorType=" + errorType;
 		response.sendRedirect(redirectUrl);
 	}
