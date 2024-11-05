@@ -28,7 +28,7 @@ public class ProfileEntity {
 	
 	private String profile_img;
 	
-	@Lob
+	@Column(length = 20)
 	private String bio;
 	
     @CreatedDate

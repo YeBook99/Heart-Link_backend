@@ -47,8 +47,9 @@ public class MainPageController {
 	        
 	        String coupleNickname = coupleProfileEntity.getNickname();
 	        String coupleImg = coupleProfileEntity.getProfile_img();
+	        String coupleBio = coupleProfileEntity.getBio();
 	        
-	        UserCoupleDTO userCoupleDTO = new UserCoupleDTO(coupleUserId, coupleImg, coupleNickname);
+	        UserCoupleDTO userCoupleDTO = new UserCoupleDTO(coupleUserId, coupleImg, coupleNickname,coupleBio);
 	        
 	        return ResponseEntity.ok(userCoupleDTO);    
 	    } catch (Exception e) {
