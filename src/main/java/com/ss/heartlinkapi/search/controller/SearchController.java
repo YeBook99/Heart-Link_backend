@@ -3,8 +3,11 @@ package com.ss.heartlinkapi.search.controller;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
+import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +27,10 @@ public class SearchController {
 
     @Autowired
     private SearchService searchService;
+    @Autowired
+    private ProfileRepository profileRepository;
+    @Autowired
+    private PostFileRepository postFileRepository;
 
     // 유저 별 검색기록 확인
     @GetMapping("/history")
@@ -62,25 +69,38 @@ public class SearchController {
                 if(userEntity == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
-                return ResponseEntity.ok(userEntity.getUserId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("userId", userEntity.getUserId());
+                map.put("loginId", userEntity.getLoginId());
+                map.put("type", "id");
+                map.put("img", profileRepository.findByUserEntity(userEntity).getProfile_img());
+                return ResponseEntity.ok(map);
             } else if (keyword.startsWith("&")) {
                 LinkTagEntity tag = searchService.searchByTag(keyword, user.getUserId());
                 if(tag == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
-                return ResponseEntity.ok(tag.getId());
+                Map<String, Object> map = new HashMap<>();
+                map.put("tagId", tag.getId());
+                map.put("tagName", tag.getKeyword());
+                map.put("type", "tag");
+                return ResponseEntity.ok(map);
             } else {
                 System.out.println("키워드 : "+keyword);
                 List<PostEntity> post = searchService.searchByPost(keyword, user.getUserId());
                 if(post == null) {
                     return ResponseEntity.ok("검색 결과가 없습니다.");
                 }
+
                 List<Map<String, Object>> postList = new ArrayList<>();
                 for(int i=0; i<post.size(); i++) {
                     Map<String, Object> postMap = new HashMap<>();
                     for(int j=0; j<post.size(); j++) {
+                        List<PostFileEntity> file = postFileRepository.findByPostId(post.get(i).getPostId());
+                        postMap.put("img", file.get(0).getFileUrl());
                         postMap.put("id", post.get(i).getPostId());
                         postMap.put("content", post.get(i).getContent());
+                        postMap.put("type", "post");
                     }
                     postList.add(i, postMap);
                 }

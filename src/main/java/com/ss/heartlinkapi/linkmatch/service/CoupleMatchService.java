@@ -7,6 +7,8 @@ import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchAnswerRepository;
 import com.ss.heartlinkapi.linkmatch.repository.CoupleMatchRepository;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
+import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
+import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,10 @@ public class CoupleMatchService {
     private UserRepository userRepository;
     @Autowired
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
+    @Autowired
+    private CoupleMissionRepository coupleMissionRepository;
+    @Autowired
+    private CoupleMatchRepository coupleMatchRepository;
 
     // 커플 답변 저장
     public LinkMatchAnswerEntity answerSave(MatchAnswer matchAnswer, UserEntity user) {
@@ -73,7 +79,19 @@ public class CoupleMatchService {
     }
 
     // 매치 답변 내역 조회
+    // 매치 답변 내역 조회
     public List<Map<String, Object>> findAnswerListByCoupleId(CoupleEntity couple, Long userId) {
+        // 상대방 유저엔티티 구하기
+        UserEntity partner;
+        UserEntity user;
+        if(couple.getUser1().getUserId().equals(userId)) {
+            partner = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
+            user = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
+        } else {
+            partner = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
+            user = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
+        }
+
         List<LinkMatchAnswerEntity> coupleList = answerRepository.findByCoupleId(couple);
         List<Map<String, Object>> answerList = new ArrayList<>();
         for(LinkMatchAnswerEntity answerEntity : coupleList) {
@@ -81,20 +99,24 @@ public class CoupleMatchService {
             LinkMatchEntity matchQuestion = matchRepository.findById(answerEntity.getMatchId().getLinkMatchId()).orElse(null);
             totalAnswerMap.put("match1", matchQuestion.getMatch1());
             totalAnswerMap.put("match2", matchQuestion.getMatch2());
-            if(answerEntity.getUserId().getUserId()==userId) {
-                Map<String, Object> myAnswerMap = new HashMap<>();
-                myAnswerMap.put("myChoice", answerEntity.getChoice());
-                myAnswerMap.put("myDate", answerEntity.getCreatedAt());
-                totalAnswerMap.put("myAnswer", myAnswerMap);
-            } else {
-                Map<String, Object> partnerAnswerMap = new HashMap<>();
-                partnerAnswerMap.put("partnerChoice", answerEntity.getChoice());
-                partnerAnswerMap.put("partnerDate", answerEntity.getCreatedAt());
-                totalAnswerMap.put("partnerAnswer", partnerAnswerMap);
+            totalAnswerMap.put("date", matchQuestion.getDisplayDate());
+            if(answerEntity.getUserId().getUserId().equals(user.getUserId())) {
+                if (matchQuestion.getDisplayDate().equals(answerEntity.getCreatedAt())) {
+                    totalAnswerMap.put("myChoice", answerEntity.getChoice());
+                } else {
+                    totalAnswerMap.put("myChoice", "답변하지 않음");
+                }
+            } else if(answerEntity.getUserId().getUserId().equals(partner.getUserId())){
+                if(matchQuestion.getDisplayDate().equals(answerEntity.getCreatedAt())){
+                    totalAnswerMap.put("partnerChoice", answerEntity.getChoice());
+                } else {
+                    totalAnswerMap.put("partnerChoice", "답변하지 않음");
+                }
             }
             answerList.add(totalAnswerMap);
         }
         // 상대 답, 내 답, 날짜, 매치1, 매치2
         return answerList;
     }
+
 }
