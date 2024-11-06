@@ -53,6 +53,7 @@ public class CoupleMatchStatisticsService {
         // 0 : 이번달, 1 : 저번달, 2 : 저저번달
         int[] monthOneMatchCount = monthSuccessMatchCountByCoupleId(coupleId);
 
+        if(genderRateResult!=null) {
         Map<String, Object> mathRate = new HashMap<>();
         mathRate.put("gender_m_0_rate", genderRateResult.getSelect0RateM());
         mathRate.put("gender_m_1_rate", genderRateResult.getSelect1RateM());
@@ -65,8 +66,10 @@ public class CoupleMatchStatisticsService {
         mathRate.put("ourThisCoupleMatchCount", monthOneMatchCount[0]);
         mathRate.put("ourBefore1CoupleMatchCount", monthOneMatchCount[1]);
         mathRate.put("ourBefore2CoupleMatchCount", monthOneMatchCount[2]);
-
-        return mathRate;
+            return mathRate;
+        } else {
+            return null;
+        }
     }
 
     // 날짜로 매치 질문 조회
@@ -89,6 +92,7 @@ public class CoupleMatchStatisticsService {
     // 통계 - 성별 별 매치 선택 횟수로 통계 구하기
     private MatchGenderRateDTO matchGenderRate(List<Object[]> result) {
         MatchGenderRateDTO genderRate = new MatchGenderRateDTO();
+        if(result != null && result.size() > 0){
         for (int i = 0; i < result.size(); i++) {
             int choice = Integer.parseInt(result.get(i)[2].toString());
             if (result.get(i)[1].equals("M") && choice == 0) {
@@ -101,14 +105,17 @@ public class CoupleMatchStatisticsService {
                 genderRate.setChoice1ByF(Integer.parseInt(result.get(i)[3].toString()));
             }
         }
-//        genderRate.setTotalFCount(genderRate.getChoice0ByF() + genderRate.getChoice1ByF());
-//        genderRate.setTotalMCount(genderRate.getChoice0ByM() + genderRate.getChoice1ByM());
+        genderRate.setTotalFCount(genderRate.getChoice0ByF() + genderRate.getChoice1ByF());
+        genderRate.setTotalMCount(genderRate.getChoice0ByM() + genderRate.getChoice1ByM());
         genderRate.setSelect0RateF((int) Math.round((((double) genderRate.getChoice0ByF() / genderRate.getTotalFCount()) * 100)));
         genderRate.setSelect1RateF((int) Math.round((((double) genderRate.getChoice1ByF() / genderRate.getTotalFCount()) * 100)));
         genderRate.setSelect0RateM((int) Math.round((((double) genderRate.getChoice0ByM() / genderRate.getTotalMCount()) * 100)));
         genderRate.setSelect1RateM((int) Math.round((((double) genderRate.getChoice1ByM() / genderRate.getTotalMCount()) * 100)));
 
         return genderRate;
+        } else {
+            return null;
+        }
     }
 
     // 통계 - 매칭된 커플 비율(매치 확률)
