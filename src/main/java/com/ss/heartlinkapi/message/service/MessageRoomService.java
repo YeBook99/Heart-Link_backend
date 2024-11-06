@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static com.ss.heartlinkapi.user.entity.Role.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -68,8 +70,7 @@ public class MessageRoomService {
 //            비공개 채팅방 개설 주체 확인
             if (entity.getUser1Id().equals(userId)) {
                 chat.put("openUser", true);
-            }
-            else{
+            } else {
                 chat.put("openUser", false);
             }
 
@@ -91,13 +92,12 @@ public class MessageRoomService {
 
 //            마지막 메시지 구하기
             MessageEntity lastMessage = messageRepository.findByMsgRoomIdOrderByCreatedAt(messageRoomId);
-            if(lastMessage == null) {
+            if (lastMessage == null) {
                 chat.put("lastMessage", null);
-            }
-            else{
-                if(lastMessage.getContent()!=null)
+            } else {
+                if (lastMessage.getContent() != null)
                     chat.put("lastMessage", lastMessage.getContent());
-                else if(lastMessage.getImgUrl()!=null)
+                else if (lastMessage.getImgUrl() != null)
                     chat.put("lastMessage", "사진을 보냈습니다.");
             }
 
@@ -123,30 +123,31 @@ public class MessageRoomService {
         return messageRoomRepository.save(messageRoomEntity);
     }
 
-//    msgRoomId를 기준으로 방을 삭제
+    //    msgRoomId를 기준으로 방을 삭제
     public void applyRejection(Long msgRoomId) {
         messageRoomRepository.deleteById(msgRoomId);
     }
 
-//    msgRoomId를 기준으로 type을 y로 업데이트
+    //    msgRoomId를 기준으로 type을 y로 업데이트
     public void applyAccept(Long msgRoomId) {
         MessageRoomEntity messageRoomEntity = messageRoomRepository.findById(msgRoomId).orElseThrow(() -> new RuntimeException("MsgRoomId not found"));
         messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PUBLIC"));
         messageRoomRepository.save(messageRoomEntity);
     }
-//    msgRoom 존재 여부
+
+    //    msgRoom 존재 여부
     public boolean existChatRoom(Long userId, Long otherUserId) {
-        if(messageRoomRepository.existsByUser1IdAndUser2Id(userId, otherUserId))
+        if (messageRoomRepository.existsByUser1IdAndUser2Id(userId, otherUserId))
             return true;
         else return messageRoomRepository.existsByUser1IdAndUser2Id(otherUserId, userId);
     }
 
-//    상대방 존재 여부
+    //    상대방 존재 여부
     public boolean existOtherUser(Long otherUserId) {
         return userRepository.existsById(otherUserId);
     }
 
-//    채팅방 생성
+    //    채팅방 생성
     public MessageRoomEntity createChatRoom(Long userId, Long otherUserId) {
         MessageRoomEntity messageRoomEntity = new MessageRoomEntity();
         messageRoomEntity.setUser1Id(userId);
@@ -154,6 +155,7 @@ public class MessageRoomService {
         messageRoomEntity.setMsgRoomType(MsgRoomType.valueOf("PUBLIC"));
         return messageRoomRepository.save(messageRoomEntity);
     }
+
     //  searchName으로 유저를 검색하는 메서드
     public List<FriendDTO> searchUsers(Long userId, String searchName) {
 
@@ -162,9 +164,11 @@ public class MessageRoomService {
 
         for (UserEntity user : users) {
 
-            if(Objects.equals(user.getUserId(), userId))
+            if (Objects.equals(user.getUserId(), userId))
                 continue;
-            if(existChatRoom(userId, user.getUserId()))
+            if (user.getRole().equals(ROLE_ADMIN) || user.getRole().equals(ROLE_SINGLE) || user.getRole().equals(ROLE_USER))
+                continue;
+            if (existChatRoom(userId, user.getUserId()))
                 continue;
 
             FriendDTO friend = new FriendDTO();
@@ -192,7 +196,7 @@ public class MessageRoomService {
 
             BlockUserCheckDTO blockUserCheckDTO = new BlockUserCheckDTO();
             blockUserCheckDTO.setUserId(user.getUserId());
-            blockUserCheckDTO.setBlockUserId((Long)map.get("userId"));
+            blockUserCheckDTO.setBlockUserId((Long) map.get("userId"));
 
             if (messageService.blockMessage(blockUserCheckDTO)) {
                 continue;
