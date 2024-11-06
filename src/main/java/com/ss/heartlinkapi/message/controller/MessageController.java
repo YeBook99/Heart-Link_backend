@@ -5,7 +5,6 @@ import com.ss.heartlinkapi.message.dto.*;
 import com.ss.heartlinkapi.message.entity.MessageRoomEntity;
 import com.ss.heartlinkapi.message.service.MessageRoomService;
 import com.ss.heartlinkapi.message.service.MessageService;
-import com.ss.heartlinkapi.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;

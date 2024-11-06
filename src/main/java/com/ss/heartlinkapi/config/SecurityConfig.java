@@ -72,26 +72,51 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                		//user
                 .authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
-                        .antMatchers("/user/idcheck").permitAll()
-                        .antMatchers("/reissue").permitAll()
-                        .antMatchers("/oauth2/**").permitAll()
-                        .antMatchers("/user/auth/**").permitAll()
-                        .antMatchers("/user/sms/**").permitAll()
-                        .antMatchers("/user/**").permitAll()
-                        .antMatchers("/follow/**").permitAll()
-                        //토큰 role값 검증 확인용
-                        //.antMatchers("/user/check").hasRole("USER")
-                        // 예능 전용
-                        .antMatchers("/couple/**", "/admin/**", "/search/**", "/es/**", "/ads/**", "/tag/**").permitAll()
-                        .antMatchers("/dm/**","/message","/report","/notifications/**").permitAll()
+                		.antMatchers("/user/idcheck").permitAll()
+                		.antMatchers("/user/account/linking").permitAll()
+                		.antMatchers("/user/auth/**").permitAll()
+                		.antMatchers("/user/sms/**").permitAll()
+                		.antMatchers("/oauth2/**").permitAll()
+                		.antMatchers("/reissue").permitAll()
+                		.antMatchers("/user/find/loginId").permitAll()
+                		.antMatchers("/user/update/password").permitAll()
+                		.antMatchers("/user/profile/**").hasAnyRole("SINGLE","COUPLE", "ADMIN")
+                		.antMatchers("/user/block/**").hasAnyRole("COUPLE", "ADMIN")
+                		.antMatchers("/user/couple").hasAnyRole("COUPLE","ADMIN")
+                		//follow
+                		.antMatchers("/follow/**").hasAnyRole("COUPLE", "ADMIN")
+                		//couple
+                		.antMatchers("/couple/missionslink/**").hasAnyRole("COUPLE", "ADMIN")
+                		.antMatchers("/couple/missionmatch/**").hasAnyRole("COUPLE", "ADMIN")
+                		.antMatchers("/couple/dday/**").hasAnyRole("COUPLE", "ADMIN")
+                		.antMatchers("/couple/unlink").hasRole("COUPLE")
+                		.antMatchers("/couple/unlink/cancel").hasRole("SINGLE")
+                		.antMatchers("/couple/finalNowUnlink").hasRole("SINGLE")
+                		.antMatchers("/couple/match/code/**").hasRole("USER")
+                		//post
+                		.antMatchers("/feed/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+                		.antMatchers("/comment/**").hasAnyRole("COUPLE","ADMIN")
+                		.antMatchers("/like/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+                		.antMatchers("/bookmark/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+                		.antMatchers("/tag/**").hasAnyRole("COUPLE","ADMIN")
+                		//message
+                		.antMatchers("/dm/**").hasAnyRole("COUPLE","ADMIN")
+                		.antMatchers("/message").hasAnyRole("COUPLE","ADMIN")
+                		//report
+                		.antMatchers("/report").hasAnyRole("COUPLE","ADMIN")
+                		//notification
+                		.antMatchers("/notifications/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+                		//search
+                		.antMatchers("/search/**").hasAnyRole("COUPLE","ADMIN")
+                		.antMatchers("/es/**").hasAnyRole("COUPLE","ADMIN")
+                		//ad
+                		.antMatchers("/ads/**").hasAnyRole("COUPLE","ADMIN")
+                		//admin
+						.antMatchers("/admin/**").hasRole("ADMIN")
+						//img
 						.antMatchers("/img/**","/images/**").permitAll()
-						.antMatchers("/v2/api-docs", "/swagger-resources/**","/swagger-ui/**","/webjars/**").permitAll()
-						// 정훈 전용
-						.antMatchers("/feed/**").permitAll()
-						.antMatchers("/like/**").permitAll()
-						.antMatchers("/bookmark/**").permitAll()
-						.antMatchers("/comment/**").permitAll()
                         .anyRequest().authenticated());
         // oauth2
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler).failureHandler(customFailureHandler));
