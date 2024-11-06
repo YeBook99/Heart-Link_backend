@@ -223,9 +223,9 @@ public class PostService {
 					.orElseGet(() -> new LinkTagEntity(null, keyword));
 			LinkTagEntity result = linkTagRepository.save(linkTag);
 			// 엘라스틱 태그 인덱스에 추가
-//			if(elasticService.addTag(result)==null) {
-//				System.out.println("엘라스틱 태그 저장 실패");
-//			}
+			if(elasticService.addTag(result)==null) {
+				System.out.println("엘라스틱 태그 저장 실패");
+			}
 			System.out.println("저장된 LinkTag: " + linkTag.getKeyword());
 			
 			
@@ -510,30 +510,68 @@ public class PostService {
 		
 	}
 	
-		// 게시글 수정
-		@Transactional
-		public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
-		    // 게시글 조회 및 권한 확인
-		    PostEntity post = postRepository.findById(postId)
-		            .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
+	// 게시글 수정
+	@Transactional
+	public void updatePost(Long postId, Long userId, PostUpdateDTO updateDTO) {
+	    // 게시글 조회 및 권한 확인
+	    PostEntity post = postRepository.findById(postId)
+	            .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + postId));
+	
+	    if (!post.getUserId().getUserId().equals(userId)) {
+	        throw new IllegalArgumentException("권한이 없습니다. 게시글 작성자와 동일한 사용자가 아닙니다.");
+	    }
+	    
+	    // 멘션 데이터 삭제
+	    mentionRepository.deleteByPostId(post);
+	    
+	    // 링크 태그 데이터 삭제
+	    contentLinktagRepository.deleteByBoardId(post);
+	
+	    // 게시글 내용 및 가시성 업데이트
+	    post.setContent(updateDTO.getContent());
+	
+	    processTags(updateDTO.getContent(), post);
+	
+	    postRepository.save(post);
+	}
 
-		    if (!post.getUserId().getUserId().equals(userId)) {
-		        throw new IllegalArgumentException("권한이 없습니다. 게시글 작성자와 동일한 사용자가 아닙니다.");
-		    }
-		    
-		    // 멘션 데이터 삭제
-		    mentionRepository.deleteByPostId(post);
-		    
-		    // 링크 태그 데이터 삭제
-		    contentLinktagRepository.deleteByBoardId(post);
-
-		    // 게시글 내용 및 가시성 업데이트
-		    post.setContent(updateDTO.getContent());
-
-		    processTags(updateDTO.getContent(), post);
-
-		    postRepository.save(post);
+	// 태그 검색 결과 조회
+	public List<PostFileDTO> searchPostByLinktag(String keyword) {
+		List<PostFileDTO> result = new ArrayList<>();
+		
+		// 입력한 내용이 Linktag에 있는지 조회
+		Optional<LinkTagEntity> linkTagOptional = linkTagRepository.findByKeyword(keyword);  
+		
+		// LinkTag에 없으면 빈 리스트 반환
+		if (!linkTagOptional.isPresent()) {
+			System.out.println("LinkTag에 없는 keyword : " + keyword);
+			return result;
 		}
+		String Linktag = '&' + keyword;
+		
+		// Post의 content에 해당 keyword가 있는지 조회
+		List<PostEntity> posts = postRepository.findByContentContaining(Linktag);
+		
+		// Post에 없으면 빈 리스트 반환
+		if(posts.isEmpty()) {
+			System.out.println("해당하는 게시글이 없습니다.");
+			return result;
+		}
+		
+		for(PostEntity post : posts) {
+			System.out.println("게시글 있음 post는 " + post);
+			Long postId = post.getPostId();
+			
+			List<PostFileEntity> postFiles = postFileRepository.findByPostIdAndSortOrder(postId);
+			
+			for (PostFileEntity postFile : postFiles) {
+				result.add(new PostFileDTO(postId, postFile.getFileUrl(), postFile.getFileType(), postFile.getSortOrder()));
+			}
+			
+		}
+		System.out.println(result);
+		return result;
+	}
 
 
 

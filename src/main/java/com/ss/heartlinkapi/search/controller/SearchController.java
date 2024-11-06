@@ -1,10 +1,14 @@
 package com.ss.heartlinkapi.search.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
+import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.dto.PostSearchDTO;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
+import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.search.service.SearchService;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
@@ -17,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +38,8 @@ public class SearchController {
     private ProfileRepository profileRepository;
     @Autowired
     private PostFileRepository postFileRepository;
+    @Autowired
+    private PostService postService;
 
     @Autowired
     private UserRepository userRepository;
@@ -118,17 +126,22 @@ public class SearchController {
     }
 
     // 검색창과 함께 띄울 게시글 조회
+    @Transactional
     @GetMapping("/getSearchPost")
-    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "30") int limit) {
+    public ResponseEntity<?> getPostList(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(required = false) Integer cursor, @RequestParam(defaultValue = "30") int limit, HttpServletResponse response) {
         try {
             if(user == null) {
                 return ResponseEntity.badRequest().body(null);
             }
-            Map<String, Object> postList = searchService.getPost(user, cursor, limit);
+            List<PostSearchDTO> postList = searchService.getPost(user, cursor, limit);
             return ResponseEntity.ok(postList);
         } catch (Exception e) {
             e.printStackTrace();
+            if (!response.isCommitted()) {
+                return ResponseEntity.internalServerError().build();
+            }
             return ResponseEntity.internalServerError().build();
+
         }
     }
 
@@ -147,6 +160,19 @@ public class SearchController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+    
+    // 링크태그 검색
+    @GetMapping("/tag")
+    public List<PostFileDTO> searchPost(@RequestParam String keyword){
+    	return postService.searchPostByLinktag(keyword);
+    }
+
+    // 모든 게시글 조회
+    @GetMapping("/allPosts")
+    public ResponseEntity<?> allPosts(@AuthenticationPrincipal CustomUserDetails user){
+        List<Map<String, Object>> result = searchService.findGroupByPostId();
+        return ResponseEntity.ok(result);
     }
 
 }

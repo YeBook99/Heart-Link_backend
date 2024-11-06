@@ -11,4 +11,5 @@ public class UserCoupleDTO {
 	private Long coupleUserId;
 	private String coupleImg;
 	private String coupleNickname;
+	private String coupleBio;
 }

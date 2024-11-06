@@ -1,7 +1,10 @@
 package com.ss.heartlinkapi.post.repository;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.ss.heartlinkapi.post.dto.PostFileDTO;
+import com.ss.heartlinkapi.post.dto.PostSearchDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +30,8 @@ public interface PostFileRepository extends JpaRepository<PostFileEntity, Long>{
 	@Query("DELETE FROM PostFileEntity pf WHERE pf.postId.id = :postId")
 	void deleteByPostId(@Param("postId") Long postId);
 
-
-
+	// 입력한 postId의 sortOrder가 1인 데이터 가져오기
+	@Query("SELECT pf FROM PostFileEntity pf WHERE pf.postId.postId = :postId AND pf.sortOrder = 1")
+    List<PostFileEntity> findByPostIdAndSortOrder(@Param("postId") Long postId);
 
 }

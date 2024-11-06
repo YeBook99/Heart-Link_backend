@@ -89,4 +89,6 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
 
     // 유저아이디로 링크매치답변 조회
     List<LinkMatchAnswerEntity> findAllByUserId(UserEntity user);
+
+
 }

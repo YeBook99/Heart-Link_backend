@@ -3,6 +3,7 @@ package com.ss.heartlinkapi.linkmatch.controller;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linkmatch.dto.MatchAnswer;
+import com.ss.heartlinkapi.linkmatch.dto.MatchAnswerListDTO;
 import com.ss.heartlinkapi.linkmatch.service.CoupleMatchService;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchEntity;
@@ -108,8 +109,8 @@ public class CoupleMatchController {
 
         CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
 
-        List<Map<String, Object>> answerList = coupleMatchService.findAnswerListByCoupleId(couple, userDetails.getUserId());
-
+            Set<MatchAnswerListDTO> answerList = coupleMatchService.findAnswerListByCoupleId(couple, userDetails.getUserId());
+        System.out.println("컨트롤러의 answerList : "+answerList);
         return ResponseEntity.ok().body(answerList);
         } catch (Exception e) {
             e.printStackTrace();

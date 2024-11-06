@@ -169,6 +169,7 @@ public class CoupleService {
     }
 
     // 커플 해지 유예기간 없이 즉시 해지
+    @Transactional
     public void finalNowUnlinkCouple(CoupleEntity couple) {
         List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
         if(answerList != null && answerList.size() > 0) {
@@ -180,12 +181,16 @@ public class CoupleService {
             coupleMissionService.deleteUserMissionByCoupleId(couple.getCoupleId());
         }
         try {
-            couple.getUser1().setRole(Role.ROLE_USER);
-            couple.getUser2().setRole(Role.ROLE_USER);
-            couple.getUser1().setCoupleCode(generateRandomCode());
-            couple.getUser2().setCoupleCode(generateRandomCode());
-            userRepository.save(couple.getUser1());
-            userRepository.save(couple.getUser2());
+            UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
+            UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
+            System.out.println("user1 : "+user1);
+            System.out.println("user2 : "+user2);
+            user1.setRole(Role.ROLE_USER);
+            user2.setRole(Role.ROLE_USER);
+            user1.setCoupleCode(generateRandomCode());
+            user2.setCoupleCode(generateRandomCode());
+            userRepository.save(user1);
+            userRepository.save(user2);
             coupleRepository.deleteById(couple.getCoupleId());
         } catch (Exception e) {
             e.printStackTrace();
