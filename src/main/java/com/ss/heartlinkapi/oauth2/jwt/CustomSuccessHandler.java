@@ -50,7 +50,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
 		
 		// 리프레쉬 쿠키에 추가
 		response.addCookie(createCookie("RefreshToken", token));
-		response.sendRedirect("http://localhost:3000/home");
+		response.sendRedirect("http://localhost:3000/refresh");
 		
 	}
 	
