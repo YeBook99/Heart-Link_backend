@@ -101,8 +101,8 @@ public class CoupleMatchStatisticsService {
                 genderRate.setChoice1ByF(Integer.parseInt(result.get(i)[3].toString()));
             }
         }
-        genderRate.setTotalFCount(genderRate.getChoice0ByF() + genderRate.getChoice1ByF());
-        genderRate.setTotalMCount(genderRate.getChoice0ByM() + genderRate.getChoice1ByM());
+//        genderRate.setTotalFCount(genderRate.getChoice0ByF() + genderRate.getChoice1ByF());
+//        genderRate.setTotalMCount(genderRate.getChoice0ByM() + genderRate.getChoice1ByM());
         genderRate.setSelect0RateF((int) Math.round((((double) genderRate.getChoice0ByF() / genderRate.getTotalFCount()) * 100)));
         genderRate.setSelect1RateF((int) Math.round((((double) genderRate.getChoice1ByF() / genderRate.getTotalFCount()) * 100)));
         genderRate.setSelect0RateM((int) Math.round((((double) genderRate.getChoice0ByM() / genderRate.getTotalMCount()) * 100)));

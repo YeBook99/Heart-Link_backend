@@ -1,5 +1,7 @@
 package com.ss.heartlinkapi.couple.service;
 
+import com.ss.heartlinkapi.block.entity.BlockEntity;
+import com.ss.heartlinkapi.block.repository.BlockRepository;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
 import com.ss.heartlinkapi.linkmatch.entity.LinkMatchAnswerEntity;
@@ -40,6 +42,9 @@ public class CoupleService {
     @Autowired
     @Lazy
     private PostService postService;
+
+    @Autowired
+    private BlockRepository blockRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -133,6 +138,12 @@ public class CoupleService {
                     if(answerList != null && answerList.size() > 0) {
                         coupleMatchAnswerRepository.deleteAllByCoupleId(couple);
                     }
+                    // 차단 목록 삭제
+                    List<BlockEntity> blockList = blockRepository.findByCoupleId(couple);
+                    for(BlockEntity block : blockList) {
+                        blockRepository.delete(block);
+                        System.out.println("차단 목록에서 커플 삭제");
+                    }
                     // 매치 미션 목록 삭제
                     List<UserLinkMissionEntity> userMissionList = coupleMissionService.findUserLinkMissionByCoupleId(couple);
                     if(userMissionList != null && userMissionList.size() > 0) {
@@ -179,6 +190,12 @@ public class CoupleService {
         List<UserLinkMissionEntity> userMissionList = coupleMissionService.findUserLinkMissionByCoupleId(couple);
         if(userMissionList != null && userMissionList.size() > 0) {
             coupleMissionService.deleteUserMissionByCoupleId(couple.getCoupleId());
+        }
+        // 차단 목록 삭제
+        List<BlockEntity> blockList = blockRepository.findByCoupleId(couple);
+        for(BlockEntity block : blockList) {
+            blockRepository.delete(block);
+            System.out.println("차단 목록에서 커플 삭제");
         }
         try {
             UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);

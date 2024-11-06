@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import com.ss.heartlinkapi.block.entity.BlockEntity;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 
+import java.util.List;
+
 public interface BlockRepository extends JpaRepository<BlockEntity, Long>{
 	
     /********* 차단한 유저와 차단된 유저로 블락 엔티티 반환 **********/
@@ -29,5 +31,7 @@ public interface BlockRepository extends JpaRepository<BlockEntity, Long>{
 	@Query("SELECT CASE WHEN COUNT(b) > 0 THEN true ELSE false END " +
 	           "FROM BlockEntity b WHERE b.blockedId.userId = :userId AND b.coupleId.coupleId = :coupleId")
 	boolean existsByBlockedId_UserIdAndCoupleId_CoupleId(@Param("userId") Long userId, @Param("coupleId") Long coupleId);
-    
+
+    // 커플아이디로 차단된 리스트 조회
+    List<BlockEntity> findByCoupleId(CoupleEntity coupleId);
 }
