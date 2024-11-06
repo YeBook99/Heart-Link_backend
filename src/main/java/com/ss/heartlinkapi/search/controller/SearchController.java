@@ -133,7 +133,7 @@ public class SearchController {
             if(user == null) {
                 return ResponseEntity.badRequest().body(null);
             }
-            List<PostSearchDTO> postList = searchService.getPost(user, cursor, limit);
+            Map<String, Object> postList = searchService.getPost(user, cursor, limit);
             return ResponseEntity.ok(postList);
         } catch (Exception e) {
             e.printStackTrace();

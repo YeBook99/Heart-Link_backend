@@ -118,6 +118,23 @@ public class CoupleMatchController {
         }
     }
 
+    // 오늘 선택한 내 매치 답변 조회
+    @GetMapping("/checkMyAnswer")
+    public ResponseEntity<?> checkMyAnswer(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try{
+            if(userDetails == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            // result가 0이면 매치1번, 1이면 매치2번, 2이면 미답변
+            int result = coupleMatchService.checkMyTodayAnswer(userDetails.getUserEntity());
+            return ResponseEntity.ok().body(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     // 통계 - 일일 매치 통계 조회(일일 매치 답변 별 성별 비율 통계, 일일 매칭된 커플 퍼센트, 월별 매칭 횟수 조회)
     @GetMapping("/statistics/dailyMatch")
     public ResponseEntity<?> getStatisticsDailyMatchById(@AuthenticationPrincipal CustomUserDetails userDetails) {
