@@ -98,25 +98,15 @@ public class CoupleMatchService {
             MatchAnswerListDTO dto = new MatchAnswerListDTO();
             LinkMatchEntity matchQuestion = matchRepository.findById(answerEntity.getMatchId().getLinkMatchId()).orElse(null);
             dto.setMatch1(matchQuestion.getMatch1());
-            System.out.println("서비스의 setMatch1 : "+matchQuestion.getMatch1());
-
             dto.setMatch2(matchQuestion.getMatch2());
-            System.out.println("서비스의 setMatch2 : "+matchQuestion.getMatch2());
-
             dto.setDate(matchQuestion.getDisplayDate());
-            System.out.println("서비스의 setDate : "+matchQuestion.getDisplayDate());
-
             LinkMatchAnswerEntity myAnswer = coupleMatchAnswerRepository.findByUserIdAndCreatedAt(user, matchQuestion.getDisplayDate());
-            System.out.println("서비스의 myAnswer : "+coupleMatchAnswerRepository.findByUserIdAndCreatedAt(user, matchQuestion.getDisplayDate()));
-
             if(myAnswer != null) {
                 dto.setMyChoice(myAnswer.getChoice());
             } else {
                 dto.setMyChoice(-1);
             }
             LinkMatchAnswerEntity partnerAnswer = coupleMatchAnswerRepository.findByUserIdAndCreatedAt(partner, matchQuestion.getDisplayDate());
-            System.out.println("서비스의 partnerAnswer : "+coupleMatchAnswerRepository.findByUserIdAndCreatedAt(partner, matchQuestion.getDisplayDate()));
-
             if(partnerAnswer != null) {
                 dto.setPartnerChoice(partnerAnswer.getChoice());
             } else {
@@ -127,7 +117,6 @@ public class CoupleMatchService {
         }
         Set<MatchAnswerListDTO> set = new HashSet<>(answerList);
         // 상대 답, 내 답, 날짜, 매치1, 매치2
-        System.out.println("서비스의 answerList : "+answerList);
 
         return set;
     }
