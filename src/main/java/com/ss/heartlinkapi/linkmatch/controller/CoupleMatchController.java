@@ -110,7 +110,6 @@ public class CoupleMatchController {
         CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userDetails.getUserId());
 
             Set<MatchAnswerListDTO> answerList = coupleMatchService.findAnswerListByCoupleId(couple, userDetails.getUserId());
-        System.out.println("컨트롤러의 answerList : "+answerList);
         return ResponseEntity.ok().body(answerList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,7 +152,7 @@ public class CoupleMatchController {
             Map<String, Object> rateResult = statisticsService.matchRate(todayMatch, couple.getCoupleId());
 
             if(rateResult == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.ok(new HashMap<>());
             }
 
             return ResponseEntity.ok(rateResult);
