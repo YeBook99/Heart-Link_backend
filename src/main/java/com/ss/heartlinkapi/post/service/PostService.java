@@ -125,6 +125,7 @@ public class PostService {
 
 	    // 파일 저장 경로 지정
 	    String uploadDir = Paths.get("").toAbsolutePath().toString();
+	    System.out.println("주소 보기 " + uploadDir);
 	    
 	    int sortOrder = 1; // 정렬 순서 초기화
 
@@ -146,7 +147,7 @@ public class PostService {
 	                file.transferTo(destinationFile);
 	                
 	                // 파일 URL 생성
-	                String fileUrl = "src/main/resources/static/img/" + newFileName;
+	                String fileUrl = "http://localhost:9090/img/" + newFileName;
 	                
 	                // PostFileEntity 생성
 	                PostFileEntity postFile = new PostFileEntity();
