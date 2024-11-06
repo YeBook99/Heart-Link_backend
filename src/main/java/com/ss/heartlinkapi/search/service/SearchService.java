@@ -189,7 +189,7 @@ public class SearchService {
 
     // 검색창 옆에 띄울 게시글 목록 가져오기
     // 좋아요 많은 순+검색기록 관련 순으로 섞고 나서 연관없는 게시글 최근순으로 가져오기
-    public List<PostSearchDTO> getPost(CustomUserDetails user, Integer cursor, int limit) {
+    public Map<String, Object> getPost(CustomUserDetails user, Integer cursor, int limit) {
         List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
 
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
@@ -233,13 +233,13 @@ public class SearchService {
             dto.setFileUrl(file.getFileUrl());
             postDTOList.add(dto);
         }
-//        Map<String, Object> postData = new HashMap<>();
-//
-//        postData.put("nextCursor", nextCursor);
-//        postData.put("data", sliceData);
-//        postData.put("hasNext", nextCursor != null && nextCursor < mixPostList.size());
+        Map<String, Object> postData = new HashMap<>();
 
-        return postDTOList;
+        postData.put("nextCursor", nextCursor);
+        postData.put("data", postDTOList);
+        postData.put("hasNext", nextCursor != null && nextCursor < mixPostList.size());
+
+        return postData;
     }
 
     // 게시글 섞기 (좋아요 많은 순 + 검색기록에 따른 게시글 리스트)

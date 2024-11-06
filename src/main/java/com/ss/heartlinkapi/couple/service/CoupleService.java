@@ -214,7 +214,7 @@ public class CoupleService {
     public int getDday(CoupleEntity couple) {
         LocalDate anniversaryDate = couple.getAnniversaryDate();
         LocalDate today = LocalDate.now();
-        int dday = (int) ChronoUnit.DAYS.between(anniversaryDate, today);
+        int dday = (int) ChronoUnit.DAYS.between(anniversaryDate, today)+1;
         return dday;
     }
     

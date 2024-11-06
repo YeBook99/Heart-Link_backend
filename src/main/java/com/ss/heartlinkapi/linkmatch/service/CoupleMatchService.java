@@ -132,4 +132,16 @@ public class CoupleMatchService {
         return set;
     }
 
+    // 오늘의 내 매치답변 조회
+    public int checkMyTodayAnswer(UserEntity userEntity) {
+        LinkMatchAnswerEntity result = coupleMatchAnswerRepository.findByUserIdAndCreatedAt(userEntity, LocalDate.now());
+        if(result != null) {
+            if(result.getChoice()==0){
+                return 0; // 매치 0번 답했을 때
+            } else if(result.getChoice()==1){
+                return 1; // 매치 1번 답했을 때
+            }
+        }
+            return 2; // 미답변 했을 때
+    }
 }
