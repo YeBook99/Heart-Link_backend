@@ -133,33 +133,34 @@ public class SearchService {
         }
 
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByKeywordAndTypeAndUserId(keyword, "content", user.getUserId());
-        SearchHistoryEntity elasticEntity;
+        SearchHistoryEntity elasticEntity = new SearchHistoryEntity();
+        SearchHistoryEntity searchHistory;
         String deepLResult;
 //        System.out.println("검색기록 : "+searchHistory);
 
         if(searchHistoryList != null && searchHistoryList.size() > 0) {
-            elasticEntity = searchHistoryList.get(0);
-            elasticEntity.setUpdatedAt(LocalDateTime.now());
-            searchRepository.save(elasticEntity);
-            deepLResult = deepLService.translate(elasticEntity.getKeyword(), Language.KO, Language.EN);
+            searchHistory = searchHistoryList.get(0);
+            searchHistory.setUpdatedAt(LocalDateTime.now());
+            searchRepository.save(searchHistory);
+            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.KO, Language.EN);
         } else {
-            elasticEntity = new SearchHistoryEntity();
-            elasticEntity.setUserId(user);
-            elasticEntity.setKeyword(keyword);
-            elasticEntity.setType("content");
-            elasticEntity.setCreatedAt(LocalDateTime.now());
-            SearchHistoryEntity result = searchRepository.save(elasticEntity);
-            deepLResult = deepLService.translate(elasticEntity.getKeyword(), Language.KO, Language.EN);
+            searchHistory = new SearchHistoryEntity();
+            searchHistory.setUserId(user);
+            searchHistory.setKeyword(keyword);
+            searchHistory.setType("content");
+            searchHistory.setCreatedAt(LocalDateTime.now());
+            SearchHistoryEntity result = searchRepository.save(searchHistory);
+            deepLResult = deepLService.translate(searchHistory.getKeyword(), Language.KO, Language.EN);
         }
 
         // Elastic용 entity
         elasticEntity.setKeyword(deepLResult);
-        elasticEntity.setType(elasticEntity.getType());
-        elasticEntity.setCreatedAt(elasticEntity.getUpdatedAt()==null?elasticEntity.getCreatedAt():elasticEntity.getUpdatedAt());
+        elasticEntity.setType(searchHistory.getType());
+        elasticEntity.setCreatedAt(searchHistory.getUpdatedAt()==null?searchHistory.getCreatedAt():searchHistory.getUpdatedAt());
         elasticEntity.setUpdatedAt(null);
-        elasticEntity.setSearchHistoryId(elasticEntity.getSearchHistoryId());
+        elasticEntity.setSearchHistoryId(searchHistory.getSearchHistoryId());
         elasticEntity.setUserId(user);
-        elasticService.addOrUpdateHistory(elasticEntity);
+        elasticService.addOrUpdateHistory(searchHistory);
         return findPost;
     }
 
@@ -171,8 +172,7 @@ public class SearchService {
            return null;
        }
        List<Map<String, Object>> historyList = new ArrayList<>();
-       int size = history.size()<=5 ? history.size() : 5;
-       for(int i=0; i<size; i++) {
+       for(int i=0; i<history.size(); i++) {
            Map<String, Object> map = new HashMap<>();
            map.put("type", history.get(i).getType());
            map.put("keyword", history.get(i).getKeyword());
