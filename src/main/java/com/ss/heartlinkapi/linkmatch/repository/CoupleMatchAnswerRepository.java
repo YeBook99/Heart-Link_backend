@@ -35,7 +35,7 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
             "GROUP BY m.link_match_id, g.gender, c.choice " +
             "having m.link_match_id = :matchId " +
             "ORDER BY m.link_match_id, g.gender, c.choice", nativeQuery = true)
-    List<Object[]> matchCountGenderById(Long matchId);
+    List<Object[]> matchCountGenderById(@Param("matchId") Long matchId);
 
     // 통계 - 오늘 매치 답변에 응답한 인원 수 커플 아이디로 그룹지어 조회하기
     @Query(value = "select count(*) from match_answer where created_at = :today group by couple_id", nativeQuery = true)
