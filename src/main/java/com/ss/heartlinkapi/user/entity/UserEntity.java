@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -41,7 +42,8 @@ public class UserEntity {
     
     @Enumerated(EnumType.STRING)
     private Role role; // 역할
-    
+
+    @ToString.Exclude
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<SocialEntity> socialAccounts; // 소셜 엔티티 목록
     
