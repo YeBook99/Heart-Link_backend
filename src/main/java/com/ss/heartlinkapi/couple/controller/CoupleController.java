@@ -91,8 +91,8 @@ public class CoupleController {
     }
 
     // 디데이 수정
-    @PutMapping("/dday/update/{userId}")
-    public ResponseEntity<?> updateAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user, @PathVariable Long userId, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate date) {
+    @PutMapping("/dday/update")
+    public ResponseEntity<?> updateAnniversaryDay(@AuthenticationPrincipal CustomUserDetails user, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam LocalDate date) {
         // 오류 500 검사
         try{
             // 오류 400 검사
@@ -100,11 +100,7 @@ public class CoupleController {
                 return ResponseEntity.badRequest().build();
             }
 
-            if (!userId.equals(user.getUserId())) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("수정 권한이 없습니다.");
-            }
-
-            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userId);
+            CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(user.getUserId());
             // 오류 404 검사
             if(couple == null) {
                 return ResponseEntity.notFound().build();
