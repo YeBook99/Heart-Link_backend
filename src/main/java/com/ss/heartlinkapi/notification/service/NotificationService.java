@@ -45,7 +45,7 @@ public class NotificationService {
 
     //    이벤트발생시 data가 notify 메서드를 통해 sendToClient으로 넘어가고 client측으로 출력되게 된다.
     public void notifyLikePost(String userName, Long postId, Long userId) {
-        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 글을 좋아합니다.");
+        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:3000/feed/details/" + postId, userName + "님이 회원님의 글을 좋아합니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
@@ -69,14 +69,14 @@ public class NotificationService {
         UserEntity user = new UserEntity();
         user.setUserId(userId);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
-        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:9090/feed/details/" + postId, userName + "님이 회원님의 댓글을 좋아합니다.");
+        NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:3000/feed/details/" + postId, userName + "님이 회원님의 댓글을 좋아합니다.");
         saveNotification("COMMENT_LIKE", notificationLikeDTO.getMessage(), postWriterId, otherUserImg );
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationLikeDTO);
     }
 
     public void notifyComment(String userName, Long postId, Long userId) {
-        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:9090/feed/details/" + postId,userName + "님이 댓글을 남겼습니다.");
+        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:3000/feed/details/" + postId,userName + "님이 댓글을 남겼습니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
@@ -90,7 +90,7 @@ public class NotificationService {
     }
     //      팔로우 요청 시 알람
     public void notifyFollow(String userName, Long userId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
@@ -99,7 +99,7 @@ public class NotificationService {
     }
     //      비공개 유저 팔로우 요청
     public void notifyFollowPrivate(String userName, Long userId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
@@ -108,7 +108,7 @@ public class NotificationService {
     }
     //  유저 태그시 알람
     public void notifyIdTag(String userName, Long postId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:9090/feed/details/" + postId , userName + "님이 게시글에 회원님을 태그하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/feed/details/" + postId , userName + "님이 게시글에 회원님을 태그하였습니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
