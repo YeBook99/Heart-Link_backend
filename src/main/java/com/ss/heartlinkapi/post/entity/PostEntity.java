@@ -48,7 +48,7 @@ public class PostEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	private UserEntity userId; // 게시글 작성자 id
 	
-	@Column(name = "content")
+	@Column(name = "content", length = 300)
 	private String content; // 내용
 	
 	@CreatedDate
