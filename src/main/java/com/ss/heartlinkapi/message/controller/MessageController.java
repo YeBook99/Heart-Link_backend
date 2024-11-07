@@ -36,24 +36,24 @@ public class MessageController {
     private final MessageRoomService messageRoomService;
     private final MessageService messageService;
 
-    //      images 파일내의 이미지를 가져오기 위한 endpoint
-    @GetMapping("/images/{filename:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
-        try {
-            Path filePath = Paths.get("images").resolve(filename); // 'images'는 루트 디렉토리에 있는 폴더
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (resource.exists() || resource.isReadable()) {
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
+//    //      images 파일내의 이미지를 가져오기 위한 endpoint
+//    @GetMapping("/images/{filename:.+}")
+//    public ResponseEntity<Resource> getImage(@PathVariable String filename) {
+//        try {
+//            Path filePath = Paths.get("images").resolve(filename); // 'images'는 루트 디렉토리에 있는 폴더
+//            Resource resource = new UrlResource(filePath.toUri());
+//
+//            if (resource.exists() || resource.isReadable()) {
+//                return ResponseEntity.ok()
+//                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+//                        .body(resource);
+//            } else {
+//                return ResponseEntity.notFound().build();
+//            }
+//        } catch (MalformedURLException e) {
+//            return ResponseEntity.internalServerError().build();
+//        }
+//    }
 
     //          채팅방을 개설하는 핸들러 메서드
     @PostMapping("/new/{otherUserId}")
@@ -165,7 +165,7 @@ public class MessageController {
                 multipartFile.transferTo(new File(filePath));
 
 //            이미지를 가져올 경로를 저장하는 과정
-                String importPath = "http://localhost:9090/dm/images/" + newFileName;
+                String importPath = "http://localhost:9090/images/" + newFileName;
 
                 SaveMsgDTO saveMsgDTO = new SaveMsgDTO().builder()
                         .msgRoomId(msgRoomId)
