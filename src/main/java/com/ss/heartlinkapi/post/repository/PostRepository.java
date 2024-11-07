@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ss.heartlinkapi.post.entity.PostEntity;
+import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 
 public interface PostRepository extends JpaRepository<PostEntity, Long>{
@@ -55,5 +56,6 @@ public interface PostRepository extends JpaRepository<PostEntity, Long>{
 	List<PostEntity> findAllByUserIdAndMonth (@Param("userId") Long userId, @Param("year") int year, @Param("month") int month);
 
 	// 입력한 내용이 content에 포함되어 있는지 조회
-	List<PostEntity> findByContentContaining(String Linktag);
+	List<PostEntity> findByContentContainingAndVisibilityNot(String Linktag, Visibility visibility);
+	
 }

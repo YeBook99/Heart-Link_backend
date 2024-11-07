@@ -142,7 +142,6 @@ public class LikeService {
         if (postId != null) {
             post = postRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("Post not found"));
-
         } else if (commentId != null) {
             comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
@@ -156,7 +155,6 @@ public class LikeService {
         // 게시글에 대한 좋아요
         if (post != null) {
             existingLike = likeRepository.findByUserIdAndPostId(user, post);
-            // 댓글에 대한 좋아요
         } else {
             existingLike = likeRepository.findByUserIdAndCommentId(user, comment);
         }
@@ -171,12 +169,13 @@ public class LikeService {
                 comment.setLikeCount(comment.getLikeCount() - 1);
                 commentRepository.save(comment);
             }
+            return false;  // 삭제되었음을 반환
         } else {
             // 좋아요가 없으면 추가
             LikeEntity like = new LikeEntity();
             like.setUserId(user);
 
-            //	사용자의 LoginId 가져오기 위해서
+            // 사용자의 LoginId 가져오기
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String myLoginId = authentication.getName();
 
@@ -184,19 +183,18 @@ public class LikeService {
                 like.setPostId(post);
                 post.setLikeCount(post.getLikeCount() + 1);
                 postRepository.save(post);
-
                 notificationService.notifyLikePost(myLoginId, postId, userId);
             } else if (comment != null) {
                 like.setCommentId(comment);
                 comment.setLikeCount(comment.getLikeCount() + 1);
                 commentRepository.save(comment);
-
                 notificationService.notifyLikeComment(myLoginId, comment.getPostId().getPostId(), userId);
             }
             likeRepository.save(like);
+            return true;  // 추가되었음을 반환
         }
-        return true;
     }
+
 
 
 
