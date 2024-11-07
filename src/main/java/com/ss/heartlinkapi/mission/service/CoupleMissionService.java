@@ -122,8 +122,8 @@ public class CoupleMissionService {
     }
 
     // 유저 미션 삭제
-    public void deleteUserMissionByCoupleId(Long coupleId) {
-        userLinkMissionRepository.deleteAllByCoupleId(coupleId);
+    public void deleteUserMissionByCoupleId(CoupleEntity couple) {
+        userLinkMissionRepository.deleteAllByCoupleId(couple);
     }
 
     // 모든 미션 리스트 조회
