@@ -12,7 +12,7 @@ public interface UserLinkMissionRepository extends JpaRepository<UserLinkMission
     public List<UserLinkMissionEntity> findAllByCoupleId(CoupleEntity couple);
 
     // 커플아이디로 삭제하기
-    public void deleteAllByCoupleId(Long coupleId);
+    public void deleteAllByCoupleId(CoupleEntity couple);
 
     // 유저아이디로 완료된 커플 미션 조회
     

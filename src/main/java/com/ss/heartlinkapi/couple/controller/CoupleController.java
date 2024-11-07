@@ -6,6 +6,7 @@ import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -172,7 +173,7 @@ public class CoupleController {
                 return ResponseEntity.badRequest().body("커플 연결에 실패하였습니다.");
             }
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            return ResponseEntity.status(HttpStatus.CREATED).body("커플 연결에 성공하였습니다.");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -253,8 +254,16 @@ public class CoupleController {
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
-
-            coupleService.finalNowUnlinkCouple(couple);
+            System.out.println("커플엔티티: "+couple);
+            System.out.println("커플유저1계정: "+couple.getUser1().getUserId());
+            System.out.println("커플유저2계정: "+couple.getUser2().getUserId());
+            System.out.println("커플유저1계정유저아이디: "+couple.getUser1().getUserId());
+            System.out.println("커플유저2계정유저아이디: "+couple.getUser2().getUserId());
+            System.out.println("커플유저1계정유저아이디로 유저찾기: "+userRepository.findById(couple.getUser1().getUserId()).orElse(null));
+            System.out.println("커플유저2계정유저아이디로 유저찾기: "+userRepository.findById(couple.getUser2().getUserId()).orElse(null));
+            UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
+            UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
+            coupleService.finalNowUnlinkCouple(couple, user1, user2);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             e.printStackTrace();
