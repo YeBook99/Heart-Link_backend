@@ -47,6 +47,7 @@ import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
+import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
@@ -559,6 +560,11 @@ public class PostService {
 	        System.out.println("해당하는 게시글이 없습니다.");
 	        return result;
 	    }
+	    
+	    // role이 ROLE_COUPLE인 게시글만 필터링
+	    posts = posts.stream()
+	                 .filter(post -> post.getUserId().getRole() == Role.ROLE_COUPLE)
+	                 .collect(Collectors.toList());
 	    
 	    for(PostEntity post : posts) {
 	        System.out.println("게시글 있음 post는 " + post);
