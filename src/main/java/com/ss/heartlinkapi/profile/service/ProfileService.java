@@ -178,7 +178,7 @@ public class ProfileService {
         // UUID로 파일 이름 변경
         String newFileName = UUID.randomUUID().toString() + fileExtension;
         String currentPath = Paths.get("").toAbsolutePath().toString();
-        String filePath = currentPath + "/src/main/resources/static/img/" + newFileName;
+        String filePath = currentPath + "/images/" + newFileName;
 
         // 파일 생성
         img.transferTo(new File(filePath));
@@ -189,7 +189,7 @@ public class ProfileService {
             throw new IllegalArgumentException("프로필이 존재하지 않습니다.");
         }
         
-        String imageUrl = "http://localhost:9090/img/" + newFileName;
+        String imageUrl = "http://localhost:9090/images/" + newFileName;
         profileEntity.setProfile_img(imageUrl);
         profileRepository.save(profileEntity);
     }
