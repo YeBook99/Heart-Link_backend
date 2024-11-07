@@ -43,6 +43,7 @@ import com.ss.heartlinkapi.post.dto.PostUpdateDTO;
 import com.ss.heartlinkapi.post.entity.FileType;
 import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
+import com.ss.heartlinkapi.post.entity.Visibility;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.ProfileEntity;
@@ -538,41 +539,42 @@ public class PostService {
 
 	// 태그 검색 결과 조회
 	public List<PostFileDTO> searchPostByLinktag(String keyword) {
-		List<PostFileDTO> result = new ArrayList<>();
-		
-		// 입력한 내용이 Linktag에 있는지 조회
-		Optional<LinkTagEntity> linkTagOptional = linkTagRepository.findByKeyword(keyword);  
-		
-		// LinkTag에 없으면 빈 리스트 반환
-		if (!linkTagOptional.isPresent()) {
-			System.out.println("LinkTag에 없는 keyword : " + keyword);
-			return result;
-		}
-		String Linktag = '&' + keyword;
-		
-		// Post의 content에 해당 keyword가 있는지 조회
-		List<PostEntity> posts = postRepository.findByContentContaining(Linktag);
-		
-		// Post에 없으면 빈 리스트 반환
-		if(posts.isEmpty()) {
-			System.out.println("해당하는 게시글이 없습니다.");
-			return result;
-		}
-		
-		for(PostEntity post : posts) {
-			System.out.println("게시글 있음 post는 " + post);
-			Long postId = post.getPostId();
-			
-			List<PostFileEntity> postFiles = postFileRepository.findByPostIdAndSortOrder(postId);
-			
-			for (PostFileEntity postFile : postFiles) {
-				result.add(new PostFileDTO(postId, postFile.getFileUrl(), postFile.getFileType(), postFile.getSortOrder()));
-			}
-			
-		}
-		System.out.println(result);
-		return result;
+	    List<PostFileDTO> result = new ArrayList<>();
+	    
+	    // 입력한 내용이 Linktag에 있는지 조회
+	    Optional<LinkTagEntity> linkTagOptional = linkTagRepository.findByKeyword(keyword);
+	    
+	    // LinkTag에 없으면 빈 리스트 반환
+	    if (!linkTagOptional.isPresent()) {
+	        System.out.println("LinkTag에 없는 keyword : " + keyword);
+	        return result;
+	    }
+	    String Linktag = '&' + keyword;
+	    
+	    // content에 해당 keyword가 있고 visibility가 "PRIVATE"이 아닌 게시글만 조회
+	    List<PostEntity> posts = postRepository.findByContentContainingAndVisibilityNot(Linktag, Visibility.PRIVATE);
+	    
+	    // Post에 없으면 빈 리스트 반환
+	    if(posts.isEmpty()) {
+	        System.out.println("해당하는 게시글이 없습니다.");
+	        return result;
+	    }
+	    
+	    for(PostEntity post : posts) {
+	        System.out.println("게시글 있음 post는 " + post);
+	        Long postId = post.getPostId();
+	        
+	        List<PostFileEntity> postFiles = postFileRepository.findByPostIdAndSortOrder(postId);
+	        
+	        for (PostFileEntity postFile : postFiles) {
+	            result.add(new PostFileDTO(postId, postFile.getFileUrl(), postFile.getFileType(), postFile.getSortOrder()));
+	        }
+	    }
+	    System.out.println(result);
+	    return result;
 	}
+
+
 
 
 

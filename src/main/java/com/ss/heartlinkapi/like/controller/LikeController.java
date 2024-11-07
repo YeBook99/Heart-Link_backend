@@ -46,10 +46,15 @@ public class LikeController {
             @RequestParam(required = false) Long postId,
             @RequestParam(required = false) Long commentId,
             @AuthenticationPrincipal CustomUserDetails user) {
-        
+
         Long userId = user.getUserId();
-        likeService.addOrRemoveLike(postId, userId, commentId);
-        return ResponseEntity.ok("좋아요 업데이트");
+        boolean likeAdded = likeService.addOrRemoveLike(postId, userId, commentId);
+
+        if (likeAdded) {
+            return ResponseEntity.ok("좋아요 추가");
+        } else {
+            return ResponseEntity.ok("좋아요 삭제");
+        }
     }
 
 }
