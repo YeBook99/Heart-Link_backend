@@ -55,10 +55,6 @@ public class PostController {
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    PostDTO postDTO = objectMapper.readValue(postJson, PostDTO.class);
 
-//	    Long userId = user.getUserId();
-//	    
-//	    UserEntity myId = new UserEntity();
-//	    myId.setUserId(userId);
 	    
 	    UserEntity user = userDetails.getUserEntity();
 	    
@@ -81,13 +77,13 @@ public class PostController {
 	public ResponseEntity<?> getFollowingPublicPosts(
 	        @AuthenticationPrincipal CustomUserDetails user,
 	        @RequestParam(required = false) Integer cursor,
-	        @RequestParam(defaultValue = "6") int limit) {
+	        @RequestParam(defaultValue = "30") int limit) {
 
 		// 커플 해지한 사용자는 접근 불가
-		if (user.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals(Role.ROLE_SINGLE.name()))) {
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-	                .body("커플을 해지한 사용자는 접근할 수 없습니다.");
-	    }
+//		if (user.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals(Role.ROLE_SINGLE.name()))) {
+//	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//	                .body("커플을 해지한 사용자는 접근할 수 없습니다.");
+//	    }
 		
 	    Long userId = user.getUserId();
 	    
