@@ -1,6 +1,7 @@
 package com.ss.heartlinkapi.comment.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,4 +22,6 @@ public class CommentDTO {
     
     private String loginId;		// 좋아요를 누른 사용자 loginId
     private String profileImg;	// 프로필 이미지
+    private List<String> mentionedLoginIds;   // 댓글에 태그된 사용자들의 loginId 목록
+    private List<Long> mentionedUserIds;      // 댓글에 태그된 사용자들의 userId 목록
 }
