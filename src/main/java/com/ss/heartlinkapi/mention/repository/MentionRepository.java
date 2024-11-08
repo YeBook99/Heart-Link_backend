@@ -20,7 +20,8 @@ public interface MentionRepository extends JpaRepository<MentionEntity, Long>{
 	void deleteByPostId(PostEntity post);
 	
 	// 게시글에 태그된 사용자의 userId만 조회
-	@Query("SELECT m FROM MentionEntity m WHERE m.postId = :postId")
-	List<MentionEntity> findMentionsByPostId(@Param("postId") Long postId);
-
+	List<MentionEntity> findMentionsByPostIdPostId(Long postId);
+	
+	// 댓글에 태그된 사용자의 멘션 정보 조회
+    List<MentionEntity> findByCommentId(CommentEntity commentId);
 }
