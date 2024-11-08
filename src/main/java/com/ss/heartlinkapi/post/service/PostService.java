@@ -255,10 +255,10 @@ public class PostService {
 		    // 모든 게시물을 가져옴
 		    List<PostEntity> allPosts = postRepository.findPublicPostsByFollowerId(userId);
 		    
-		    // role이 ROLE_COUPLE인 게시글만 필터링
-		    allPosts = allPosts.stream()
-		                       .filter(post -> post.getUserId().getRole() == Role.ROLE_COUPLE)
-		                       .collect(Collectors.toList());
+//		    // role이 ROLE_COUPLE인 게시글만 필터링
+//		    allPosts = allPosts.stream()
+//		                       .filter(post -> post.getUserId().getRole() == Role.ROLE_COUPLE)
+//		                       .collect(Collectors.toList());
 
 		    // 커서가 없는 경우 (처음 페이지)
 		    if (cursor == null) cursor = Integer.MAX_VALUE;

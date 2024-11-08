@@ -79,15 +79,17 @@ public class SecurityConfig {
 						.antMatchers("/user/auth/**").permitAll()
 						.antMatchers("/user/sms/**").permitAll()
 						.antMatchers("/oauth2/**").permitAll()
+						.antMatchers("/login/**").permitAll()
 						.antMatchers("/reissue").permitAll()
 						.antMatchers("/user/find/loginId").permitAll()
 						.antMatchers("/user/update/password").permitAll()
 						.antMatchers("/user/profile/**").hasAnyRole("SINGLE","COUPLE", "ADMIN")
 						.antMatchers("/user/block/**").hasAnyRole("COUPLE", "ADMIN")
-						.antMatchers("/user/couple").hasAnyRole("COUPLE","ADMIN","SINGLE")
+						.antMatchers("/user/couple").hasAnyRole("COUPLE","ADMIN","SINGLE","USER")
 						//follow
 						.antMatchers("/follow/**").hasAnyRole("COUPLE", "ADMIN","SINGLE")
 						//couple
+						.antMatchers("/couple/dday").permitAll()
 						.antMatchers("/couple/unlink").hasRole("COUPLE")
 						.antMatchers("/couple/unlink/cancel").hasRole("SINGLE")
 						.antMatchers("/couple/finalNowUnlink").hasRole("SINGLE")
@@ -108,7 +110,7 @@ public class SecurityConfig {
 						.antMatchers("/notifications/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
 						//search
 						.antMatchers("/search/**").hasAnyRole("COUPLE","ADMIN")
-						.antMatchers("/es/**").hasAnyRole("COUPLE","ADMIN")
+						.antMatchers("/es/**").hasAnyRole("COUPLE","ADMIN","USER","SINGLE")
 						//ad
 						.antMatchers("/ads/**").hasAnyRole("COUPLE","ADMIN","SINGLE")
 						//admin
