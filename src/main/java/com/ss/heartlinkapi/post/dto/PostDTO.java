@@ -30,7 +30,10 @@ public class PostDTO {
     
     private String partnerId; // 내 커플의 login 아이디
     private Long partnerUserId;	// 내 커플의 User 아이디
-//    private List<CommentDTO> comments;	// 댓글 리스트
+    
+    // 게시글에 태그된 사용자의 loginId 리스트 추가
+    private List<String> mentionedLoginIds; // 태그된 사용자들의 loginId
+    private List<Long> mentionedUserIds;	// 태그된 사용자들의 userId
     
 
 }
