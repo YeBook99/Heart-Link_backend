@@ -145,11 +145,11 @@ public class PostService {
 	                
 	                // 파일 이름에 UUID 추가
 	                String newFileName = UUID.randomUUID().toString() + fileExtension;
-	                File destinationFile = new File(uploadDir + "/src/main/resources/static/img/" + newFileName);
+	                File destinationFile = new File(uploadDir + "/images/" + newFileName);
 	                file.transferTo(destinationFile);
 	                
 	                // 파일 URL 생성
-	                String fileUrl = "http://localhost:9090/img/" + newFileName;
+	                String fileUrl = "http://localhost:9090/images/" + newFileName;
 	                
 	                // PostFileEntity 생성
 	                PostFileEntity postFile = new PostFileEntity();
@@ -298,7 +298,9 @@ public class PostService {
 		                    .collect(Collectors.toList()),
 		                null,
 		                partner != null ? partner.getLoginId() : "No Partner",
-		                partner != null ? partner.getUserId() : null
+		                partner != null ? partner.getUserId() : null,
+		                null,
+		                null
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -363,7 +365,9 @@ public class PostService {
 		                    .collect(Collectors.toList()),
 		                null,
 		                partner != null ? partner.getLoginId() : "No Partner",
-		                partner != null ? partner.getUserId() : null
+		                partner != null ? partner.getUserId() : null,
+		                null,
+		                null
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -413,6 +417,15 @@ public class PostService {
 	        })
 	        .collect(Collectors.toList());
 	        
+	        // 게시글에 태그된 사용자들(userId) 조회
+//	        List<MentionEntity> mentions = mentionRepository.findMentionsByPostId(postId);
+//	        List<String> mentionedLoginIds = mentions.stream()
+//	            .map(mention -> mention.getUserId().getLoginId()) // loginId만 추출
+//	            .collect(Collectors.toList());
+//	        List<Long> mentionedUserIds = mentions.stream()
+//		            .map(mention -> mention.getUserId().getUserId()) // userId만 추출
+//		            .collect(Collectors.toList());
+	        
 	        return new PostDTO(
 	            post.getPostId(),
 	            post.getUserId().getUserId(),
@@ -433,7 +446,9 @@ public class PostService {
 	                .collect(Collectors.toList()),
 	            commentDTO.isEmpty() ? Collections.emptyList() : commentDTO, // 댓글이 없으면 빈 리스트
 	            partner != null ? partner.getLoginId() : "No Partner",
-	           partner != null ? partner.getUserId() : null
+	           partner != null ? partner.getUserId() : null,
+	   	       null,
+	   	       null
 	        );
 	    } else {
 	        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
