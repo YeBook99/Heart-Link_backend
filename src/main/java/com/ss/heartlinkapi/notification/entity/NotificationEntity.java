@@ -21,8 +21,11 @@ public class NotificationEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "sender_user_id")
+    private Long senderUserId;
+
+    @Column(name = "reciever_user_id")
+    private Long recieverUserId;
 
     @Enumerated(EnumType.STRING)
     private Type type;
@@ -39,6 +42,9 @@ public class NotificationEntity {
     @Column(name = "created_date")
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @Column(name = "link")
+    private String link;
 
 }
 
