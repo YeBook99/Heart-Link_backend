@@ -13,6 +13,7 @@ import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.repository.PostRepository;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.ProfileRepository;
+import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -34,6 +35,7 @@ public class NotificationService {
     private final PostRepository postRepository;
 
     private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
 
     //    구독시 연결 해제 방지를 위해 더미데이터를 보내 연결을 유지시킨다.
     public SseEmitter subscribe(Long userId) {
@@ -53,8 +55,8 @@ public class NotificationService {
         UserEntity user = new UserEntity();
         user.setUserId(userId);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
-
-        saveNotification("MESSAGE_LIKE", notificationLikeDTO.getMessage(), postWriterId, otherUserImg);
+        UserEntity senderUser = userRepository.findByLoginId(userName);
+        saveNotification("MESSAGE_LIKE", notificationLikeDTO.getMessage(), postWriterId, senderUser.getUserId(), otherUserImg, "http://localhost:3000/feed/details/" + postId);
 
         sendToClient(postWriterId, notificationLikeDTO);
     }
@@ -68,55 +70,61 @@ public class NotificationService {
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
         UserEntity user = new UserEntity();
         user.setUserId(userId);
+        UserEntity senderUser = userRepository.findByLoginId(userName);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
         NotificationLikeDTO notificationLikeDTO = new NotificationLikeDTO("http://localhost:3000/feed/details/" + postId, userName + "님이 회원님의 댓글을 좋아합니다.");
-        saveNotification("COMMENT_LIKE", notificationLikeDTO.getMessage(), postWriterId, otherUserImg );
+        saveNotification("COMMENT_LIKE", notificationLikeDTO.getMessage(), postWriterId, senderUser.getUserId(), otherUserImg, "http://localhost:3000/feed/details/" + postId);
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationLikeDTO);
     }
 
     public void notifyComment(String userName, Long postId, Long userId) {
-        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:3000/feed/details/" + postId,userName + "님이 댓글을 남겼습니다.");
+        NotificationCommentDTO notificationCommentDTO = new NotificationCommentDTO("http://localhost:3000/feed/details/" + postId, userName + "님이 댓글을 남겼습니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
         UserEntity user = new UserEntity();
         user.setUserId(userId);
+        UserEntity senderUser = userRepository.findByLoginId(userName);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
-        saveNotification("COMMENT", notificationCommentDTO.getMessage(), postWriterId, otherUserImg );
+        saveNotification("COMMENT", notificationCommentDTO.getMessage(), postWriterId, senderUser.getUserId(), otherUserImg, "http://localhost:3000/feed/details/" + postId);
 //        포스트 아이디 기준으로 작성자 찾아서 userId에 넣을 것.
         sendToClient(postWriterId, notificationCommentDTO);
     }
+
     //      팔로우 요청 시 알람
     public void notifyFollow(String userName, Long userId, Long id) {
         NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
-        saveNotification("FOLLOW", notificationFollowDTO.getMessage(), userId, otherUserImg );
+        saveNotification("FOLLOW", notificationFollowDTO.getMessage(), userId, id, otherUserImg, "http://localhost:3000/user/profile/" + id);
         sendToClient(userId, notificationFollowDTO);
     }
+
     //      비공개 유저 팔로우 요청
     public void notifyFollowPrivate(String userName, Long userId, Long id) {
         NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/user/profile/" + id, userName + "님이 회원님을 팔로우하였습니다.");
         UserEntity user = new UserEntity();
         user.setUserId(id);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
-        saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId, otherUserImg );
+        saveNotification("PRIVATE_FOLLOW_REQUEST", notificationFollowDTO.getMessage(), userId, id, otherUserImg, "http://localhost:3000/user/profile/" + id);
         sendToClient(userId, notificationFollowDTO);
     }
+
     //  유저 태그시 알람
     public void notifyIdTag(String userName, Long postId, Long id) {
-        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/feed/details/" + postId , userName + "님이 게시글에 회원님을 태그하였습니다.");
+        NotificationFollowDTO notificationFollowDTO = new NotificationFollowDTO("http://localhost:3000/feed/details/" + postId, userName + "님이 게시글에 회원님을 태그하였습니다.");
         Optional<PostEntity> post = postRepository.findById(postId);
         Long postWriterId = post
                 .map(p -> p.getUserId().getUserId())
                 .orElseThrow(() -> new NoSuchElementException("there is no post"));
         UserEntity user = new UserEntity();
         user.setUserId(postWriterId);
+        UserEntity senderUser = userRepository.findByLoginId(userName);
         String otherUserImg = profileRepository.findByUserEntity(user).getProfile_img();
-        saveNotification("COMMENT", notificationFollowDTO.getMessage(), id, otherUserImg );
+        saveNotification("COMMENT", notificationFollowDTO.getMessage(), id, senderUser.getUserId(), otherUserImg, "http://localhost:3000/feed/details/" + postId);
         sendToClient(id, notificationFollowDTO);
     }
 
@@ -146,34 +154,39 @@ public class NotificationService {
 
         return emitter;
     }
+
     //      알람 저장
-    private void saveNotification(String type, String message, Long userId, String otherUserImg){
+    private void saveNotification(String type, String message, Long receiverId, Long senderId, String otherUserImg, String link) {
         UserEntity user = new UserEntity();
-        user.setUserId(userId);
+        user.setUserId(receiverId);
         NotificationEntity notificationEntity = new NotificationEntity().builder()
-                .userId(user.getUserId())
+                .recieverUserId(user.getUserId())
+                .senderUserId(senderId)
                 .message(message)
                 .userImg(otherUserImg)
                 .isRead(true)
                 .type(Type.valueOf(type))
+                .link(link)
                 .build();
 
         notificationRepository.save(notificationEntity);
     }
+
     //      내 알람 리스트 불러오기
     public List<NotificationDTO> getNotifications(CustomUserDetails user) {
 
-        List<NotificationEntity> notifications = notificationRepository.findByUserId(user.getUserId());
+        List<NotificationEntity> notifications = notificationRepository.findByRecieverUserId(user.getUserId());
 
         List<NotificationDTO> notificationDTOS = new ArrayList<>();
 
-        for(NotificationEntity notificationEntity : notifications) {
+        for (NotificationEntity notificationEntity : notifications) {
             NotificationDTO notificationDTO = new NotificationDTO();
+            notificationDTO.setSenderId(notificationEntity.getSenderUserId());
             notificationDTO.setOtherUserImg(notificationEntity.getUserImg());
             notificationDTO.setType(String.valueOf(notificationEntity.getType()));
             notificationDTO.setCreatedAt(notificationEntity.getCreatedDate());
             notificationDTO.setMessage(notificationEntity.getMessage());
-
+            notificationDTO.setLink(notificationEntity.getLink());
             notificationDTOS.add(notificationDTO);
         }
 
