@@ -18,6 +18,8 @@ import javax.transaction.Transactional;
 
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
 import com.ss.heartlinkapi.notification.service.NotificationService;
+
+import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
@@ -259,6 +261,8 @@ public class PostService {
 		    allPosts = allPosts.stream()
 		                       .filter(post -> post.getUserId().getRole() == Role.ROLE_COUPLE)
 		                       .collect(Collectors.toList());
+		    
+		    
 
 		    // 커서가 없는 경우 (처음 페이지)
 		    if (cursor == null) cursor = Integer.MAX_VALUE;
@@ -398,11 +402,26 @@ public class PostService {
 	        
 	        // 댓글 목록 가져오기
 	        List<CommentEntity> comments = commentRepository.findByPostIdAndNotReported(post, userId);
+	        
+	        
+	        
 	        List<CommentDTO> commentDTO = comments.stream()
 	            .map(comment -> {
 	            	List<ProfileEntity> commentProfiles = profileRepository.findAllByUserEntity(comment.getUserId());
 	                String profileImage = (commentProfiles != null && !commentProfiles.isEmpty()) ? commentProfiles.get(0).getProfile_img() : null;
 	            	
+	                // 댓글에 태그된 사용자들을 가져옴
+		            List<MentionEntity> mentionEntities = mentionRepository.findByCommentId(comment);
+		            
+		            List<String> mentionedLoginIds = mentionEntities.stream()
+			                .map(mention -> mention.getUserId().getLoginId()) // loginId 추출
+			                .collect(Collectors.toList()); 
+		            
+		            List<Long> mentionedUserIds = mentionEntities.stream()
+		                .map(mention -> mention.getUserId().getUserId()) // userId 추출
+		                .collect(Collectors.toList());
+	
+	                
 	            return new CommentDTO(
 	                comment.getCommentId(),
 	                comment.getPostId().getPostId(),
@@ -412,19 +431,27 @@ public class PostService {
 	                comment.getCreatedAt(),
 	                comment.getUpdatedAt(),
 	                comment.getUserId().getLoginId(),
-	                profileImage
+	                profileImage,
+	                mentionedLoginIds,
+	                mentionedUserIds
 	            );
 	        })
 	        .collect(Collectors.toList());
 	        
 	        // 게시글에 태그된 사용자들(userId) 조회
-//	        List<MentionEntity> mentions = mentionRepository.findMentionsByPostId(postId);
-//	        List<String> mentionedLoginIds = mentions.stream()
-//	            .map(mention -> mention.getUserId().getLoginId()) // loginId만 추출
-//	            .collect(Collectors.toList());
-//	        List<Long> mentionedUserIds = mentions.stream()
-//		            .map(mention -> mention.getUserId().getUserId()) // userId만 추출
-//		            .collect(Collectors.toList());
+	        List<MentionEntity> mentions = mentionRepository.findMentionsByPostIdPostId(postId);
+
+	        List<String> mentionedLoginIds = mentions.stream()
+		            .map(mention -> mention.getUserId().getLoginId()) // loginId만 추출
+		            .collect(Collectors.toList());
+	        
+	        List<Long> mentionedUserIds = mentions.stream()
+            .map(mention -> mention.getUserId().getUserId()) // userId만 추출
+            .collect(Collectors.toList());
+	        
+	        
+	        
+
 	        
 	        return new PostDTO(
 	            post.getPostId(),
@@ -447,8 +474,8 @@ public class PostService {
 	            commentDTO.isEmpty() ? Collections.emptyList() : commentDTO, // 댓글이 없으면 빈 리스트
 	            partner != null ? partner.getLoginId() : "No Partner",
 	           partner != null ? partner.getUserId() : null,
-	   	       null,
-	   	       null
+	           mentionedLoginIds,
+	           mentionedUserIds
 	        );
 	    } else {
 	        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
