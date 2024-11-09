@@ -262,8 +262,6 @@ public class CoupleMissionService {
             return new ArrayList<>();
         }
 
-//        List<Map<String, Object>> completeTag = new ArrayList<>(tagList);
-
         return myMissionList;
     }
 }

@@ -184,81 +184,33 @@ public class CoupleService {
     // 커플 해지 유예기간 없이 즉시 해지
     @Transactional
     public void finalNowUnlinkCouple(CoupleEntity couple) {
-//        userRepository.flush();
-
-
-//        UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
-//        UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
         UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
         UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
         List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
         if(answerList != null && answerList.size() > 0) {
             coupleMatchAnswerRepository.deleteAllByCoupleId(couple);
         }
-        System.out.println("커플매치 답변 삭제");
-        System.out.println("커플유저1계정: "+user1);
-        System.out.println("커플유저1계정유저아이디: "+user1.getUserId());
-        System.out.println("커플유저2계정: "+user2);
-        System.out.println("커플유저2계정유저아이디: "+user2.getUserId());
 
         // 매치 미션 목록 삭제
         List<UserLinkMissionEntity> userMissionList = coupleMissionService.findUserLinkMissionByCoupleId(couple);
         if(userMissionList != null && userMissionList.size() > 0) {
             coupleMissionService.deleteUserMissionByCoupleId(couple);
         }
-        System.out.println("커플미션 한거 삭제");
-        System.out.println("커플매치 답변 삭제");
-        System.out.println("커플유저1계정: "+user1);
-        System.out.println("커플유저1계정유저아이디: "+user1.getUserId());
-        System.out.println("커플유저2계정: "+user2);
-        System.out.println("커플유저2계정유저아이디: "+user2.getUserId());
 
         // 차단 목록 삭제
         List<BlockEntity> blockList = blockRepository.findByCoupleId(couple);
         for(BlockEntity block : blockList) {
             blockRepository.delete(block);
-            System.out.println("차단 목록에서 커플 삭제중");
         }
-        System.out.println("차단 목록에서 커플 삭제");
-        System.out.println("커플매치 답변 삭제");
-        System.out.println("커플유저1계정: "+user1);
-        System.out.println("커플유저1계정유저아이디: "+user1.getUserId());
-        System.out.println("커플유저2계정: "+user2);
-        System.out.println("커플유저2계정유저아이디: "+user2.getUserId());
 
         try {
-            Long user1Id = couple.getUser1().getUserId();
-            System.out.println("유저가왜없어"+couple.getUser1().getUserId());
-//            UserEntity user1 = userRepository.findById(user1Id).orElse(null);
-            System.out.println("여기여기유저1"+user1);
-
-//            UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
-            System.out.println("여기여기유저2"+user2);
-            System.out.println("user1 : "+user1);
-            System.out.println("user2 : "+user2);
             user2.setRole(Role.ROLE_USER);
-            System.out.println("user2롤 유저로 바꿈 : "+user2);
-
             user1.setRole(Role.ROLE_USER);
-            System.out.println("user1롤 유저로 바꿈 : "+user1);
-
             user1.setCoupleCode(generateRandomCode());
-            System.out.println("user1커플코드 바꿈 : "+user1);
             user2.setCoupleCode(generateRandomCode());
-            System.out.println("user12커플코드 바꿈 : "+user2);
 
             UserEntity result = userRepository.save(user1);
-            if(result != null) {
-                System.out.println("success");
-            } else {
-                System.out.println("fail");
-            }
             UserEntity result2 = userRepository.save(user2);
-            if(result2 != null) {
-                System.out.println("success q2222222");
-            } else {
-                System.out.println("fail 222222");
-            }
             coupleRepository.deleteById(couple.getCoupleId());
         } catch (Exception e) {
             e.printStackTrace();
