@@ -158,6 +158,8 @@ public class LikeService {
         } else {
             existingLike = likeRepository.findByUserIdAndCommentId(user, comment);
         }
+        
+        boolean liked = false; // 좋아요 상태 변수
 
         if (existingLike.isPresent()) {
             // 좋아요가 이미 있으면 삭제
@@ -169,6 +171,7 @@ public class LikeService {
                 comment.setLikeCount(comment.getLikeCount() - 1);
                 commentRepository.save(comment);
             }
+            liked = false;
             return false;  // 삭제되었음을 반환
         } else {
             // 좋아요가 없으면 추가
@@ -191,6 +194,7 @@ public class LikeService {
                 notificationService.notifyLikeComment(myLoginId, comment.getPostId().getPostId(), userId);
             }
             likeRepository.save(like);
+            liked = true;
             return true;  // 추가되었음을 반환
         }
     }
