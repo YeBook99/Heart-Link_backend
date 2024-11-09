@@ -254,15 +254,6 @@ public class CoupleController {
             if(couple == null) {
                 return ResponseEntity.notFound().build();
             }
-            System.out.println("커플엔티티: "+couple);
-            System.out.println("커플유저1계정: "+couple.getUser1().getUserId());
-            System.out.println("커플유저2계정: "+couple.getUser2().getUserId());
-            System.out.println("커플유저1계정유저아이디: "+couple.getUser1().getUserId());
-            System.out.println("커플유저2계정유저아이디: "+couple.getUser2().getUserId());
-            System.out.println("커플유저1계정유저아이디로 유저찾기: "+userRepository.findById(couple.getUser1().getUserId()).orElse(null));
-            System.out.println("커플유저2계정유저아이디로 유저찾기: "+userRepository.findById(couple.getUser2().getUserId()).orElse(null));
-            UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
-            UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
             coupleService.finalNowUnlinkCouple(couple);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

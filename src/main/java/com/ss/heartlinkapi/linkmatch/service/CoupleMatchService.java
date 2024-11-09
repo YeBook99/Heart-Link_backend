@@ -116,7 +116,6 @@ public class CoupleMatchService {
             answerList.add(dto);
         }
         Set<MatchAnswerListDTO> set = new HashSet<>(answerList);
-        // 상대 답, 내 답, 날짜, 매치1, 매치2
 
         return set;
     }
