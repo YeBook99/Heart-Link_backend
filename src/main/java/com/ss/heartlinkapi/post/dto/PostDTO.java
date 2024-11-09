@@ -38,6 +38,9 @@ public class PostDTO {
     // 좋아요 상태값
     private boolean isLiked;
     
+    // 북마크 상태값
+    private boolean isBookmarked;
+    
 
 }
 

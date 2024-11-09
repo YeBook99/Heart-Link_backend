@@ -28,6 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ss.heartlinkapi.block.repository.BlockRepository;
+import com.ss.heartlinkapi.bookmark.entity.BookmarkEntity;
+import com.ss.heartlinkapi.bookmark.repository.BookmarkRepository;
 import com.ss.heartlinkapi.comment.dto.CommentDTO;
 import com.ss.heartlinkapi.comment.entity.CommentEntity;
 import com.ss.heartlinkapi.comment.repository.CommentRepository;
@@ -74,9 +76,10 @@ public class PostService {
 	private final BlockRepository blockRepository;
 	private final NotificationService notificationService;
 	private final LikeRepository likeRepository;
+	private final BookmarkRepository bookmarkRepository;
 
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository, NotificationService notificationService, LikeRepository likeRepository) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository, NotificationService notificationService, LikeRepository likeRepository, BookmarkRepository bookmarkRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -92,6 +95,7 @@ public class PostService {
 		this.blockRepository = blockRepository;
         this.notificationService = notificationService;
         this.likeRepository = likeRepository;
+        this.bookmarkRepository = bookmarkRepository;
     }
 
 	// 게시글 작성
@@ -285,6 +289,10 @@ public class PostService {
 		            // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 여부를 확인
 			        Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
 			        boolean isLiked = existingLike.isPresent();  // 좋아요가 눌렀으면 true, 아니면 false
+			        
+			        // 현재 사용자가 해당 게시글에 북마크를 눌렀는지 여부를 확인
+			        Optional<BookmarkEntity> existingBookmark = bookmarkRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+			        boolean isBookmarked = existingBookmark.isPresent();
 
 		            return new PostDTO(
 		                post.getPostId(),
@@ -309,7 +317,8 @@ public class PostService {
 		                partner != null ? partner.getUserId() : null,
 		                null,
 		                null,
-		                isLiked
+		                isLiked,
+		                isBookmarked
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -354,10 +363,14 @@ public class PostService {
 		            List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 		            UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
 		            
-		         // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 여부를 확인
+		            // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 여부를 확인
 			        Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
 			        boolean isLiked = existingLike.isPresent();  // 좋아요가 눌렀으면 true, 아니면 false
-
+			        
+			        // 현재 사용자가 해당 게시글에 북마크를 눌렀는지 여부를 확인
+			        Optional<BookmarkEntity> existingBookmark = bookmarkRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+			        boolean isBookmarked = existingBookmark.isPresent();
+			        
 		            return new PostDTO(
 		                post.getPostId(),
 		                post.getUserId().getUserId(),
@@ -381,7 +394,8 @@ public class PostService {
 		                partner != null ? partner.getUserId() : null,
 		                null,
 		                null,
-		                isLiked
+		                isLiked,
+		                isBookmarked
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -431,10 +445,13 @@ public class PostService {
 			                .map(mention -> mention.getUserId().getUserId()) // userId 추출
 			                .collect(Collectors.toList());
 			            
-			         // 댓글에 좋아요 상태 확인
+			            // 댓글에 좋아요 상태 확인
 		                Optional<LikeEntity> existingCommentLike = likeRepository.findByUserIdAndCommentIdUsingQuery(userId, comment.getCommentId());
 		                boolean isCommentLiked = existingCommentLike.isPresent();  // 댓글 좋아요 여부
 		
+		                // 현재 사용자가 해당 게시글에 북마크를 눌렀는지 여부를 확인
+				        Optional<BookmarkEntity> existingBookmark = bookmarkRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+				        boolean isBookmarked = existingBookmark.isPresent();
 		                
 		            return new CommentDTO(
 		                comment.getCommentId(),
@@ -468,6 +485,9 @@ public class PostService {
 		        Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
 		        boolean isLiked = existingLike.isPresent();  // 좋아요가 눌렀으면 true, 아니면 false
 		        
+		        // 현재 사용자가 해당 게시글에 북마크를 눌렀는지 여부를 확인
+		        Optional<BookmarkEntity> existingBookmark = bookmarkRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+		        boolean isBookmarked = existingBookmark.isPresent();
 
 		        
 		        return new PostDTO(
@@ -493,7 +513,8 @@ public class PostService {
 		           partner != null ? partner.getUserId() : null,
 		           mentionedLoginIds,
 		           mentionedUserIds,
-		           isLiked
+		           isLiked,
+		           isBookmarked
 		        );
 		    } else {
 		        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
