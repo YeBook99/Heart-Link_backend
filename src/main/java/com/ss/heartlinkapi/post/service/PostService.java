@@ -385,75 +385,98 @@ public class PostService {
 		}
 
 	
-	// 게시글 상세보기
-	public PostDTO getPostById(Long postId, Long userId) {
-	    Optional<PostEntity> optionalPost = postRepository.findById(postId);
-	    
-	    // 값이 존재하는 경우
-	    if (optionalPost.isPresent()) {
-	        PostEntity post = optionalPost.get();
-	        List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
-	        List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
-	        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
-	        
-	        // 댓글 목록 가져오기
-	        List<CommentEntity> comments = commentRepository.findByPostIdAndNotReported(post, userId);
-	        List<CommentDTO> commentDTO = comments.stream()
-	            .map(comment -> {
-	            	List<ProfileEntity> commentProfiles = profileRepository.findAllByUserEntity(comment.getUserId());
-	                String profileImage = (commentProfiles != null && !commentProfiles.isEmpty()) ? commentProfiles.get(0).getProfile_img() : null;
-	            	
-	            return new CommentDTO(
-	                comment.getCommentId(),
-	                comment.getPostId().getPostId(),
-	                comment.getParentId() != null ? comment.getParentId().getCommentId() : null,
-	                comment.getUserId().getUserId(),
-	                comment.getContent(),
-	                comment.getCreatedAt(),
-	                comment.getUpdatedAt(),
-	                comment.getUserId().getLoginId(),
-	                profileImage
-	            );
-	        })
-	        .collect(Collectors.toList());
-	        
-	        // 게시글에 태그된 사용자들(userId) 조회
-//	        List<MentionEntity> mentions = mentionRepository.findMentionsByPostId(postId);
-//	        List<String> mentionedLoginIds = mentions.stream()
-//	            .map(mention -> mention.getUserId().getLoginId()) // loginId만 추출
-//	            .collect(Collectors.toList());
-//	        List<Long> mentionedUserIds = mentions.stream()
-//		            .map(mention -> mention.getUserId().getUserId()) // userId만 추출
-//		            .collect(Collectors.toList());
-	        
-	        return new PostDTO(
-	            post.getPostId(),
-	            post.getUserId().getUserId(),
-	            post.getUserId().getLoginId(),
-	            post.getContent(),
-	            post.getCreatedAt(),
-	            post.getUpdatedAt(),
-	            post.getLikeCount(),
-	            post.getCommentCount(),
-	            post.getVisibility(),
-	            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
-	            postFiles.stream()
-	                .map(file -> new PostFileDTO(
-	                    post.getPostId(),
-	                    file.getFileUrl(),
-	                    file.getFileType(),
-	                    file.getSortOrder()))
-	                .collect(Collectors.toList()),
-	            commentDTO.isEmpty() ? Collections.emptyList() : commentDTO, // 댓글이 없으면 빈 리스트
-	            partner != null ? partner.getLoginId() : "No Partner",
-	           partner != null ? partner.getUserId() : null,
-	   	       null,
-	   	       null
-	        );
-	    } else {
-	        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
-	    }
-	}
+		// 게시글 상세보기
+		public PostDTO getPostById(Long postId, Long userId) {
+		    Optional<PostEntity> optionalPost = postRepository.findById(postId);
+		    
+		    // 값이 존재하는 경우
+		    if (optionalPost.isPresent()) {
+		        PostEntity post = optionalPost.get();
+		        List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
+		        List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
+		        UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+		        
+		        // 댓글 목록 가져오기
+		        List<CommentEntity> comments = commentRepository.findByPostIdAndNotReported(post, userId);
+		        
+		        
+		        
+		        List<CommentDTO> commentDTO = comments.stream()
+		            .map(comment -> {
+		            	List<ProfileEntity> commentProfiles = profileRepository.findAllByUserEntity(comment.getUserId());
+		                String profileImage = (commentProfiles != null && !commentProfiles.isEmpty()) ? commentProfiles.get(0).getProfile_img() : null;
+		            	
+		                // 댓글에 태그된 사용자들을 가져옴
+			            List<MentionEntity> mentionEntities = mentionRepository.findByCommentId(comment);
+			            
+			            List<String> mentionedLoginIds = mentionEntities.stream()
+				                .map(mention -> mention.getUserId().getLoginId()) // loginId 추출
+				                .collect(Collectors.toList()); 
+			            
+			            List<Long> mentionedUserIds = mentionEntities.stream()
+			                .map(mention -> mention.getUserId().getUserId()) // userId 추출
+			                .collect(Collectors.toList());
+		
+		                
+		            return new CommentDTO(
+		                comment.getCommentId(),
+		                comment.getPostId().getPostId(),
+		                comment.getParentId() != null ? comment.getParentId().getCommentId() : null,
+		                comment.getUserId().getUserId(),
+		                comment.getContent(),
+		                comment.getCreatedAt(),
+		                comment.getUpdatedAt(),
+		                comment.getUserId().getLoginId(),
+		                profileImage,
+		                mentionedLoginIds,
+		                mentionedUserIds
+		            );
+		        })
+		        .collect(Collectors.toList());
+		        
+		        // 게시글에 태그된 사용자들(userId) 조회
+		        List<MentionEntity> mentions = mentionRepository.findMentionsByPostIdPostId(postId);
+
+		        List<String> mentionedLoginIds = mentions.stream()
+			            .map(mention -> mention.getUserId().getLoginId()) // loginId만 추출
+			            .collect(Collectors.toList());
+		        
+		        List<Long> mentionedUserIds = mentions.stream()
+	            .map(mention -> mention.getUserId().getUserId()) // userId만 추출
+	            .collect(Collectors.toList());
+		        
+		        
+		        
+
+		        
+		        return new PostDTO(
+		            post.getPostId(),
+		            post.getUserId().getUserId(),
+		            post.getUserId().getLoginId(),
+		            post.getContent(),
+		            post.getCreatedAt(),
+		            post.getUpdatedAt(),
+		            post.getLikeCount(),
+		            post.getCommentCount(),
+		            post.getVisibility(),
+		            (profiles != null) ? profiles.get(0).getProfile_img() : null, // 프로필 이미지 추가
+		            postFiles.stream()
+		                .map(file -> new PostFileDTO(
+		                    post.getPostId(),
+		                    file.getFileUrl(),
+		                    file.getFileType(),
+		                    file.getSortOrder()))
+		                .collect(Collectors.toList()),
+		            commentDTO.isEmpty() ? Collections.emptyList() : commentDTO, // 댓글이 없으면 빈 리스트
+		            partner != null ? partner.getLoginId() : "No Partner",
+		           partner != null ? partner.getUserId() : null,
+		           mentionedLoginIds,
+		           mentionedUserIds
+		        );
+		    } else {
+		        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");
+		    }
+		}
 	
 	// 사용자와 사용자의 커플 게시글 목록 가져오기
 	public Map<String, Object> getPostFilesByUserId(Long currentUserId, Long userId, Integer cursor, int limit) {
