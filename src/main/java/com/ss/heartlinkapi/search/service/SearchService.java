@@ -191,7 +191,6 @@ public class SearchService {
     // 좋아요 많은 순+검색기록 관련 순으로 섞고 나서 연관없는 게시글 최근순으로 가져오기
     public Map<String, Object> getPost(CustomUserDetails user, Integer cursor, int limit) {
         List<PostEntity> manyLikePostList = postRepository.findAllByOrderByLikeCountDesc(); // 좋아요 많은 순으로 게시글 목록 조회
-
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByUserId(user.getUserEntity()); // 유저의 검색기록 리스트 조회
 
         List<PostEntity> searchPostList = new ArrayList<>(); // 검색기록 키워드가 포함된 피드 목록 생성
@@ -223,14 +222,23 @@ public class SearchService {
         }
 
         int endIndex = (nextCursor != null) ? Math.min(nextCursor, mixPostList.size()) : mixPostList.size();
-        List<PostEntity> sliceData = mixPostList.subList(cursor, endIndex);
+//        무한스크롤 보류
+//        List<PostEntity> sliceData = mixPostList.subList(cursor, endIndex);
+        List<PostEntity> sliceData = mixPostList.subList(0, mixPostList.size());
         List<PostSearchDTO> postDTOList = new ArrayList<>();
 
         for(PostEntity post : sliceData) {
             PostSearchDTO dto = new PostSearchDTO();
-            PostFileEntity file = postFileRepository.findByPostId(post.getPostId()).get(0);
+            List<PostFileEntity> file = postFileRepository.findByPostId(post.getPostId());
+            PostFileEntity fileEntity;
+            if(file != null && file.size() > 0) {
+                fileEntity = postFileRepository.findByPostId(post.getPostId()).get(0);
+                dto.setFileUrl(fileEntity.getFileUrl());
+            } else {
+                fileEntity = null;
+                dto.setFileUrl(null);
+            }
             dto.setPostId(post.getPostId());
-            dto.setFileUrl(file.getFileUrl());
             postDTOList.add(dto);
         }
         Map<String, Object> postData = new HashMap<>();
