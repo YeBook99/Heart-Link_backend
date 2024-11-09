@@ -33,19 +33,8 @@ public interface LikeRepository extends JpaRepository<LikeEntity, Long> {
     // 게시글 좋아요 증감
 	Optional<LikeEntity> findByUserIdAndPostId(UserEntity user, PostEntity post);
 
-	// 게시글 좋아요 상태 확인
-    @Query("SELECT l FROM LikeEntity l WHERE l.userId.userId = :userId AND l.postId.postId = :postId")
-    Optional<LikeEntity> findByUserIdAndPostIdUsingQuery(@Param("userId") Long userId, @Param("postId") Long postId);
-    
-
-	
 	// 댓글 좋아요 증감
 	Optional<LikeEntity> findByUserIdAndCommentId(UserEntity user, CommentEntity comment);
-	
-	 // 댓글 좋아요 상태 확인
-    @Query("SELECT l FROM LikeEntity l WHERE l.userId.userId = :userId AND l.commentId.commentId = :commentId")
-    Optional<LikeEntity> findByUserIdAndCommentIdUsingQuery(@Param("userId") Long userId, @Param("commentId") Long commentId);
-
     
 
 }
