@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
 import com.ss.heartlinkapi.elasticSearch.service.ElasticService;
+import com.ss.heartlinkapi.like.entity.LikeEntity;
+import com.ss.heartlinkapi.like.repository.LikeRepository;
 import com.ss.heartlinkapi.notification.service.NotificationService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -71,9 +73,10 @@ public class PostService {
 	private final ElasticService elasticService;
 	private final BlockRepository blockRepository;
 	private final NotificationService notificationService;
+	private final LikeRepository likeRepository;
 
 
-	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository, NotificationService notificationService) {
+	public PostService(PostRepository postRepository, PostFileRepository postFileRepository, CoupleService coupleService, CommentRepository commentRepository, ProfileRepository profileRepository, UserRepository userRepository, PostFileService postFileService, ContentLinktagRepository contentLinktagRepository, LinkTagRepository linkTagRepository, MentionRepository mentionRepository, CoupleMissionService coupleMissionService, ElasticService elasticService, BlockRepository blockRepository, NotificationService notificationService, LikeRepository likeRepository) {
 		this.postRepository = postRepository;
 		this.postFileRepository = postFileRepository;
 		this.coupleService = coupleService;
@@ -88,6 +91,7 @@ public class PostService {
 		this.elasticService = elasticService;
 		this.blockRepository = blockRepository;
         this.notificationService = notificationService;
+        this.likeRepository = likeRepository;
     }
 
 	// 게시글 작성
@@ -277,6 +281,10 @@ public class PostService {
 		            List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
 		            List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 		            UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+		            
+		            // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 여부를 확인
+			        Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+			        boolean isLiked = existingLike.isPresent();  // 좋아요가 눌렀으면 true, 아니면 false
 
 		            return new PostDTO(
 		                post.getPostId(),
@@ -300,7 +308,8 @@ public class PostService {
 		                partner != null ? partner.getLoginId() : "No Partner",
 		                partner != null ? partner.getUserId() : null,
 		                null,
-		                null
+		                null,
+		                isLiked
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -344,6 +353,10 @@ public class PostService {
 		            List<PostFileEntity> postFiles = postFileRepository.findByPostId(post.getPostId());
 		            List<ProfileEntity> profiles = profileRepository.findAllByUserEntity(post.getUserId());
 		            UserEntity partner = coupleService.getCouplePartner(post.getUserId().getUserId());
+		            
+		         // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 여부를 확인
+			        Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+			        boolean isLiked = existingLike.isPresent();  // 좋아요가 눌렀으면 true, 아니면 false
 
 		            return new PostDTO(
 		                post.getPostId(),
@@ -367,7 +380,8 @@ public class PostService {
 		                partner != null ? partner.getLoginId() : "No Partner",
 		                partner != null ? partner.getUserId() : null,
 		                null,
-		                null
+		                null,
+		                isLiked
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -416,6 +430,10 @@ public class PostService {
 			            List<Long> mentionedUserIds = mentionEntities.stream()
 			                .map(mention -> mention.getUserId().getUserId()) // userId 추출
 			                .collect(Collectors.toList());
+			            
+			         // 댓글에 좋아요 상태 확인
+		                Optional<LikeEntity> existingCommentLike = likeRepository.findByUserIdAndCommentIdUsingQuery(userId, comment.getCommentId());
+		                boolean isCommentLiked = existingCommentLike.isPresent();  // 댓글 좋아요 여부
 		
 		                
 		            return new CommentDTO(
@@ -429,7 +447,8 @@ public class PostService {
 		                comment.getUserId().getLoginId(),
 		                profileImage,
 		                mentionedLoginIds,
-		                mentionedUserIds
+		                mentionedUserIds,
+		                isCommentLiked
 		            );
 		        })
 		        .collect(Collectors.toList());
@@ -445,7 +464,9 @@ public class PostService {
 	            .map(mention -> mention.getUserId().getUserId()) // userId만 추출
 	            .collect(Collectors.toList());
 		        
-		        
+		        // 현재 사용자가 해당 게시글에 좋아요를 눌렀는지 여부를 확인
+		        Optional<LikeEntity> existingLike = likeRepository.findByUserIdAndPostIdUsingQuery(userId, post.getPostId());
+		        boolean isLiked = existingLike.isPresent();  // 좋아요가 눌렀으면 true, 아니면 false
 		        
 
 		        
@@ -471,7 +492,8 @@ public class PostService {
 		            partner != null ? partner.getLoginId() : "No Partner",
 		           partner != null ? partner.getUserId() : null,
 		           mentionedLoginIds,
-		           mentionedUserIds
+		           mentionedUserIds,
+		           isLiked
 		        );
 		    } else {
 		        throw new NoSuchElementException("해당 게시글을 찾을 수 없습니다.");

@@ -24,4 +24,7 @@ public class CommentDTO {
     private String profileImg;	// 프로필 이미지
     private List<String> mentionedLoginIds;   // 댓글에 태그된 사용자들의 loginId 목록
     private List<Long> mentionedUserIds;      // 댓글에 태그된 사용자들의 userId 목록
+    
+    // 댓글 좋아요 상태
+    private boolean isLiked;
 }
