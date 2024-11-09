@@ -155,7 +155,7 @@ public class PostController {
 			@AuthenticationPrincipal CustomUserDetails user,
 	        @PathVariable Long userId,
 	        @RequestParam(required = false) Integer cursor,
-	        @RequestParam(defaultValue = "6") int limit) {
+	        @RequestParam(defaultValue = "50") int limit) {
 
 		// 로그인한 사용자의 userId
 		Long currentUserId = user.getUserId();
