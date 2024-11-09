@@ -263,7 +263,7 @@ public class CoupleController {
             System.out.println("커플유저2계정유저아이디로 유저찾기: "+userRepository.findById(couple.getUser2().getUserId()).orElse(null));
             UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
             UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
-            coupleService.finalNowUnlinkCouple(couple, user1, user2);
+            coupleService.finalNowUnlinkCouple(couple);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             e.printStackTrace();
