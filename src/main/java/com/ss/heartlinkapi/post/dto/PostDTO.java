@@ -35,6 +35,9 @@ public class PostDTO {
     private List<String> mentionedLoginIds; // 태그된 사용자들의 loginId
     private List<Long> mentionedUserIds;	// 태그된 사용자들의 userId
     
+    // 좋아요 상태값
+    private boolean isLiked;
+    
 
 }
 
