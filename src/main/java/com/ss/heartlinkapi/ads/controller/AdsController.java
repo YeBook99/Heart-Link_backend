@@ -36,4 +36,11 @@ public class AdsController {
         adsService.getPickAds(url);
         return ResponseEntity.ok().build();
     }
+
+    // 로스테이 광고
+    @GetMapping("/lostayAd")
+    public ResponseEntity<?> lostayAd(@AuthenticationPrincipal CustomUserDetails user){
+        String url = "https://www.yanolja.com/";
+        return ResponseEntity.ok(url);
+    }
 }
