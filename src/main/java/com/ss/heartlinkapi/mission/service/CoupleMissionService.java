@@ -184,7 +184,14 @@ public class CoupleMissionService {
                         map.put("tagId", mission.getLinkTagId().getId());
                         map.put("tagName", mission.getLinkTagId().getKeyword());
                         map.put("postId", contentLinktagEntity.getBoardId().getPostId());
-                        map.put("postImgUrl", fileList.get(0).getFileUrl());
+                        System.out.println("fileList"+fileList);
+//                        System.out.println("fileList.get(0)"+fileList.get(0));
+//                        System.out.println("fileList.get(0).getFileUrl())"+fileList.get(0).getFileUrl());
+                        if(fileList.size()<1 || fileList.get(0)==null){
+                            map.put("postImgUrl", "이미지가 없습니다.");
+                        } else {
+                            map.put("postImgUrl", fileList.get(0).getFileUrl());
+                        }
                         tagList.add(map);
                     }
                 }

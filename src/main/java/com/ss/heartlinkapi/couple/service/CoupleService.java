@@ -12,6 +12,7 @@ import com.ss.heartlinkapi.post.service.PostService;
 import com.ss.heartlinkapi.user.entity.Role;
 import com.ss.heartlinkapi.user.entity.UserEntity;
 import com.ss.heartlinkapi.user.repository.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -181,7 +182,14 @@ public class CoupleService {
 
     // 커플 해지 유예기간 없이 즉시 해지
     @Transactional
-    public void finalNowUnlinkCouple(CoupleEntity couple, UserEntity user1, UserEntity user2) {
+    public void finalNowUnlinkCouple(CoupleEntity couple) {
+//        userRepository.flush();
+
+
+//        UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
+//        UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
+        UserEntity user1 = userRepository.findById(couple.getUser1().getUserId()).orElse(null);
+        UserEntity user2 = userRepository.findById(couple.getUser2().getUserId()).orElse(null);
         List<LinkMatchAnswerEntity> answerList = coupleMatchAnswerRepository.findByCoupleId(couple);
         if(answerList != null && answerList.size() > 0) {
             coupleMatchAnswerRepository.deleteAllByCoupleId(couple);
@@ -234,9 +242,22 @@ public class CoupleService {
             System.out.println("user1롤 유저로 바꿈 : "+user1);
 
             user1.setCoupleCode(generateRandomCode());
+            System.out.println("user1커플코드 바꿈 : "+user1);
             user2.setCoupleCode(generateRandomCode());
-            userRepository.save(user1);
-            userRepository.save(user2);
+            System.out.println("user12커플코드 바꿈 : "+user2);
+
+            UserEntity result = userRepository.save(user1);
+            if(result != null) {
+                System.out.println("success");
+            } else {
+                System.out.println("fail");
+            }
+            UserEntity result2 = userRepository.save(user2);
+            if(result2 != null) {
+                System.out.println("success q2222222");
+            } else {
+                System.out.println("fail 222222");
+            }
             coupleRepository.deleteById(couple.getCoupleId());
         } catch (Exception e) {
             e.printStackTrace();

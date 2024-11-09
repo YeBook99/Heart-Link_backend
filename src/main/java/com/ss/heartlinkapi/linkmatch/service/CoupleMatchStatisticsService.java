@@ -66,6 +66,8 @@ public class CoupleMatchStatisticsService {
         mathRate.put("ourThisCoupleMatchCount", monthOneMatchCount[0]);
         mathRate.put("ourBefore1CoupleMatchCount", monthOneMatchCount[1]);
         mathRate.put("ourBefore2CoupleMatchCount", monthOneMatchCount[2]);
+        mathRate.put("match1", findMatchByDate(LocalDate.now()).getMatch1());
+        mathRate.put("match2", findMatchByDate(LocalDate.now()).getMatch2());
             return mathRate;
         } else {
             return null;
