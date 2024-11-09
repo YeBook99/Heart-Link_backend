@@ -77,7 +77,7 @@ public class PostController {
 	public ResponseEntity<?> getFollowingPublicPosts(
 	        @AuthenticationPrincipal CustomUserDetails user,
 	        @RequestParam(required = false) Integer cursor,
-	        @RequestParam(defaultValue = "30") int limit) {
+	        @RequestParam(defaultValue = "50") int limit) {
 
 		// 커플 해지한 사용자는 접근 불가
 //		if (user.getAuthorities().stream().anyMatch(auth -> auth.getAuthority().equals(Role.ROLE_SINGLE.name()))) {
@@ -126,7 +126,7 @@ public class PostController {
 	@GetMapping("/like")
 	public ResponseEntity<?> getLikePostFilesByUserId(@AuthenticationPrincipal CustomUserDetails user,
 																	@RequestParam(required = false) Integer cursor,
-																	@RequestParam(defaultValue = "6") int limit) {
+																	@RequestParam(defaultValue = "50") int limit) {
 		
 		Long userId = user.getUserId();
 		Map<String, Object> postFiles = likeService.getPostFilesByUserId(userId, cursor, limit); 				   
@@ -138,7 +138,7 @@ public class PostController {
 	@GetMapping("/bookmark")
 	public ResponseEntity<?> getBokkmarkPostFilesByUserId(@AuthenticationPrincipal CustomUserDetails user,
 																	@RequestParam(required = false) Integer cursor,
-																	@RequestParam(defaultValue = "6") int limit) {
+																	@RequestParam(defaultValue = "50") int limit) {
 		
 		Long userId = user.getUserId();
 		
