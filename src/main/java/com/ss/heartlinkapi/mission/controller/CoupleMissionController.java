@@ -2,6 +2,7 @@ package com.ss.heartlinkapi.mission.controller;
 
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
+import com.ss.heartlinkapi.mission.dto.CompleteMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.service.CoupleMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,7 @@ public class CoupleMissionController {
            if(user == null){
                return ResponseEntity.badRequest().build();
            }
-           List<Map<String, Object>> completeList = missionService.getMissionStatus(user.getUserId(), year, month);
+           List<CompleteMissionDTO> completeList = missionService.getMissionStatus(user.getUserId(), year, month);
            return ResponseEntity.ok(completeList);
        } catch (Exception e) {
            e.printStackTrace();

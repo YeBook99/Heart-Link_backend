@@ -38,6 +38,7 @@ public class CoupleService {
     private CoupleMatchAnswerRepository coupleMatchAnswerRepository;
 
     @Autowired
+    @Lazy
     private CoupleMissionService coupleMissionService;
 
     @Autowired
