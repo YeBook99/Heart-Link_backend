@@ -4,8 +4,10 @@ import com.ss.heartlinkapi.contentLinktag.entity.ContentLinktagEntity;
 import com.ss.heartlinkapi.contentLinktag.repository.ContentLinktagRepository;
 import com.ss.heartlinkapi.couple.entity.CoupleEntity;
 import com.ss.heartlinkapi.couple.repository.CoupleRepository;
+import com.ss.heartlinkapi.couple.service.CoupleService;
 import com.ss.heartlinkapi.linktag.entity.LinkTagEntity;
 import com.ss.heartlinkapi.linktag.repository.LinkTagRepository;
+import com.ss.heartlinkapi.mission.dto.CompleteMissionDTO;
 import com.ss.heartlinkapi.mission.entity.LinkMissionEntity;
 import com.ss.heartlinkapi.mission.entity.UserLinkMissionEntity;
 import com.ss.heartlinkapi.mission.repository.CoupleMissionRepository;
@@ -15,12 +17,14 @@ import com.ss.heartlinkapi.post.entity.PostEntity;
 import com.ss.heartlinkapi.post.entity.PostFileEntity;
 import com.ss.heartlinkapi.post.repository.PostFileRepository;
 import com.ss.heartlinkapi.post.repository.PostRepository;
+import com.ss.heartlinkapi.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CoupleMissionService {
@@ -45,6 +49,9 @@ public class CoupleMissionService {
 
     @Autowired
     private PostFileRepository postFileRepository;
+
+    @Autowired
+    private CoupleService coupleService;
 
     // 매월 미션 태그 리스트 조회
     public List<LinkMissionEntity> findMissionByYearMonth(Integer year, Integer month) {
@@ -150,7 +157,7 @@ public class CoupleMissionService {
     }
 
     // 유저 아이디로 완료된 미션태그 조회
-    public List<Map<String, Object>> getMissionStatus(Long userId, Integer year, Integer month) {
+    public List<CompleteMissionDTO> getMissionStatus(Long userId, Integer year, Integer month) {
 
         // 넘어온 날짜가 없을 경우 디폴트값 현재
         if(year == null){
@@ -169,6 +176,8 @@ public class CoupleMissionService {
         // 유저 게시글들에 연결된 태그들 조회하기
         Set<Map<String, Object>> tagList = new HashSet<>();
 
+        List<CompleteMissionDTO> myMissionList = new ArrayList<>();
+
         for(PostEntity postEntity : postList){
             // 유저가 작성한 게시글들의 아이디로 정보 조회
             List<ContentLinktagEntity> contentList = contentLinktagRepository.findByBoardId(postEntity);
@@ -179,31 +188,82 @@ public class CoupleMissionService {
                         // 이번달의 태그와 이번달 작성한 게시글의 태그가 맞을 때
                         // 포스트 아이디로 포스트 이미지 조회
                         List<PostFileEntity> fileList = postFileRepository.findByPostId(contentLinktagEntity.getBoardId().getPostId());
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("missionId", mission.getLinkMissionId());
-                        map.put("tagId", mission.getLinkTagId().getId());
-                        map.put("tagName", mission.getLinkTagId().getKeyword());
-                        map.put("postId", contentLinktagEntity.getBoardId().getPostId());
-                        System.out.println("fileList"+fileList);
-//                        System.out.println("fileList.get(0)"+fileList.get(0));
-//                        System.out.println("fileList.get(0).getFileUrl())"+fileList.get(0).getFileUrl());
+                        CompleteMissionDTO myMission = new CompleteMissionDTO();
+                        myMission.setMissionId(mission.getLinkMissionId());
+                        myMission.setLinkTagId(mission.getLinkTagId().getId());
+                        myMission.setKeyword(mission.getLinkTagId().getKeyword());
+                        myMission.setPostId(contentLinktagEntity.getBoardId().getPostId());
                         if(fileList.size()<1 || fileList.get(0)==null){
-                            map.put("postImgUrl", "이미지가 없습니다.");
+                            myMission.setPostImgUrl("이미지가 없습니다.");
                         } else {
-                            map.put("postImgUrl", fileList.get(0).getFileUrl());
+                            myMission.setPostImgUrl(fileList.get(0).getFileUrl());
                         }
-                        tagList.add(map);
+                        myMissionList.add(myMission);
                     }
                 }
             }
         }
 
-        if (tagList.isEmpty()) {
+        // 상대방 아이디로 유저 게시글 작성시간을 기준으로 월로 조회해서 전부 가져오기
+        UserEntity partner;
+        CoupleEntity couple = coupleService.findByUser1_IdOrUser2_Id(userId);
+        if(couple.getUser1().getUserId()==userId) {
+            partner = couple.getUser2();
+        } else {
+            partner = couple.getUser1();
+        }
+        List<PostEntity> partnerPostList = postRepository.findAllByUserIdAndMonth(partner.getUserId(), year, month);
+        System.out.println("partnerPostList : "+partnerPostList);
+
+        List<CompleteMissionDTO> partnerMissionList = new ArrayList<>();
+
+        for(PostEntity postEntity : partnerPostList){
+            // 상대방이 작성한 게시글들의 아이디로 정보 조회
+            List<ContentLinktagEntity> contentList = contentLinktagRepository.findByBoardId(postEntity);
+            for(ContentLinktagEntity contentLinktagEntity : contentList){
+                // 게시글들의 태그 아이디와 미션태그의 태그 아이디를 비교해서 맞으면 저장
+                for(LinkMissionEntity mission : missionList){
+                    if(contentLinktagEntity.getLinktagId()==mission.getLinkTagId()){
+                        // 이번달의 태그와 이번달 작성한 게시글의 태그가 맞을 때
+                        // 포스트 아이디로 포스트 이미지 조회
+                        List<PostFileEntity> fileList = postFileRepository.findByPostId(contentLinktagEntity.getBoardId().getPostId());
+                        CompleteMissionDTO myMission = new CompleteMissionDTO();
+                        myMission.setMissionId(mission.getLinkMissionId());
+                        myMission.setLinkTagId(mission.getLinkTagId().getId());
+                        myMission.setKeyword(mission.getLinkTagId().getKeyword());
+                        myMission.setPostId(contentLinktagEntity.getBoardId().getPostId());
+                        if(fileList.size()<1 || fileList.get(0)==null){
+                            myMission.setPostImgUrl("이미지가 없습니다.");
+                        } else {
+                            myMission.setPostImgUrl(fileList.get(0).getFileUrl());
+                        }
+                        partnerMissionList.add(myMission);
+                    }
+                }
+            }
+        }
+
+        // 상대방이 완료한 미션이 있는지 확인하고 있으면 추가하고 겹치면 추가 안하기
+        // 1. myMissionList의 linktagId를 Set에 저장
+        Set<Long> myMissionLinktagIds = myMissionList.stream()
+                .map(CompleteMissionDTO::getLinkTagId)
+                .collect(Collectors.toSet());
+
+        // 2. partnerMissionList를 순회하며 myMissionList에 없는 linktagId를 추가
+        for (CompleteMissionDTO partnerMission : partnerMissionList) {
+            if (!myMissionLinktagIds.contains(partnerMission.getLinkTagId())) {
+                myMissionList.add(partnerMission); // 없는 linktagId의 partnerMission을 myMissionList에 추가
+                myMissionLinktagIds.add(partnerMission.getLinkTagId()); // 중복 방지를 위해 Set에도 추가
+            }
+        }
+
+
+        if (myMissionList.isEmpty()) {
             return new ArrayList<>();
         }
 
-        List<Map<String, Object>> completeTag = new ArrayList<>(tagList);
+//        List<Map<String, Object>> completeTag = new ArrayList<>(tagList);
 
-        return completeTag;
+        return myMissionList;
     }
 }
