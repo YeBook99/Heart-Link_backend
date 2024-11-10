@@ -82,6 +82,7 @@ public class SecurityConfig {
 						.antMatchers("/login/**").permitAll()
 						.antMatchers("/reissue").permitAll()
 						.antMatchers("/message").permitAll()
+						.antMatchers("/notifications/subscribe/**").permitAll()
 						.antMatchers("/user/find/loginId").permitAll()
 						.antMatchers("/user/update/password").permitAll()
 						.antMatchers("/user/profile/**").hasAnyRole("SINGLE","COUPLE", "ADMIN")
