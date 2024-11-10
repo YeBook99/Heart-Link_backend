@@ -81,6 +81,7 @@ public class SecurityConfig {
 						.antMatchers("/oauth2/**").permitAll()
 						.antMatchers("/login/**").permitAll()
 						.antMatchers("/reissue").permitAll()
+						.antMatchers("/message").permitAll()
 						.antMatchers("/user/find/loginId").permitAll()
 						.antMatchers("/user/update/password").permitAll()
 						.antMatchers("/user/profile/**").hasAnyRole("SINGLE","COUPLE", "ADMIN")
@@ -103,7 +104,6 @@ public class SecurityConfig {
 						.antMatchers("/tag/**").hasAnyRole("COUPLE","ADMIN")
 						//message
 						.antMatchers("/dm/**").hasAnyRole("COUPLE","ADMIN")
-						.antMatchers("/message").hasAnyRole("COUPLE","ADMIN")
 						//report
 						.antMatchers("/report").hasAnyRole("COUPLE","ADMIN")
 						//notification
