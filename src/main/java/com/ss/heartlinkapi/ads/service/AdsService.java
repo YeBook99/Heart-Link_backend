@@ -174,15 +174,12 @@ public class AdsService {
                 double price = Double.parseDouble((String)sellingStatus4Wrap.get("__value__"));
                 JSONArray listingInfoWrap = (JSONArray)item.get("listingInfo");
                 JSONObject listingInfo = (JSONObject)listingInfoWrap.get(0);
-                JSONArray watchCountWrap = (JSONArray)listingInfo.get("watchCount");
                 // 조회 수
-//                int viewCount = Integer.parseInt((String)watchCountWrap.get(0));
                 EbayProductDTO productDTO = new EbayProductDTO();
                 productDTO.setTitle(title);
                 productDTO.setImgUrl(imgUrl);
                 productDTO.setSiteUrl(siteUrl);
                 productDTO.setPrice(price);
-//                productDTO.setViewCount(viewCount);
                 productDTO.setCurrency(currency);
                 productDTO.setSearchTime(searchTime);
                 products.add(productDTO);

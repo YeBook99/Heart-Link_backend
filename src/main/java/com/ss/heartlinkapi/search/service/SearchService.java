@@ -74,7 +74,6 @@ public class SearchService {
 
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByKeywordAndTypeAndUserId(keyword, "tag", user.getUserId());
         SearchHistoryEntity elasticEntity;
-//        System.out.println("검색기록 : "+searchHistory);
         if(searchHistoryList != null && searchHistoryList.size() > 0) {
             elasticEntity = searchHistoryList.get(0);
             elasticEntity.setUpdatedAt(LocalDateTime.now());
@@ -104,7 +103,6 @@ public class SearchService {
 
         List<SearchHistoryEntity> searchHistoryList = searchRepository.findByKeywordAndTypeAndUserId(keyword, "tag", user.getUserId());
         SearchHistoryEntity elasticEntity;
-//        System.out.println("검색기록 : "+searchHistory);
 
         if(searchHistoryList != null && searchHistoryList.size() > 0) {
             elasticEntity = searchHistoryList.get(0);
@@ -136,7 +134,6 @@ public class SearchService {
         SearchHistoryEntity elasticEntity = new SearchHistoryEntity();
         SearchHistoryEntity searchHistory;
         String deepLResult;
-//        System.out.println("검색기록 : "+searchHistory);
 
         if(searchHistoryList != null && searchHistoryList.size() > 0) {
             searchHistory = searchHistoryList.get(0);
