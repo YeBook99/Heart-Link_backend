@@ -1,5 +1,8 @@
 package com.ss.heartlinkapi.notification.service;
 
+import com.ss.heartlinkapi.follow.entity.FollowEntity;
+import com.ss.heartlinkapi.follow.repository.FollowRepository;
+import com.ss.heartlinkapi.follow.service.FollowService;
 import com.ss.heartlinkapi.login.dto.CustomUserDetails;
 import com.ss.heartlinkapi.notification.dto.NotificationCommentDTO;
 import com.ss.heartlinkapi.notification.dto.NotificationDTO;
@@ -16,6 +19,7 @@ import com.ss.heartlinkapi.user.repository.ProfileRepository;
 import com.ss.heartlinkapi.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -27,15 +31,12 @@ public class NotificationService {
 
     //    기본 타임아웃 설정
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
-
     private final EmitterRepository emitterRepository;
-
     private final NotificationRepository notificationRepository;
-
     private final PostRepository postRepository;
-
     private final ProfileRepository profileRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     //    구독시 연결 해제 방지를 위해 더미데이터를 보내 연결을 유지시킨다.
     public SseEmitter subscribe(Long userId) {
@@ -181,6 +182,7 @@ public class NotificationService {
 
         for (NotificationEntity notificationEntity : notifications) {
             NotificationDTO notificationDTO = new NotificationDTO();
+            notificationDTO.setId(notificationEntity.getId());
             notificationDTO.setSenderId(notificationEntity.getSenderUserId());
             notificationDTO.setOtherUserImg(notificationEntity.getUserImg());
             notificationDTO.setType(String.valueOf(notificationEntity.getType()));
@@ -191,5 +193,9 @@ public class NotificationService {
         }
 
         return notificationDTOS;
+    }
+
+    public void confirmFollowRequest(Long notificationId) {
+            notificationRepository.deleteById(notificationId);
     }
 }
