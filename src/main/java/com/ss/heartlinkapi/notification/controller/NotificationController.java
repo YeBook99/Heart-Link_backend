@@ -56,10 +56,8 @@ public class NotificationController {
         UserEntity followingUser = userRepository.findById(follower.getUserId()).get();
         UserEntity followerUser = userRepository.findById(senderId).get();
 
-        System.out.println(followerUser.toString());
-        System.out.println(followingUser.toString());
         followService.acceptFollow(followerUser, followingUser);
-        notificationService.confirmFollowRequest(notificationId);
+        notificationService.deleteById(notificationId);
 
         return ResponseEntity.ok("follow request accepted");
 
@@ -67,8 +65,14 @@ public class NotificationController {
 
     //    팔로우 알람 메시지 거절
     @PostMapping("/deny/{notificationId}")
-    public ResponseEntity<String> denyFollowRequest(@PathVariable String notificationId, @AuthenticationPrincipal CustomUserDetails follower, @RequestParam Long following) {
+    public ResponseEntity<String> denyFollowRequest(@PathVariable Long notificationId, @AuthenticationPrincipal CustomUserDetails follower, @RequestParam Long senderId) {
 
-        return ResponseEntity.ok(null);
+        UserEntity followingUser = userRepository.findById(follower.getUserId()).get();
+        UserEntity followerUser = userRepository.findById(senderId).get();
+
+        followService.rejectFollow(followerUser, followingUser);
+        notificationService.deleteById(notificationId);
+
+        return ResponseEntity.ok("follow request denied");
     }
 }

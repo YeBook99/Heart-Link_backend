@@ -195,7 +195,8 @@ public class NotificationService {
         return notificationDTOS;
     }
 
-    public void confirmFollowRequest(Long notificationId) {
+    public void deleteById(Long notificationId) {
             notificationRepository.deleteById(notificationId);
     }
+
 }
