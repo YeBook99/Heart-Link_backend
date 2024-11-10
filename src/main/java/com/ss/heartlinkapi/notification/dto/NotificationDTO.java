@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class NotificationDTO {
+    private Long id;
     private Long senderId;
     private String otherUserImg;    //  상대방 이미지
     private String type;    // 알람의 유형

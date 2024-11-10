@@ -36,8 +36,7 @@ public class NotificationAspect {
     @AfterReturning("execution(* com.ss.heartlinkapi.follow.repository.FollowRepository.save(..)) && args(followEntity)" )
     public void notifyFollow(final JoinPoint joinPoint, final FollowEntity followEntity){
         if(followEntity.isStatus()){
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            notificationService.notifyFollow(authentication.getName(), followEntity.getFollowing().getUserId(), followEntity.getFollower().getUserId());
+            notificationService.notifyFollow(followEntity.getFollower().getLoginId(), followEntity.getFollowing().getUserId(), followEntity.getFollower().getUserId());
         }
     }
 
