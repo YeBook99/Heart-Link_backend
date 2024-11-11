@@ -73,51 +73,53 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 		//user
-				.authorizeHttpRequests(auth -> auth.antMatchers("/user/join").permitAll()
-						.antMatchers("/user/idcheck").permitAll()
-						.antMatchers("/user/account/linking").permitAll()
-						.antMatchers("/user/auth/**").permitAll()
-						.antMatchers("/user/sms/**").permitAll()
-						.antMatchers("/oauth2/**").permitAll()
-						.antMatchers("/login/**").permitAll()
-						.antMatchers("/reissue").permitAll()
-						.antMatchers("/user/find/loginId").permitAll()
-						.antMatchers("/user/update/password").permitAll()
-						.antMatchers("/user/profile/**").hasAnyRole("SINGLE","COUPLE", "ADMIN")
-						.antMatchers("/user/block/**").hasAnyRole("COUPLE", "ADMIN")
-						.antMatchers("/user/couple").hasAnyRole("COUPLE","ADMIN","SINGLE","USER")
-						//follow
-						.antMatchers("/follow/**").hasAnyRole("COUPLE", "ADMIN","SINGLE")
-						//couple
-						.antMatchers("/couple/dday").permitAll()
-						.antMatchers("/couple/unlink").hasRole("COUPLE")
-						.antMatchers("/couple/unlink/cancel").hasRole("SINGLE")
-						.antMatchers("/couple/finalNowUnlink").hasRole("SINGLE")
-						.antMatchers("/couple/match/code/**").hasRole("USER")
-						.antMatchers("/couple/**").hasAnyRole("COUPLE", "ADMIN", "SINGLE")
-						//post
-						.antMatchers("/feed/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
-						.antMatchers("/comment/**").hasAnyRole("COUPLE","ADMIN")
-						.antMatchers("/like/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
-						.antMatchers("/bookmark/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
-						.antMatchers("/tag/**").hasAnyRole("COUPLE","ADMIN")
-						//message
-						.antMatchers("/dm/**").hasAnyRole("COUPLE","ADMIN")
-						.antMatchers("/message").hasAnyRole("COUPLE","ADMIN")
-						//report
-						.antMatchers("/report").hasAnyRole("COUPLE","ADMIN")
-						//notification
-						.antMatchers("/notifications/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
-						//search
-						.antMatchers("/search/**").hasAnyRole("COUPLE","ADMIN")
-						.antMatchers("/es/**").hasAnyRole("COUPLE","ADMIN","USER","SINGLE")
-						//ad
-						.antMatchers("/ads/**").hasAnyRole("COUPLE","ADMIN","SINGLE")
-						//admin
-						.antMatchers("/admin/**").hasRole("ADMIN")
-						//img
-						.antMatchers("/img/**","/images/**").permitAll()
-						.anyRequest().authenticated());
+				.authorizeHttpRequests(auth -> auth
+						.anyRequest().permitAll());
+//						.antMatchers("/user/join").permitAll()
+//						.antMatchers("/user/idcheck").permitAll()
+//						.antMatchers("/user/account/linking").permitAll()
+//						.antMatchers("/user/auth/**").permitAll()
+//						.antMatchers("/user/sms/**").permitAll()
+//						.antMatchers("/oauth2/**").permitAll()
+//						.antMatchers("/login/**").permitAll()
+//						.antMatchers("/reissue").permitAll()
+//						.antMatchers("/user/find/loginId").permitAll()
+//						.antMatchers("/user/update/password").permitAll()
+//						.antMatchers("/user/profile/**").hasAnyRole("SINGLE","COUPLE", "ADMIN")
+//						.antMatchers("/user/block/**").hasAnyRole("COUPLE", "ADMIN")
+//						.antMatchers("/user/couple").hasAnyRole("COUPLE","ADMIN","SINGLE","USER")
+//						//follow
+//						.antMatchers("/follow/**").hasAnyRole("COUPLE", "ADMIN","SINGLE")
+//						//couple
+//						.antMatchers("/couple/dday").permitAll()
+//						.antMatchers("/couple/unlink").hasRole("COUPLE")
+//						.antMatchers("/couple/unlink/cancel").hasRole("SINGLE")
+//						.antMatchers("/couple/finalNowUnlink").hasRole("SINGLE")
+//						.antMatchers("/couple/match/code/**").hasRole("USER")
+//						.antMatchers("/couple/**").hasAnyRole("COUPLE", "ADMIN", "SINGLE")
+//						//post
+//						.antMatchers("/feed/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+//						.antMatchers("/comment/**").hasAnyRole("COUPLE","ADMIN")
+//						.antMatchers("/like/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+//						.antMatchers("/bookmark/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+//						.antMatchers("/tag/**").hasAnyRole("COUPLE","ADMIN")
+//						//message
+//						.antMatchers("/dm/**").hasAnyRole("COUPLE","ADMIN")
+//						.antMatchers("/message").hasAnyRole("COUPLE","ADMIN")
+//						//report
+//						.antMatchers("/report").hasAnyRole("COUPLE","ADMIN")
+//						//notification
+//						.antMatchers("/notifications/**").hasAnyRole("COUPLE","SINGLE","ADMIN")
+//						//search
+//						.antMatchers("/search/**").hasAnyRole("COUPLE","ADMIN")
+//						.antMatchers("/es/**").hasAnyRole("COUPLE","ADMIN","USER","SINGLE")
+//						//ad
+//						.antMatchers("/ads/**").hasAnyRole("COUPLE","ADMIN","SINGLE")
+//						//admin
+//						.antMatchers("/admin/**").hasRole("ADMIN")
+//						//img
+//						.antMatchers("/img/**","/images/**").permitAll()
+//						.anyRequest().authenticated());
         // oauth2
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)).successHandler(customSuccessHandler).failureHandler(customFailureHandler));
         // login
