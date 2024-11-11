@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AddReportDTO {
     private Long userId;
-    private Long commentId;
     private Long postId;
     private String reason;
 }

@@ -30,7 +30,6 @@ public class ReportService {
 		UserEntity user = new UserEntity();
 
 //		각 엔티티에 id값 설정
-		comment.setCommentId(addReportDTO.getCommentId());
 		post.setPostId(addReportDTO.getPostId());
 		user.setUserId(addReportDTO.getUserId());
 
@@ -38,7 +37,6 @@ public class ReportService {
 		ReportEntity reportEntity = new ReportEntity();
 		reportEntity.setUserId(user);
 		reportEntity.setPostId(post);
-		reportEntity.setCommentId(comment);
 		reportEntity.setReason(addReportDTO.getReason());
 		reportEntity.setStatus(Status.valueOf("AWAIT"));
 
