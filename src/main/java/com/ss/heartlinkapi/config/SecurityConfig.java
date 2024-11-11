@@ -106,6 +106,7 @@ public class SecurityConfig {
 //						//message
 //						.antMatchers("/dm/**").hasAnyRole("COUPLE","ADMIN")
 //						.antMatchers("/message").hasAnyRole("COUPLE","ADMIN")
+        				//.antMatchers("/notifications/subscribe/**").permitAll()
 //						//report
 //						.antMatchers("/report").hasAnyRole("COUPLE","ADMIN")
 //						//notification
