@@ -39,7 +39,7 @@ public interface CoupleMatchAnswerRepository extends JpaRepository<LinkMatchAnsw
 
     // 통계 - 오늘 매치 답변에 응답한 인원 수 커플 아이디로 그룹지어 조회하기
     @Query(value = "select count(*) from match_answer where created_at = :today group by couple_id", nativeQuery = true)
-    List<Integer> todayTotalAnswerCountGroupByCoupleId(LocalDate today);
+    List<Integer> todayTotalAnswerCountGroupByCoupleId(@Param("today") LocalDate today);
 
     // 통계 - 오늘 매치 답변에 매치성공한 커플 쌍의 수
     @Query(value = "SELECT COUNT(*) AS matching_couples " +
