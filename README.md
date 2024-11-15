@@ -1,6 +1,4 @@
-<div align="center">
 ## 💘Heart Link _ 커플 SNS
-</div>
 검색 데이터 활용 타겟팅 광고 시스템
 
 > Back-End Develop
