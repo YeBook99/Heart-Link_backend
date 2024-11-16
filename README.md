@@ -6,7 +6,7 @@
 
 <br>
 
-> Back-End Develop
+> Back-End
 > <br>
 > 2024.09.26 ~ 2024.11.10
 
