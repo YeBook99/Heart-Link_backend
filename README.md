@@ -1,5 +1,8 @@
+<div align="center">
+  
 ## 💘 Heart Link _ 커플 SNS
 검색 데이터 활용 타겟팅 광고 시스템
+</div>
 
 <br>
 
@@ -9,20 +12,20 @@
 
 <br>
 
-#### ✏️ Summary
+### ✏️ Summary
 
 ##### '두 사람의 마음을 Heart(하트)로 Link(연결)한다' 는 의미의 커플만의 특별한 추억을 기록하고 공유할 수 있는 소셜 플랫폼입니다.
 ##### 기존의 SNS와 커플 앱을 통합한 새로운 형태의 커플 SNS를 통하여 다양한 커플 미션을 수행하며 관계를 깊이하고, 다른 커플들과도 따뜻한 소통을 나눌 수 있습니다.
 
 <br>
 
-#### 🛠 ️Skills
+### 🛠 ️Skills
 ![Java](https://img.shields.io/badge/Java-007396?style=flat-square&logo=java&logoColor=white) ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) ![React](https://img.shields.io/badge/React-00008B?style=flat-square&logo=react&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=spring-boot&logoColor=white) ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-005571?style=flat-square&logo=elasticsearch&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) ![JPA](https://img.shields.io/badge/JPA-6DB33F?style=flat-square&logo=java&logoColor=white) ![eBay API](https://img.shields.io/badge/eBay%20API-FF0000?style=flat-square&logo=ebay&logoColor=white) ![DeepL API](https://img.shields.io/badge/DeepL%20API-00008B?style=flat-square&logo=deepl&logoColor=white)
 
 <br>
 
-#### 👩‍💻 My Role
-##### 🔍 검색 기능
+### 👩‍💻 My Role
+#### 🔍 검색 기능
 ##### 1. 검색 데이터 관련 광고 수집
 - 영어 검색만 가능한 eBay 광고 API 특성으로 사용자의 검색기록을 DeepL API라는 번역 API를 통하여 번역
 - 번역된 검색기록을 elastic search 인덱스에 저장
@@ -52,14 +55,14 @@
 
 <br>
 
-#### ❌ Difficulties
-##### 1. 광고 API 탐색 과정
+### ❌ Difficulties
+#### 1. 광고 API 탐색 과정
 ###### 어려움
 학생 팀 프로젝트이기 때문에 사업자 등록증이나 실제 판매 수익이 있는 상황이 아니어서 선택지가 매우 찾기 어려웠음.
 ###### 해결방안
 꾸준히 탐색해본 결과 현실적으로 선택할 수 있는 eBay Finding API를 발견하여 사용하였음. 그러나 국내 사이트가 아닌 점으로 영어 검색만 가능하여 번역할 수 있는 DeepL API를 사용하여 번역 후 광고 데이터를 조회함.
 
-##### 2. 검색 시 태그 자동완성 영어 검색 고려
+#### 2. 검색 시 태그 자동완성 영어 검색 고려
 ###### 어려움
 태그를 검색 할 때 같은 내용이지만 언어가 달라 검색되지 않는 태그가 있을 경우를 고려하게 됨.
 (EX. 'date' 태그 검색 -> 'date' 태그는 없지만 '데이트' 태그는 존재할 경우)
@@ -68,9 +71,14 @@ elastic search 인덱스에 원형 필드, 영어 필드, 한글 필드를 만�
 
 <br>
 
-#### 📋 ERD & UseCases
+### 📋 ERD & UseCases
+<div align="center" style="display: inline-block;">
 
+<img src="하트링크 ERD.jpg" alt="Project Logo" style="width: 47%; margin-right:10px; height: auto;" />
+<img src="하트링크 유스케이스.png" alt="Project Logo" style="width: 47%; height: auto;" />
+</div>
 <br>
 
-#### 💡 Front-End
-##### https://github.com/YeBook99/Heart-Link_frontend.git
+### 💡 Front-End
+#### https://github.com/YeBook99/Heart-Link_frontend.git
+
